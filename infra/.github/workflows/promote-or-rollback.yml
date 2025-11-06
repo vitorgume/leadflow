@@ -1,0 +1,49 @@
+name: PROD → Promote/Rollback (App Runner por digest)
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:         { description: "principal | intermediaria | agente", required: true, type: choice, options: [principal, intermediaria, agente] }
+      image_digest:    { description: "sha256:xxxx do ECR (sem o prefixo repo@)", required: true }
+      repository_name: { description: "ECR repo (ex: ura-chatbot-ia ou ura-chatbot-ia-principal)", required: true, default: ura-chatbot-ia }
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION:     ${{ vars.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+  ECR_REGISTRY:   ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: AWS Credentials (OIDC - PROD)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Resolver ARNs do App Runner
+        id: svc
+        run: |
+          case "${{ inputs.service }}" in
+            principal)     SVC_NAME="ura-chatbot-ia-api-principal" ;;
+            intermediaria) SVC_NAME="ura-chatbot-ia-api-intermediaria" ;;
+            agente)        SVC_NAME="ura-chatbot-ia-api-agente" ;;
+          esac
+          ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='${SVC_NAME}'].ServiceArn | [0]" --output text)
+          if [ -z "$ARN" ] || [ "$ARN" = "None" ]; then echo "Service $SVC_NAME not found"; exit 1; fi
+          echo "SERVICE_ARN=$ARN" >> $GITHUB_OUTPUT
+
+      - name: Atualizar imagem do serviço (pin por digest)
+        run: |
+          IMG="${{ env.ECR_REGISTRY }}/${{ inputs.repository_name }}@${{ inputs.image_digest }}"
+          aws apprunner update-service \
+            --service-arn "${{ steps.svc.outputs.SERVICE_ARN }}" \
+            --source-configuration "ImageRepository={ImageRepositoryType=ECR,ImageIdentifier=${IMG}}"
+          echo "Promoted to $IMG"
