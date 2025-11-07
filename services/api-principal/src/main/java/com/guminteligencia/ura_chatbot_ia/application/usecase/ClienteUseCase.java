@@ -25,6 +25,7 @@ public class ClienteUseCase {
 
         Cliente cliente = Cliente.builder()
                 .telefone(telefone)
+                .consentimentoAtendimnento(false)
                 .inativo(false)
                 .build();
 

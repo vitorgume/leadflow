@@ -15,13 +15,13 @@ public class MensagemDataProvider implements MensagemGateway {
 
     private final WebClientExecutor executor;
 
-    @Value("${neoprint.ura.whatsapp.token}")
+    @Value("${app.ura.whatsapp.token}")
     private final String token;
 
-    @Value("${neoprint.ura.whatsapp.id-instance}")
+    @Value("${app.ura.whatsapp.id-instance}")
     private final String idInstance;
 
-    @Value("${neoprint.ura.whatsapp.client-token}")
+    @Value("${app.ura.whatsapp.client-token}")
     private final String clienteToken;
 
     @Value("${spring.profiles.active}")
@@ -29,9 +29,9 @@ public class MensagemDataProvider implements MensagemGateway {
 
     public MensagemDataProvider(
             WebClientExecutor executor,
-            @Value("${neoprint.ura.whatsapp.token}") String token,
-            @Value("${neoprint.ura.whatsapp.id-instance}") String idInstance,
-            @Value("${neoprint.ura.whatsapp.client-token}") String clienteToken,
+            @Value("${app.ura.whatsapp.token}") String token,
+            @Value("${app.ura.whatsapp.id-instance}") String idInstance,
+            @Value("${app.ura.whatsapp.client-token}") String clienteToken,
             @Value("${spring.profiles.active}") String profile
     ) {
         this.executor = executor;

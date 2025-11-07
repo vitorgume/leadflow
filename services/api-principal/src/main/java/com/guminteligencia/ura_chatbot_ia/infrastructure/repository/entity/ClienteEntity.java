@@ -28,6 +28,7 @@ public class ClienteEntity {
     private Boolean consentimentoAtendimnento;
 
     @Enumerated(EnumType.ORDINAL)
+    @Column(name = "tipo_consulta")
     private TipoConsulta tipoConsulta;
 
     @Column(name = "dor_desejo_paciente")

@@ -1,0 +1,1 @@
+ALTER TABLE vendedores ADD id_vendedor_crm INT NOT NULL;

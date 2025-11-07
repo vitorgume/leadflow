@@ -1,0 +1,4 @@
+from .vendedor_entity import VendedorEntity
+from .cliente_entity import ClienteEntity
+from .conversa_entity import ConversaEntity
+from .mensagem_conversa_entity import MensagemConversaEntity

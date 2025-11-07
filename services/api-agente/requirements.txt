@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+openai
+redis
+python-dotenv
+sqlalchemy
+psycopg2-binary
+pymysql
+pytest
+coverage

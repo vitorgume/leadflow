@@ -23,18 +23,15 @@ import java.util.Optional;
 public class CrmUseCase {
 
     private final CrmGateway gateway;
-    private final ChatUseCase chatUseCase;
 
     @Value("${spring.profiles.active}")
     private final String profile;
 
     public CrmUseCase(
             CrmGateway gateway,
-            ChatUseCase chatUseCase,
             @Value("${spring.profiles.active}") String profile
     ) {
         this.gateway = gateway;
-        this.chatUseCase = chatUseCase;
         this.profile = profile;
     }
 
@@ -42,7 +39,6 @@ public class CrmUseCase {
         if(profile.equals("prod")) {
             log.info("Atualizando crm. Vendedor: {}, Cliente: {}, Conversa: {}", vendedor, cliente, conversaAgente);
 
-//            String urlChat = chatUseCase.criar(conversaAgente.getId());
             Integer idLead = this.consultaLeadPeloTelefone(cliente.getTelefone());
 
             log.info("Construindo body para atualizar card.");
