@@ -8,7 +8,16 @@ import org.springframework.stereotype.Component;
 public class MensagemDirecionamentoVendedor implements MensagemType {
     @Override
     public String getMensagem(String nomeVendedor, Cliente cliente) {
-        return "Muito obrigado pelas informações ! Agora você será redirecionado para o(a) " + nomeVendedor + ", logo entrará em contato com você ! Até...";
+        StringBuilder mensagem = new StringBuilder();
+
+        mensagem.append(cliente.getNome()).append("! Sua triagem está completa! 😊").append("\n");
+        mensagem.append("Seu agendamento será tratado com prioridade pela nossa Consultoria, que já tem seu objetivo principal: ").append(cliente.getDorDesejoPaciente())
+                .append("\n");
+        mensagem.append("Nossas atendentes estão finalizando o encaixe do seu horário exclusivo de 1 hora com o Dr. Felipe. Em instantes, elas entrarão em contato para confirmar a data e o endereço da clínica.")
+                .append("\n");
+        mensagem.append("Obrigada pela confiança! Em breve, retornamos com as opções. ✨");
+
+        return mensagem.toString();
     }
 
     @Override

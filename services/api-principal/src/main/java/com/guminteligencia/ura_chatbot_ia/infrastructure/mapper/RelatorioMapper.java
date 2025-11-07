@@ -3,8 +3,8 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.EscolhaNaoIdentificadoException;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.GatewayEnum;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
-import com.guminteligencia.ura_chatbot_ia.domain.Regiao;
-import com.guminteligencia.ura_chatbot_ia.domain.Segmento;
+import com.guminteligencia.ura_chatbot_ia.domain.PreferenciaHorario;
+import com.guminteligencia.ura_chatbot_ia.domain.TipoConsulta;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -17,20 +17,24 @@ public class RelatorioMapper {
                             RelatorioContatoDto relatorio = RelatorioContatoDto.builder()
                                     .nome((String) obj[0])
                                     .telefone((String) obj[1])
-                                    .dataCriacao(((Timestamp) obj[4]).toLocalDateTime())
-                                    .nomeVendedor((String) obj[5])
+                                    .cpf((String) obj[2])
+                                    .consentimentoAtendimnento((Boolean) obj[3])
+                                    .dorDesejoPaciente((String) obj[5])
+                                    .linkMidia((String) obj[6])
+                                    .dataCriacao(((Timestamp) obj[8]).toLocalDateTime())
+                                    .nomeVendedor((String) obj[9])
                                     .build();
 
                             try {
-                                relatorio.setSegmento(GatewayEnum.gatewaySegmentoRelatorio(String.valueOf(obj[2])));
+                                relatorio.setTipoConsulta(GatewayEnum.gateayTipoConsultaRelatorio(String.valueOf(obj[4])));
                             } catch (EscolhaNaoIdentificadoException ex) {
-                                relatorio.setSegmento(Segmento.NAO_INFORMADO);
+                                relatorio.setTipoConsulta(TipoConsulta.NAO_INFORMADO);
                             }
 
                             try {
-                                relatorio.setRegiao(GatewayEnum.gatewayRegiaoRelatorio(String.valueOf(obj[3])));
+                                relatorio.setPreferenciaHorario(GatewayEnum.gatewayPreferenciaHorarioRelatorio(String.valueOf(obj[7])));
                             } catch (EscolhaNaoIdentificadoException ex) {
-                                relatorio.setRegiao(Regiao.NAO_INFORMADA);
+                                relatorio.setPreferenciaHorario(PreferenciaHorario.NAO_INFORMADO);
                             }
 
 

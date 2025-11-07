@@ -9,7 +9,21 @@ public class MensagemRecontatoIantivoG1 implements MensagemType {
 
     @Override
     public String getMensagem(String nomeVendedor, Cliente cliente) {
-        return "Oii! Aqui é da Gráfica Neoprint! Você nos enviou mensagem, mas não deu continuidade no atendimento! Se você quiser que eu te conecte com um vendedor, é só me responder essa mensagem, ok?";
+        StringBuilder mensagem = new StringBuilder();
+
+        mensagem.append(cliente.getNome())
+                .append("notei que paramos nossa conversa e quis retornar para que você não perca o seu lugar na fila de agendamento.")
+                .append("\n");
+
+        mensagem.append("O seu objetivo (")
+                .append(cliente.getDorDesejoPaciente())
+                .append(") já estava quase sendo encaminhado para a avaliação de 1 hora com o Dr. Felipe.")
+                .append("\n");
+
+        mensagem.append("Podemos dar sequência agora? A agenda do Dr. Felipe está com poucos horários disponíveis, e gostaria de garantir que você de início ao seu tratamento! 😊");
+
+
+        return mensagem.toString();
     }
 
     @Override

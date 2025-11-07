@@ -1,12 +1,8 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
-import com.guminteligencia.ura_chatbot_ia.application.gateways.RelatorioGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioOnlineDto;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
-import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
@@ -20,7 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
 
@@ -32,7 +27,6 @@ public class RelatorioUseCase {
     private final ClienteUseCase clienteUseCase;
     private final OutroContatoUseCase outroContatoUseCase;
     private final MensagemUseCase mensagemUseCase;
-    private final RelatorioGateway gateway;
 
     @Scheduled(cron = "0 0 17 * * MON-FRI")
     public void enviarRelatorioDiarioVendedores() {
@@ -46,13 +40,11 @@ public class RelatorioUseCase {
             relatorio = clienteUseCase.getRelatorio();
         }
 
-        OutroContato gerencia = outroContatoUseCase.consultarPorNome("Ney");
-        OutroContato consultor = outroContatoUseCase.consultarPorNome("Ricardo");
+        OutroContato gerencia = outroContatoUseCase.consultarPorNome("");
 
         String arquivo = gerarArquivo(relatorio);
 
         mensagemUseCase.enviarRelatorio(arquivo, "Relatorio.xlsx", gerencia.getTelefone());
-        mensagemUseCase.enviarRelatorio(arquivo, "Relatorio.xlsx", consultor.getTelefone());
 
         log.info("Geração de relatório dos contatos dos vendedores concluida com sucesso.");
     }
@@ -64,20 +56,28 @@ public class RelatorioUseCase {
             Row header = sheet.createRow(0);
             header.createCell(0).setCellValue("Nome");
             header.createCell(1).setCellValue("Telefone");
-            header.createCell(2).setCellValue("Segmento");
-            header.createCell(3).setCellValue("Região");
-            header.createCell(4).setCellValue("Data de Criação");
-            header.createCell(5).setCellValue("Vendedor");
+            header.createCell(2).setCellValue("Cpf");
+            header.createCell(3).setCellValue("Consentimento Atendimento");
+            header.createCell(4).setCellValue("Tipo Consulta");
+            header.createCell(5).setCellValue("Dor / Desejo do paciente");
+            header.createCell(6).setCellValue("Link da Mídia");
+            header.createCell(7).setCellValue("Preferência Horário");
+            header.createCell(8).setCellValue("Data de criação");
+            header.createCell(9).setCellValue("Nome vendedor");
 
             int rowNum = 1;
             for (RelatorioContatoDto dto : contatos) {
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(dto.getNome());
                 row.createCell(1).setCellValue(dto.getTelefone());
-                row.createCell(2).setCellValue(dto.getSegmento().getDescricao());
-                row.createCell(3).setCellValue(dto.getRegiao().getDescricao());
-                row.createCell(4).setCellValue(dto.getDataCriacao().toString());
-                row.createCell(5).setCellValue(dto.getNomeVendedor());
+                row.createCell(2).setCellValue(dto.getCpf());
+                row.createCell(3).setCellValue(dto.getConsentimentoAtendimnento());
+                row.createCell(4).setCellValue(dto.getTipoConsulta().getDescricao());
+                row.createCell(5).setCellValue(dto.getDorDesejoPaciente());
+                row.createCell(6).setCellValue(dto.getLinkMidia());
+                row.createCell(7).setCellValue(dto.getPreferenciaHorario().getDescricao());
+                row.createCell(8).setCellValue(dto.getDataCriacao().toString());
+                row.createCell(9).setCellValue(dto.getNomeVendedor());
             }
 
             for (int i = 0; i < 6; i++) {

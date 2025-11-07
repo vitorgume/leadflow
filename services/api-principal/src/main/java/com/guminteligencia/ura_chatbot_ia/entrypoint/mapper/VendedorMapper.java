@@ -11,10 +11,9 @@ public class VendedorMapper {
                 .nome(dto.getNome())
                 .telefone(dto.getTelefone())
                 .inativo(dto.getInativo())
-                .segmentos(dto.getSegmentos())
-                .regioes(dto.getRegioes())
                 .prioridade(dto.getPrioridade())
                 .idVendedorCrm(dto.getIdVendedorCrm())
+                .padrao(dto.getPadrao())
                 .build();
     }
 
@@ -24,10 +23,9 @@ public class VendedorMapper {
                 .nome(domain.getNome())
                 .telefone(domain.getTelefone())
                 .inativo(domain.getInativo())
-                .segmentos(domain.getSegmentos())
-                .regioes(domain.getRegioes())
                 .prioridade(domain.getPrioridade())
                 .idVendedorCrm(domain.getIdVendedorCrm())
+                .padrao(domain.getPadrao())
                 .build();
     }
 }

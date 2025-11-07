@@ -1,7 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.gateways;
 
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.CardDto;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.SessaoArquivoDto;
 
 import java.util.Optional;
 

@@ -1,8 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
 import com.guminteligencia.ura_chatbot_ia.application.gateways.VendedorGateway;
-import com.guminteligencia.ura_chatbot_ia.domain.Regiao;
-import com.guminteligencia.ura_chatbot_ia.domain.Segmento;
 import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.VendedorMapper;
@@ -28,6 +26,7 @@ public class VendedorDataProvider implements VendedorGateway {
     private final String MENSAGEM_ERRO_DELETAR_VENDEDOR = "Erro ao deletar vendedor.";
     private final String MENSAGEM_ERRO_CONSULTAR_POR_ID = "Erro ao consultar vendedor pelo seu id.";
     private final String MENSAGEM_ERRO_LISTAR_ATIVOS = "Erro ao listar vendedores ativos.";
+    private final String MENSAGEM_ERRO_CONSULTAR_VENDEDOR_PADRAO = "Erro ao consultar vendedor padrão.";
     private final VendedorRepository repository;
 
     @Override
@@ -136,5 +135,19 @@ public class VendedorDataProvider implements VendedorGateway {
         }
 
         return vendedorEntities.stream().map(VendedorMapper::paraDomain).toList();
+    }
+
+    @Override
+    public Optional<Vendedor> consultarVendedorPadrao() {
+        Optional<VendedorEntity> vendedorEntity;
+
+        try {
+            vendedorEntity = repository.findByPadraoIsTrue();
+        } catch (Exception ex) {
+            log.error(MENSAGEM_ERRO_CONSULTAR_VENDEDOR_PADRAO, ex);
+            throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_VENDEDOR_PADRAO, ex.getCause());
+        }
+
+        return vendedorEntity.map(VendedorMapper::paraDomain);
     }
 }

@@ -78,14 +78,6 @@ public class VendedorUseCase {
         return vendedor.get();
     }
 
-    public Vendedor roletaVendedoresConversaInativa(Cliente cliente) {
-        if (cliente.getSegmento() != null) {
-            return escolherVendedor(cliente);
-        }
-
-        return this.consultarVendedor(this.roletaVendedores("Nilza"));
-    }
-
     public Vendedor alterar(Vendedor novosDados, Long idVendedor) {
         log.info("Alterando dados do vendedor. Novos dados: {}, Id vendedor: {}", novosDados, idVendedor);
 
@@ -124,6 +116,16 @@ public class VendedorUseCase {
         Optional<Vendedor> vendedor = gateway.consultarPorId(idVendedor);
 
         if (vendedor.isEmpty()) {
+            throw new VendedorNaoEncontradoException();
+        }
+
+        return vendedor.get();
+    }
+
+    public Vendedor consultarVendedorPadrao() {
+        Optional<Vendedor> vendedor = gateway.consultarVendedorPadrao();
+
+        if(vendedor.isEmpty()) {
             throw new VendedorNaoEncontradoException();
         }
 

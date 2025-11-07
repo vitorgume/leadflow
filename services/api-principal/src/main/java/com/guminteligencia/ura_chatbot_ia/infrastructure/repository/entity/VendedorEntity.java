@@ -1,12 +1,8 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity;
 
 import com.guminteligencia.ura_chatbot_ia.domain.Prioridade;
-import com.guminteligencia.ura_chatbot_ia.domain.Regiao;
-import com.guminteligencia.ura_chatbot_ia.domain.Segmento;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 @Entity(name = "Vendedor")
 @Table(name = "vendedores")
@@ -25,12 +21,12 @@ public class VendedorEntity {
     private String nome;
     private String telefone;
     private Boolean inativo;
-    private List<Segmento> segmentos;
-    private List<Regiao> regioes;
 
     @Column(name = "id_vendedor_crm")
     private Integer idVendedorCrm;
 
     @Embedded
     private Prioridade prioridade;
+
+    private Boolean padrao;
 }

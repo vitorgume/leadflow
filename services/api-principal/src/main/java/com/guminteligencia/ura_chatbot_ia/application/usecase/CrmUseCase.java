@@ -49,13 +49,13 @@ public class CrmUseCase {
 
             List<CustomFieldDto> customFieldDtos = new ArrayList<>();
 
-            addTextIfPresent(customFieldDtos, 1484843, cliente.getDescricaoMaterial());
-
-            customFieldDtos.add(selectField(1486843, cliente.getSegmento() == null ? 1242461 : cliente.getSegmento().getIdCrm()));
-
-            customFieldDtos.add(selectField(1486845, cliente.getRegiao() == null ? 1242469 : cliente.getRegiao().getIdCrm()));
-
-            addTextIfPresent(customFieldDtos, 1486847, cliente.getEnderecoReal());
+//            addTextIfPresent(customFieldDtos, 1484843, cliente.getDescricaoMaterial());
+//
+//            customFieldDtos.add(selectField(1486843, cliente.getSegmento() == null ? 1242461 : cliente.getSegmento().getIdCrm()));
+//
+//            customFieldDtos.add(selectField(1486845, cliente.getRegiao() == null ? 1242469 : cliente.getRegiao().getIdCrm()));
+//
+//            addTextIfPresent(customFieldDtos, 1486847, cliente.getEnderecoReal());
 
             addTextIfPresent(customFieldDtos, 1486849, "");
 

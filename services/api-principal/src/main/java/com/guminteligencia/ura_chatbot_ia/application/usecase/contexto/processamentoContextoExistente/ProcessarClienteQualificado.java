@@ -34,14 +34,16 @@ public class ProcessarClienteQualificado implements ProcessamentoContextoExisten
 
         Cliente clienteQualificado = Cliente.builder()
                 .nome(qualificacao.getNome())
-                .regiao(EnumMapper.regiaoMapper(qualificacao.getRegiao()))
-                .segmento(EnumMapper.segmentoMapper(qualificacao.getSegmento()))
-                .descricaoMaterial(qualificacao.getDescricaoMaterial())
-                .enderecoReal(qualificacao.getEnderecoReal())
+                .cpf(qualificacao.getCpf())
+                .consentimentoAtendimnento(qualificacao.getConsentimentoAtendimnento())
+                .tipoConsulta(EnumMapper.tipoConsultaMapper(qualificacao.getTipoConsulta()))
+                .dorDesejoPaciente(qualificacao.getDorDesejoPaciente())
+                .linkMidia(qualificacao.getLinkMidia())
+                .preferenciaHorario(EnumMapper.preferenciaHorarioMapper(qualificacao.getPreferenciaHorario()))
                 .build();
 
         Cliente clienteSalvo = clienteUseCase.alterar(clienteQualificado, conversaAgente.getCliente().getId());
-        Vendedor vendedor = vendedorUseCase.escolherVendedor(clienteSalvo);
+        Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
         conversaAgente.setStatus(StatusConversa.ATIVO);
 
         mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.MENSAGEM_DIRECIONAMENTO_VENDEDOR, vendedor.getNome(), null), clienteSalvo.getTelefone(), false);

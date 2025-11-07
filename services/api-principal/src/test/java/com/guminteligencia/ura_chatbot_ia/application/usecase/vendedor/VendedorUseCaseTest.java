@@ -5,7 +5,6 @@ import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEnco
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEscolhidoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.VendedorGateway;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
-import com.guminteligencia.ura_chatbot_ia.domain.Segmento;
 import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -140,35 +139,35 @@ class VendedorUseCaseTest {
         );
     }
 
-    @Test
-    void roletaVendedoresConversaInativaSeSegmentoNaoNuloChamaEscolher() {
-        Cliente cli = Cliente.builder().build();
-        cli.setSegmento(null);
-
-        cli.setSegmento(null);
-        Cliente cli2 = Cliente.builder().build();
-        cli2.setSegmento(Segmento.MEDICINA_SAUDE);
-        Vendedor v = Vendedor.builder().nome("X").build();
-        when(escolhaComposite.escolher(eq(cli2), anyList()))
-                .thenReturn(Optional.of(v));
-
-        Vendedor res = useCase.roletaVendedoresConversaInativa(cli2);
-        assertSame(v, res);
-    }
-
-    @Test
-    void roletaVendedoresConversaInativaSeSegmentoNuloChamaRoletaEConsultar() {
-        Cliente cli = Cliente.builder().build();
-        cli.setSegmento(null);
-
-        VendedorUseCase spyUC = spy(useCase);
-        doReturn("NM").when(spyUC).roletaVendedores("Nilza");
-        Vendedor v = Vendedor.builder().nome("NM").build();
-        when(gateway.consultarVendedor("NM")).thenReturn(Optional.of(v));
-
-        Vendedor res = spyUC.roletaVendedoresConversaInativa(cli);
-        assertSame(v, res);
-    }
+//    @Test
+//    void roletaVendedoresConversaInativaSeSegmentoNaoNuloChamaEscolher() {
+//        Cliente cli = Cliente.builder().build();
+//        cli.setSegmento(null);
+//
+//        cli.setSegmento(null);
+//        Cliente cli2 = Cliente.builder().build();
+//        cli2.setSegmento(Segmento.MEDICINA_SAUDE);
+//        Vendedor v = Vendedor.builder().nome("X").build();
+//        when(escolhaComposite.escolher(eq(cli2), anyList()))
+//                .thenReturn(Optional.of(v));
+//
+//        Vendedor res = useCase.roletaVendedoresConversaInativa(cli2);
+//        assertSame(v, res);
+//    }
+//
+//    @Test
+//    void roletaVendedoresConversaInativaSeSegmentoNuloChamaRoletaEConsultar() {
+//        Cliente cli = Cliente.builder().build();
+//        cli.setSegmento(null);
+//
+//        VendedorUseCase spyUC = spy(useCase);
+//        doReturn("NM").when(spyUC).roletaVendedores("Nilza");
+//        Vendedor v = Vendedor.builder().nome("NM").build();
+//        when(gateway.consultarVendedor("NM")).thenReturn(Optional.of(v));
+//
+//        Vendedor res = spyUC.roletaVendedoresConversaInativa(cli);
+//        assertSame(v, res);
+//    }
 
     @Test
     void alterarDeveChamarSalvarERetornar() {

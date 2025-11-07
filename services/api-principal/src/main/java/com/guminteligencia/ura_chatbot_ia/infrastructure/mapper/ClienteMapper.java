@@ -9,12 +9,13 @@ public class ClienteMapper {
                 .id(entity.getId())
                 .nome(entity.getNome())
                 .telefone(entity.getTelefone())
-                .regiao(entity.getRegiao())
-                .segmento(entity.getSegmento())
+                .cpf(entity.getCpf())
+                .consentimentoAtendimnento(entity.getConsentimentoAtendimnento())
+                .tipoConsulta(entity.getTipoConsulta())
+                .dorDesejoPaciente(entity.getDorDesejoPaciente())
+                .linkMidia(entity.getLinkMidia())
+                .preferenciaHorario(entity.getPreferenciaHorario())
                 .inativo(entity.isInativo())
-                .descricaoMaterial(entity.getDescricaoMaterial())
-                .canal(entity.getCanal())
-                .enderecoReal(entity.getEnderecoReal())
                 .build();
     }
 
@@ -23,12 +24,13 @@ public class ClienteMapper {
                 .id(domain.getId())
                 .nome(domain.getNome())
                 .telefone(domain.getTelefone())
-                .regiao(domain.getRegiao())
-                .segmento(domain.getSegmento())
+                .cpf(domain.getCpf())
+                .consentimentoAtendimnento(domain.getConsentimentoAtendimnento())
+                .tipoConsulta(domain.getTipoConsulta())
+                .dorDesejoPaciente(domain.getDorDesejoPaciente())
+                .linkMidia(domain.getLinkMidia())
+                .preferenciaHorario(domain.getPreferenciaHorario())
                 .inativo(domain.isInativo())
-                .descricaoMaterial(domain.getDescricaoMaterial())
-                .canal(domain.getCanal())
-                .enderecoReal(domain.getEnderecoReal())
                 .build();
     }
 }

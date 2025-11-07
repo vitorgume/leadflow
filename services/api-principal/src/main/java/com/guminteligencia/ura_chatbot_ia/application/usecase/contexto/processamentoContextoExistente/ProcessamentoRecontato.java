@@ -19,7 +19,6 @@ public class ProcessamentoRecontato implements ProcessamentoContextoExistenteTyp
 
     private final MensagemUseCase mensagemUseCase;
     private final MensagemBuilder mensagemBuilder;
-    private final OutroContatoUseCase outroContatoUseCase;
     private final ConversaAgenteUseCase conversaAgenteUseCase;
 
     @Override
@@ -27,10 +26,8 @@ public class ProcessamentoRecontato implements ProcessamentoContextoExistenteTyp
         log.info("Processando recontato. Resposta: {}, ConversaAgente: {}, Cliente: {}", resposta, conversaAgente, cliente);
         if(!conversaAgente.getRecontato()) {
             Vendedor vendedor = conversaAgente.getVendedor();
-            mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.MENSAGEM_RECONTATO_VENDEDOR, vendedor.getNome(), null), cliente.getTelefone(), false);
 
-            OutroContato outroContato = outroContatoUseCase.consultarPorNome("Ana");
-            mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.MENSAGEM_ALERTA_RECONTATO, vendedor.getNome(), cliente), outroContato.getTelefone(), false);
+            mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.MENSAGEM_RECONTATO_VENDEDOR, vendedor.getNome(), null), cliente.getTelefone(), false);
             mensagemUseCase.enviarContato(vendedor, cliente);
 
             conversaAgente.setRecontato(true);

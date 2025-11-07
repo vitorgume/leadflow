@@ -28,7 +28,7 @@ public class ProcessarConversaInativa implements ProcessamentoContextoExistenteT
     public void processar(String resposta, ConversaAgente conversaAgente, Cliente cliente) {
         log.info("Processando conversa inativa. Resposta: {}, Conversa: {}, Cliente: {}", resposta, conversaAgente, cliente);
         conversaAgente.setFinalizada(true);
-        Vendedor vendedor = vendedorUseCase.roletaVendedoresConversaInativa(cliente);
+        Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
         conversaAgente.setVendedor(vendedor);
         mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.RECONTATO_INATIVO_G1_DIRECIONAMENTO_VENDEDOR, vendedor.getNome(), null), cliente.getTelefone(), false);
         mensagemUseCase.enviarContato(vendedor, cliente);

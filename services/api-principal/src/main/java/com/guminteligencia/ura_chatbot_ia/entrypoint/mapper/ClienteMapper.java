@@ -10,12 +10,13 @@ public class ClienteMapper {
                 .id(cliente.getId())
                 .nome(cliente.getNome())
                 .telefone(cliente.getTelefone())
-                .regiao(cliente.getRegiao())
-                .segmento(cliente.getSegmento())
+                .cpf(cliente.getCpf())
+                .consentimentoAtendimnento(cliente.getConsentimentoAtendimnento())
+                .tipoConsulta(cliente.getTipoConsulta())
+                .dorDesejoPaciente(cliente.getDorDesejoPaciente())
+                .linkMidia(cliente.getLinkMidia())
+                .preferenciaHorario(cliente.getPreferenciaHorario())
                 .inativo(cliente.isInativo())
-                .descricaoMaterial(cliente.getDescricaoMaterial())
-                .canal(cliente.getCanal())
-                .enderecoReal(cliente.getEnderecoReal())
                 .build();
     }
 }

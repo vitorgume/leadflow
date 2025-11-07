@@ -12,12 +12,20 @@ import lombok.*;
 public class Qualificacao {
 
     private String nome;
-    private int segmento;
-    private int regiao;
+    private String cpf;
 
-    @JsonProperty("descricao_material")
-    private String descricaoMaterial;
+    @JsonProperty("consentimento_atendimento")
+    private Boolean consentimentoAtendimnento;
 
-    @JsonProperty("endereco_real")
-    private String enderecoReal;
+    @JsonProperty("tipo_consulta")
+    private Integer tipoConsulta;
+
+    @JsonProperty("dor_desejo_paciente")
+    private String dorDesejoPaciente;
+
+    @JsonProperty("link_midia")
+    private String linkMidia;
+
+    @JsonProperty("preferencia_horario")
+    private Integer preferenciaHorario;
 }

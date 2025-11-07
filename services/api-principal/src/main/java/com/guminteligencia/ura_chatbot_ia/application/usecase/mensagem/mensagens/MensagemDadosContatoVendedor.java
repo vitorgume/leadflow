@@ -24,18 +24,40 @@ public class MensagemDadosContatoVendedor implements MensagemType {
             mensagem.append("Nome: ").append("Nome não informado").append("\n");
         }
 
-        if(cliente.getSegmento() != null) {
-            mensagem.append("Segmento: ").append(cliente.getSegmento().getDescricao()).append("\n");
+        if(cliente.getCpf() != null) {
+            mensagem.append("Cpf: ").append(cliente.getCpf()).append("\n");
         } else {
-            mensagem.append("Segmento: ").append("Segmento não informado").append("\n");
+            mensagem.append("Cpf: ").append("Cpf não informado").append("\n");
         }
 
-        mensagem.append("Hora: ").append(horaMinutos).append("\n");
-
-        if(cliente.getRegiao() != null) {
-            mensagem.append("Região: ").append(cliente.getRegiao().getDescricao()).append("\n");
+        if(cliente.getConsentimentoAtendimnento() != null) {
+            mensagem.append("Consentimento Atendimento: ").append(cliente.getConsentimentoAtendimnento()).append("\n");
         } else {
-            mensagem.append("Região: ").append("Região não informada").append("\n");
+            mensagem.append("Consentimento Atendimento: ").append("Consentimento atendimento não informado").append("\n");
+        }
+
+        if(cliente.getTipoConsulta() != null) {
+            mensagem.append("Tipo da Consutla: ").append(cliente.getTipoConsulta().getDescricao()).append("\n");
+        } else {
+            mensagem.append("Tipo da Consulta: ").append("Tipo da consulta não informado.").append("\n");
+        }
+
+        if(cliente.getDorDesejoPaciente() != null) {
+            mensagem.append("Dor do Paciente: ").append(cliente.getDorDesejoPaciente()).append("\n");
+        } else {
+            mensagem.append("Dor do Paciente: ").append("Dor do paciente não informada").append("\n");
+        }
+
+        if(cliente.getLinkMidia() != null) {
+            mensagem.append("Link da Mídia: ").append(cliente.getLinkMidia()).append("\n");
+        } else {
+            mensagem.append("Link da Mídia: ").append("Link da mídia do usuário não recebida.").append("\n");
+        }
+
+        if(cliente.getPreferenciaHorario() != null) {
+            mensagem.append("Preferência de Horário: ").append(cliente.getPreferenciaHorario().getDescricao()).append("\n");
+        } else {
+            mensagem.append("Preferência de Horário: ").append("Preferência de horário não informada").append("\n");
         }
 
         if(cliente.getTelefone() != null) {
@@ -44,11 +66,7 @@ public class MensagemDadosContatoVendedor implements MensagemType {
             mensagem.append("Telefone: ").append("Telefone não informado").append("\n");
         }
 
-        if(cliente.getDescricaoMaterial() != null) {
-            mensagem.append("Descrição material: ").append(cliente.getDescricaoMaterial());
-        } else {
-            mensagem.append("Descrição material: ").append("Descrição material não informado.");
-        }
+        mensagem.append("Hora: ").append(horaMinutos).append("\n");
 
         return mensagem.toString();
     }

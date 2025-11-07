@@ -10,10 +10,9 @@ public class VendedorMapper {
                 .nome(entity.getNome())
                 .inativo(entity.getInativo())
                 .telefone(entity.getTelefone())
-                .segmentos(entity.getSegmentos())
-                .regioes(entity.getRegioes())
                 .prioridade(entity.getPrioridade())
                 .idVendedorCrm(entity.getIdVendedorCrm())
+                .padrao(entity.getPadrao())
                 .build();
     }
 
@@ -23,10 +22,9 @@ public class VendedorMapper {
                 .nome(domain.getNome())
                 .inativo(domain.getInativo())
                 .telefone(domain.getTelefone())
-                .segmentos(domain.getSegmentos())
-                .regioes(domain.getRegioes())
                 .prioridade(domain.getPrioridade())
                 .idVendedorCrm(domain.getIdVendedorCrm())
+                .padrao(domain.getPadrao())
                 .build();
     }
 }
