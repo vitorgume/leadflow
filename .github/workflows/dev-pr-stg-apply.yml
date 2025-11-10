@@ -2,8 +2,9 @@ name: STG (development) - Build, Infra & Migrations via PR
 
 on:
   pull_request:
-    branches: ["development"]
+    branches: ["main"]                 # alvo do PR
     types: [opened, synchronize, reopened]
+    # opcional: remova se quiser disparar sempre
     paths:
       - "services/**"
       - "infra/**"
@@ -19,29 +20,22 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # -------- Naming / imagens --------
   ECR_REGISTRY: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
   TAG_PREFIX: pr-${{ github.event.pull_request.number }}
   IMAGE_TAG_INTER:  pr-${{ github.event.pull_request.number }}-inter
   IMAGE_TAG_AGENT:  pr-${{ github.event.pull_request.number }}-agent
   IMAGE_TAG_PRINC:  pr-${{ github.event.pull_request.number }}-principal
-
-  # -------- NAME PREFIX (reuso no TF e na leitura do secret) --------
   NAME_PREFIX: ura-chatbot-ia-pr-${{ github.event.pull_request.number }}
-
-  # -------- Terraform TF_VAR_* --------
   TF_VAR_region: ${{ vars.AWS_REGION }}
   TF_VAR_name_prefix: ${{ env.NAME_PREFIX }}
   TF_VAR_account_id: ${{ vars.AWS_ACCOUNT_ID }}
-  TF_VAR_ecr_repository: ${{ vars.ECR_REPOSITORY }}
+  TF_VAR_ecr_repository: ${{ env.ECR_REPOSITORY }}
   TF_VAR_image_tag_api_intermediaria: ${{ env.IMAGE_TAG_INTER }}
   TF_VAR_image_tag_api_agente:        ${{ env.IMAGE_TAG_AGENT }}
   TF_VAR_image_tag_api_principal:     ${{ env.IMAGE_TAG_PRINC }}
   TF_VAR_rds_db_name: app_stg
   TF_VAR_APP_CRM_URL: ${{ vars.APP_CRM_URL }}
-
-  # -------- Diretórios --------
   SERVICE_INTER_PATH: services/api-intermediaria
   SERVICE_AGENT_PATH: services/api-agente
   SERVICE_PRINC_PATH: services/api-principal
@@ -52,7 +46,7 @@ jobs:
   build-infra-migrate:
     name: Build images → Terraform apply → Flyway migrate
     runs-on: ubuntu-latest
-    environment: development
+    environment: development   # garanta que o Environment "development" existe
 
     steps:
       - name: Checkout
@@ -67,7 +61,6 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      # ---------- Build & Push ----------
       - name: Build & Push - api-intermediaria
         uses: docker/build-push-action@v6
         with:
@@ -95,7 +88,6 @@ jobs:
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cache-principal
           cache-to:   type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cache-principal,mode=max
 
-      # ---------- Terraform ----------
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -107,7 +99,6 @@ jobs:
             -backend-config="key=apprunner/pr-${{ github.event.pull_request.number }}/terraform.tfstate" \
             -backend-config="region=${{ vars.AWS_REGION }}"
 
-      # Exporte apenas os TF_VAR sensíveis que faltam
       - name: Export TF VARs (sensitive)
         run: |
           echo "TF_VAR_OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY_STG }}" >> $GITHUB_ENV
@@ -122,7 +113,6 @@ jobs:
         working-directory: ${{ env.INFRA_DIR }}
         run: terraform apply -auto-approve
 
-      # ---------- Flyway usando o Secret JSON ----------
       - name: Install tools (jq)
         run: sudo apt-get update && sudo apt-get install -y jq
 
