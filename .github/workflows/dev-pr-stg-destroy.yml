@@ -2,7 +2,7 @@ name: STG (development) - Destroy on PR close
 
 on:
   pull_request:
-    branches: ["main"]         # ou "development", conforme seu alvo de PR
+    branches: ["main"]         # ou ["development"], conforme o alvo dos seus PRs
     types: [closed]
 
 permissions:
@@ -14,23 +14,37 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  # -------- Identidade do PR --------
+  NAME_PREFIX: ura-chatbot-ia-pr-${{ github.event.pull_request.number }}
+
+  # -------- Vars do Terraform --------
+  TF_VAR_region: ${{ vars.AWS_REGION }}
+  TF_VAR_name_prefix: ura-chatbot-ia-pr-${{ github.event.pull_request.number }}
+  TF_VAR_account_id: ${{ vars.AWS_ACCOUNT_ID }}
+  TF_VAR_ecr_repository: ${{ vars.ECR_REPOSITORY }}
+  TF_VAR_rds_db_name: app_stg
+
+  # -------- Diretórios --------
+  INFRA_DIR: infra
+
+  # (opcional) nomes das imagens para limpar do ECR
   ECR_REGISTRY: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-  NAME_PREFIX: ura-chatbot-ia-pr-${{ github.event.pull_request.number }}
-  TF_VAR_region: ${{ vars.AWS_REGION }}
-  TF_VAR_name_prefix: ${{ env.NAME_PREFIX }}
-  TF_VAR_account_id: ${{ vars.AWS_ACCOUNT_ID }}
-  TF_VAR_ecr_repository: ${{ env.ECR_REPOSITORY }}
-  TF_VAR_rds_db_name: app_stg
-  # se o destroy exigir as mesmas TF_VARs sensíveis, exporte também como no apply
-  INFRA_DIR: infra
+  IMAGE_TAG_INTER:  pr-${{ github.event.pull_request.number }}-inter
+  IMAGE_TAG_AGENT:  pr-${{ github.event.pull_request.number }}-agent
+  IMAGE_TAG_PRINC:  pr-${{ github.event.pull_request.number }}-principal
 
 jobs:
   destroy:
     name: Terraform destroy (on PR close)
     runs-on: ubuntu-latest
     environment: development
-    if: always()  # sempre roda quando o PR fecha; condicione abaixo se quiser
+    # Por padrão, destrói SEMPRE que o PR fecha (merge ou não).
+    # Se quiser destruir apenas quando NÃO houver merge, troque por:
+    # if: ${{ github.event.pull_request.merged == false }}
+    # Se quiser destruir apenas quando HOUVER merge:
+    # if: ${{ github.event.pull_request.merged == true }}
+    if: always()
 
     steps:
       - name: Checkout
@@ -53,8 +67,14 @@ jobs:
             -backend-config="key=apprunner/pr-${{ github.event.pull_request.number }}/terraform.tfstate" \
             -backend-config="region=${{ vars.AWS_REGION }}"
 
-      # (Opcional) Só destrói se o PR foi fechado SEM merge:
-      # if: ${{ github.event.pull_request.merged == false }}
       - name: Terraform Destroy
         working-directory: ${{ env.INFRA_DIR }}
         run: terraform destroy -auto-approve
+
+      # -------- OPCIONAL: limpeza de imagens ECR deste PR --------
+      - name: Cleanup ECR images (optional)
+        if: always()
+        run: |
+          aws ecr batch-delete-image --repository-name "${{ env.ECR_REPOSITORY }}" --image-ids imageTag="${{ env.IMAGE_TAG_INTER }}"  || true
+          aws ecr batch-delete-image --repository-name "${{ env.ECR_REPOSITORY }}" --image-ids imageTag="${{ env.IMAGE_TAG_AGENT }}"  || true
+          aws ecr batch-delete-image --repository-name "${{ env.ECR_REPOSITORY }}" --image-ids imageTag="${{ env.IMAGE_TAG_PRINC }}"  || true
