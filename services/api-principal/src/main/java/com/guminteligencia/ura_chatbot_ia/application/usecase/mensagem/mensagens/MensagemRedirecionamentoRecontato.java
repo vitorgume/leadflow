@@ -5,7 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MensagemRecontatoInativoG1DirecionamentoVendedor implements MensagemType {
+public class MensagemRedirecionamentoRecontato implements MensagemType {
 
     @Override
     public String getMensagem(String nomeVendedor, Cliente cliente) {
@@ -14,6 +14,6 @@ public class MensagemRecontatoInativoG1DirecionamentoVendedor implements Mensage
 
     @Override
     public Integer getTipoMensagem() {
-        return TipoMensagem.RECONTATO_INATIVO_G1_DIRECIONAMENTO_VENDEDOR.getCodigo();
+        return TipoMensagem.REDIRECIONAMENTO_RECONTATO.getCodigo();
     }
 }

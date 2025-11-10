@@ -38,7 +38,7 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 {
 "nome": "{Nome do cliente}",
 "cpf": "",
-"consentimento_atendimento": False,
+"consentimento_atendimento": false,
 "tipo_consulta": 0,
 "dor_desejo_paciente": "",
 "preferencia_horario": 0
@@ -52,7 +52,7 @@ Você, como assistente de IA, será plugado a um chatbot integrado ao whatsapp d
 {
 "nome": "",
 "cpf": "{CPF do cliente}",
-"consentimento_atendimento": False,
+"consentimento_atendimento": false,
 "tipo_consulta": 0,
 "dor_desejo_paciente": "",
 "preferencia_horario": 0
@@ -137,7 +137,7 @@ O usuário se chama Vitor, o cpf do Vitor é 12365478978, afirmou está conscien
 {
 "nome": "Vitor",
 "cpf": "12365478978",
-"consentimento_atendimento": True,
+"consentimento_atendimento": true,
 "tipo_consulta": 1,
 "dor_desejo_paciente": "Sua dor é o fato de já estar muito calvo",
 "preferencia_horario": 0

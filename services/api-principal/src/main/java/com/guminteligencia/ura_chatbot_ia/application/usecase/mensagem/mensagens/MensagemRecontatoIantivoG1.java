@@ -11,8 +11,10 @@ public class MensagemRecontatoIantivoG1 implements MensagemType {
     public String getMensagem(String nomeVendedor, Cliente cliente) {
         StringBuilder mensagem = new StringBuilder();
 
-        mensagem.append(cliente.getNome())
-                .append("notei que paramos nossa conversa e quis retornar para que você não perca o seu lugar na fila de agendamento.")
+        String nomeUsuario = cliente.getNome() == null ? "Paciente" : cliente.getNome();
+
+        mensagem.append(nomeUsuario)
+                .append(" notei que paramos nossa conversa e quis retornar para que você não perca o seu lugar na fila de agendamento.")
                 .append("\n");
 
         mensagem.append("O seu objetivo (")

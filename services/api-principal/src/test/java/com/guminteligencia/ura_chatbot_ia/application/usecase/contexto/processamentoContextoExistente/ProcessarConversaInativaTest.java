@@ -58,7 +58,7 @@ class ProcessarConversaInativaTest {
 
         // Mensagem do builder
         when(mensagemBuilder.getMensagem(
-                eq(TipoMensagem.RECONTATO_INATIVO_G1_DIRECIONAMENTO_VENDEDOR),
+                eq(TipoMensagem.REDIRECIONAMENTO_RECONTATO),
                 eq("Vendedor Teste"),
                 isNull()
         )).thenReturn("mensagem-g1-direcionamento");
@@ -74,7 +74,7 @@ class ProcessarConversaInativaTest {
         inOrder.verify(conversa).setVendedor(vendedor);
 
         inOrder.verify(mensagemBuilder).getMensagem(
-                eq(TipoMensagem.RECONTATO_INATIVO_G1_DIRECIONAMENTO_VENDEDOR),
+                eq(TipoMensagem.REDIRECIONAMENTO_RECONTATO),
                 eq("Vendedor Teste"),
                 isNull()
         );
@@ -117,7 +117,7 @@ class ProcessarConversaInativaTest {
         when(vendedor.getNome()).thenReturn("João");
         when(vendedorUseCase.roletaVendedoresConversaInativa(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(
-                eq(TipoMensagem.RECONTATO_INATIVO_G1_DIRECIONAMENTO_VENDEDOR),
+                eq(TipoMensagem.REDIRECIONAMENTO_RECONTATO),
                 eq("João"), isNull()))
                 .thenReturn("msg");
         doThrow(new RuntimeException("erro-envio"))
@@ -145,7 +145,7 @@ class ProcessarConversaInativaTest {
         when(vendedor.getNome()).thenReturn("Maria");
         when(vendedorUseCase.roletaVendedoresConversaInativa(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(
-                eq(TipoMensagem.RECONTATO_INATIVO_G1_DIRECIONAMENTO_VENDEDOR),
+                eq(TipoMensagem.REDIRECIONAMENTO_RECONTATO),
                 eq("Maria"), isNull()))
                 .thenReturn("msg-ok");
 
@@ -185,7 +185,7 @@ class ProcessarConversaInativaTest {
         when(vendedor.getNome()).thenReturn("Ana");
         when(vendedorUseCase.roletaVendedoresConversaInativa(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(
-                eq(TipoMensagem.RECONTATO_INATIVO_G1_DIRECIONAMENTO_VENDEDOR),
+                eq(TipoMensagem.REDIRECIONAMENTO_RECONTATO),
                 eq("Ana"), isNull()))
                 .thenReturn("msg-ok");
 

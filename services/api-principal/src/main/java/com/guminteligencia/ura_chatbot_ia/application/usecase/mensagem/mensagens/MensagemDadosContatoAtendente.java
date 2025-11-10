@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
-public class MensagemDadosContatoVendedor implements MensagemType {
+public class MensagemDadosContatoAtendente implements MensagemType {
 
     @Override
     public String getMensagem(String nomeVendedor, Cliente cliente) {
@@ -31,7 +31,9 @@ public class MensagemDadosContatoVendedor implements MensagemType {
         }
 
         if(cliente.getConsentimentoAtendimnento() != null) {
-            mensagem.append("Consentimento Atendimento: ").append(cliente.getConsentimentoAtendimnento()).append("\n");
+            String resposta = cliente.getConsentimentoAtendimnento() ? "Está consciente" : "Não está consentido";
+
+            mensagem.append("Consentimento Atendimento: ").append(resposta).append("\n");
         } else {
             mensagem.append("Consentimento Atendimento: ").append("Consentimento atendimento não informado").append("\n");
         }

@@ -13,7 +13,7 @@ public enum TipoMensagem {
     MENSAGEM_ALERTA_RECONTATO(4, "Mensagem de alerta após recontato de um usuário"),
     CONTATO_INATIVO(5, "Mensagem após evio de um contao inativo."),
     RECONTATO_INATIVO_G1(6, "Mensagem para o contato inativo do tipo G1"),
-    RECONTATO_INATIVO_G1_DIRECIONAMENTO_VENDEDOR(7, "Mensagem de direcionamento ao vendedor com recontato tipo G1");
+    REDIRECIONAMENTO_RECONTATO(7, "Mensagem de direcionamento ao atentendete quando é um recontato do paciente.");
 
     private final Integer codigo;
     private final String descricao;

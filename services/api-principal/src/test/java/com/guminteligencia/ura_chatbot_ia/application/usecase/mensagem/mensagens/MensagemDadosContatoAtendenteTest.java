@@ -1,21 +1,15 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens;
 
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
-import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.time.Month;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class MensagemDadosContatoVendedorTest {
-    private final MensagemDadosContatoVendedor sut = new MensagemDadosContatoVendedor();
+class MensagemDadosContatoAtendenteTest {
+    private final MensagemDadosContatoAtendente sut = new MensagemDadosContatoAtendente();
 
 //    @Test
 //    void deveRetornarMensagensComTodosCampos() {

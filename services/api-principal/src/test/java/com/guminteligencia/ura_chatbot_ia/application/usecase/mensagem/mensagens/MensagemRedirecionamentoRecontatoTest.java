@@ -9,10 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class MensagemRecontatoInativoG1DirecionamentoVendedorTest {
+class MensagemRedirecionamentoRecontatoTest {
 
-    private final MensagemRecontatoInativoG1DirecionamentoVendedor mensagem =
-            new MensagemRecontatoInativoG1DirecionamentoVendedor();
+    private final MensagemRedirecionamentoRecontato mensagem =
+            new MensagemRedirecionamentoRecontato();
 
     @Test
     void deveRetornarMensagemComNomeDoVendedor() {
@@ -38,7 +38,7 @@ class MensagemRecontatoInativoG1DirecionamentoVendedorTest {
     @Test
     void deveRetornarCodigoDoTipoMensagemCorreto() {
         int codigo = mensagem.getTipoMensagem();
-        assertEquals(TipoMensagem.RECONTATO_INATIVO_G1_DIRECIONAMENTO_VENDEDOR.getCodigo(), codigo);
+        assertEquals(TipoMensagem.REDIRECIONAMENTO_RECONTATO.getCodigo(), codigo);
     }
 
 }
