@@ -1,7 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.application.usecase;
 
 import com.gumeinteligencia.api_intermidiaria.application.usecase.validadorMensagens.ValidadorMensagemUseCase;
-import com.gumeinteligencia.api_intermidiaria.domain.Canal;
 import com.gumeinteligencia.api_intermidiaria.domain.Cliente;
 import com.gumeinteligencia.api_intermidiaria.domain.Contexto;
 import com.gumeinteligencia.api_intermidiaria.domain.Mensagem;
@@ -26,12 +25,6 @@ class ProcessarMensagemUseCaseTest {
 
     @Mock
     private ContextoUseCase contextoUseCase;
-
-    @Mock
-    private UraUseCase uraUseCase;
-
-    @Mock
-    private RoteadorDeTrafegoUseCase roteadorDeTrafegoUseCase;
 
     @Mock
     private ClienteUseCase clienteUseCase;
@@ -61,7 +54,7 @@ class ProcessarMensagemUseCaseTest {
         verify(contextoUseCase, never()).consultarPorTelefoneAtivo(any());
         verify(contextoUseCase, never()).processarContextoExistente(any(), any());
         verify(contextoUseCase, never()).iniciarNovoContexto(any());
-        verifyNoInteractions(uraUseCase, roteadorDeTrafegoUseCase, clienteUseCase);
+        verifyNoInteractions(clienteUseCase);
     }
 
     @Test
@@ -78,7 +71,7 @@ class ProcessarMensagemUseCaseTest {
 
         verify(contextoUseCase).processarContextoExistente(contexto, mensagem);
         verify(contextoUseCase, never()).iniciarNovoContexto(any());
-        verifyNoInteractions(uraUseCase, roteadorDeTrafegoUseCase, clienteUseCase);
+        verifyNoInteractions(clienteUseCase);
     }
 
     @Test
@@ -86,7 +79,6 @@ class ProcessarMensagemUseCaseTest {
         // cliente presente com canal código 0 (CHATBOT)
         Cliente clienteChatbot = Cliente.builder()
                 .id(UUID.randomUUID())
-                .canal(Canal.CHATBOT) // garanta que getCodigo() == 0
                 .build();
 
         when(validadorMensagem.deveIngorar(mensagem)).thenReturn(false);
@@ -101,8 +93,6 @@ class ProcessarMensagemUseCaseTest {
 
         verify(contextoUseCase).iniciarNovoContexto(mensagem);
         verify(contextoUseCase, never()).processarContextoExistente(any(), any());
-        verify(uraUseCase, never()).enviar(any());
-        verifyNoInteractions(roteadorDeTrafegoUseCase);
     }
 
     @Test
@@ -110,7 +100,6 @@ class ProcessarMensagemUseCaseTest {
         // cliente presente com canal URA (código ≠ 0)
         Cliente clienteUra = Cliente.builder()
                 .id(UUID.randomUUID())
-                .canal(Canal.URA)
                 .build();
 
         when(validadorMensagem.deveIngorar(mensagem)).thenReturn(false);
@@ -123,10 +112,8 @@ class ProcessarMensagemUseCaseTest {
 
         processarMensagemUseCase.processarNovaMensagem(mensagem);
 
-        verify(uraUseCase).enviar(mensagem);
         verify(contextoUseCase, never()).iniciarNovoContexto(any());
         verify(contextoUseCase, never()).processarContextoExistente(any(), any());
-        verifyNoInteractions(roteadorDeTrafegoUseCase);
     }
 
     @Test
@@ -136,15 +123,12 @@ class ProcessarMensagemUseCaseTest {
                 .thenReturn(Optional.empty());
         when(clienteUseCase.consultarPorTelefone(mensagem.getTelefone()))
                 .thenReturn(Optional.empty());
-        when(roteadorDeTrafegoUseCase.deveUsarChatbot(mensagem.getTelefone()))
-                .thenReturn(true);
 
         when(midiaUseCase.extrairMidias(Mockito.any())).thenReturn(mensagem);
 
         processarMensagemUseCase.processarNovaMensagem(mensagem);
 
         verify(contextoUseCase).iniciarNovoContexto(mensagem);
-        verify(uraUseCase, never()).enviar(any());
     }
 
     @Test
@@ -154,14 +138,11 @@ class ProcessarMensagemUseCaseTest {
                 .thenReturn(Optional.empty());
         when(clienteUseCase.consultarPorTelefone(mensagem.getTelefone()))
                 .thenReturn(Optional.empty());
-        when(roteadorDeTrafegoUseCase.deveUsarChatbot(mensagem.getTelefone()))
-                .thenReturn(false);
 
         when(midiaUseCase.extrairMidias(Mockito.any())).thenReturn(mensagem);
 
         processarMensagemUseCase.processarNovaMensagem(mensagem);
 
-        verify(uraUseCase).enviar(mensagem);
         verify(contextoUseCase, never()).iniciarNovoContexto(any());
     }
 }

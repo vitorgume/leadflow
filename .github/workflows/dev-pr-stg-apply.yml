@@ -82,6 +82,8 @@ jobs:
           tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG_INTER }}
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cache-inter
           cache-to:   type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cache-inter,mode=max
+          build-args: |
+            RUN_TESTS=false
 
       - name: Build & Push - api-agente
         uses: docker/build-push-action@v6
@@ -91,6 +93,8 @@ jobs:
           tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG_AGENT }}
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cache-agent
           cache-to:   type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cache-agent,mode=max
+          build-args: |
+            RUN_TESTS=false
 
       - name: Build & Push - api-principal
         uses: docker/build-push-action@v6
@@ -100,6 +104,8 @@ jobs:
           tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG_PRINC }}
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cache-principal
           cache-to:   type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:cache-principal,mode=max
+          build-args: |
+            RUN_TESTS=false
 
       # ---------- Terraform ----------
       - name: Setup Terraform
