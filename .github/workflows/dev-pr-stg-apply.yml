@@ -121,7 +121,6 @@ jobs:
           echo 'TF_CLI_ARGS_plan=-input=false -lock-timeout=5m -parallelism=10' >> $GITHUB_ENV
           echo 'TF_CLI_ARGS_apply=-input=false -lock-timeout=5m -parallelism=10' >> $GITHUB_ENV
 
-      # Formata (escreve) e depois confere o diff
       - name: Terraform fmt (write)
         working-directory: ${{ env.INFRA_DIR }}
         run: terraform fmt -recursive
@@ -147,20 +146,19 @@ jobs:
           echo "TF_VAR_WHASTAPP_CLIENT_TOKEN=${{ secrets.WHASTAPP_CLIENT_TOKEN_STG }}" >> $GITHUB_ENV
           echo "TF_VAR_WHASTAPP_INSTANCE_ID=${{ secrets.WHASTAPP_INSTANCE_ID_STG }}" >> $GITHUB_ENV
           echo "TF_VAR_WHASTAPP_TOKEN=${{ secrets.WHASTAPP_TOKEN_STG }}" >> $GITHUB_ENV
-          echo "TF_VAR_rds_password=" >> $GITHUB_ENV   # ← stopgap para não travar o plan
+          echo "TF_VAR_rds_password=" >> $GITHUB_ENV
 
       - name: Terraform validate
         working-directory: ${{ env.INFRA_DIR }}
         run: terraform validate
 
-            # (novo) Garante a service-linked role do RDS (evita InvalidParameterValue)
       - name: Ensure RDS service-linked role
         run: |
           set -euo pipefail
           aws iam get-role --role-name "AWSServiceRoleForRDS" >/dev/null 2>&1 || \
           aws iam create-service-linked-role --aws-service-name "rds.amazonaws.com"
 
-      # (ajustado) Imports idempotentes com verificação real
+      # ---------- Imports idempotentes (ajustado p/ IAM novas) ----------
       - name: Terraform imports (idempotente, verificado)
         working-directory: ${{ env.INFRA_DIR }}
         env:
@@ -180,7 +178,7 @@ jobs:
             in_state "$addr" || { echo "::error::$addr não foi importado (ausente no state)"; exit 1; }
           }
 
-          # ---------- SQS ----------
+          # ---------- SQS (pré-existente) ----------
           SQS_URL="https://sqs.${AWS_REGION}.amazonaws.com/${AWS_ACCOUNT_ID}/entradas.fifo"
           if ! in_state aws_sqs_queue.fifo; then
             aws sqs get-queue-attributes --queue-url "$SQS_URL" --attribute-names QueueArn >/dev/null
@@ -188,7 +186,7 @@ jobs:
           fi
           must_exist_in_state aws_sqs_queue.fifo
 
-          # ---------- DynamoDB ----------
+          # ---------- DynamoDB (pré-existente) ----------
           CTX_TABLE="contexto_entity_leadflow"
           OUTRO_TABLE="outro_contato_entity_leadflow"
 
@@ -204,7 +202,7 @@ jobs:
           fi
           must_exist_in_state aws_dynamodb_table.outro_contato
 
-          # ---------- RDS Subnet Group ----------
+          # ---------- RDS Subnet Group (pré-existente) ----------
           SUBNET_GRP="${NAME_PREFIX}-mysql-subnets"
           if ! in_state aws_db_subnet_group.this; then
             aws rds describe-db-subnet-groups --db-subnet-group-name "$SUBNET_GRP" >/dev/null
@@ -212,7 +210,7 @@ jobs:
           fi
           must_exist_in_state aws_db_subnet_group.this
 
-          # ---------- Security Group ----------
+          # ---------- Security Group (pré-existente) ----------
           SG_ID="sg-0c54eef38b3a9e9c1"  # ajuste se necessário
           if ! in_state aws_security_group.mysql; then
             aws ec2 describe-security-groups --group-ids "$SG_ID" >/dev/null
@@ -220,7 +218,7 @@ jobs:
           fi
           must_exist_in_state aws_security_group.mysql
 
-          # ---------- RDS Instance ----------
+          # ---------- RDS Instance (pré-existente) ----------
           DB_ID="${NAME_PREFIX}-mysql"
           if ! in_state aws_db_instance.mysql; then
             aws rds describe-db-instances --db-instance-identifier "$DB_ID" >/dev/null
@@ -228,38 +226,45 @@ jobs:
           fi
           must_exist_in_state aws_db_instance.mysql
 
-          # ---------- IAM Roles (NOVAS) ----------
+          # ---------- IAM Roles (NOVAS → importar se existirem; senão, criar no apply) ----------
           ROLE_ACCESS_NAME="${NAME_PREFIX}-apprunner-access-role"
           if ! in_state aws_iam_role.apprunner_access_role; then
-            aws iam get-role --role-name "$ROLE_ACCESS_NAME" >/dev/null
-            terraform import aws_iam_role.apprunner_access_role "$ROLE_ACCESS_NAME"
+            if aws iam get-role --role-name "$ROLE_ACCESS_NAME" >/dev/null 2>&1; then
+              terraform import aws_iam_role.apprunner_access_role "$ROLE_ACCESS_NAME"
+            else
+              echo "IAM role $ROLE_ACCESS_NAME ainda não existe; será criada pelo apply."
+            fi
           fi
-          must_exist_in_state aws_iam_role.apprunner_access_role
 
           ROLE_INSTANCE_NAME="${NAME_PREFIX}-apprunner-instance-role"
           if ! in_state aws_iam_role.apprunner_instance_role; then
-            aws iam get-role --role-name "$ROLE_INSTANCE_NAME" >/dev/null
-            terraform import aws_iam_role.apprunner_instance_role "$ROLE_INSTANCE_NAME"
+            if aws iam get-role --role-name "$ROLE_INSTANCE_NAME" >/dev/null 2>&1; then
+              terraform import aws_iam_role.apprunner_instance_role "$ROLE_INSTANCE_NAME"
+            else
+              echo "IAM role $ROLE_INSTANCE_NAME ainda não existe; será criada pelo apply."
+            fi
           fi
-          must_exist_in_state aws_iam_role.apprunner_instance_role
 
-          # ---------- IAM Policies (se já existirem) ----------
-          # Managed policy do access (ECR)
+          # ---------- IAM Policies (NOVAS → importar se existirem; senão, criar no apply) ----------
           POLICY_NAME_ACCESS="${NAME_PREFIX}-apprunner-access-ecr"
           POLICY_ARN_ACCESS=$(aws iam list-policies --scope Local \
             --query "Policies[?PolicyName=='${POLICY_NAME_ACCESS}'].Arn" --output text || true)
           if [ -n "${POLICY_ARN_ACCESS}" ] && ! in_state aws_iam_policy.apprunner_access_ecr; then
             terraform import aws_iam_policy.apprunner_access_ecr "${POLICY_ARN_ACCESS}"
+          else
+            echo "Policy ${POLICY_NAME_ACCESS} inexistente (ainda) ou já no state; apply cuidará."
           fi
-          # Managed policy do instance (runtime)
+
           POLICY_NAME_INSTANCE="${NAME_PREFIX}-apprunner-policy"
           POLICY_ARN_INSTANCE=$(aws iam list-policies --scope Local \
             --query "Policies[?PolicyName=='${POLICY_NAME_INSTANCE}'].Arn" --output text || true)
           if [ -n "${POLICY_ARN_INSTANCE}" ] && ! in_state aws_iam_policy.apprunner_policy; then
             terraform import aws_iam_policy.apprunner_policy "${POLICY_ARN_INSTANCE}"
+          else
+            echo "Policy ${POLICY_NAME_INSTANCE} inexistente (ainda) ou já no state; apply cuidará."
           fi
 
-          # ---------- Secrets Manager ----------
+          # ---------- Secrets Manager (pré-existentes) ----------
           import_secret () {
             local addr="$1"; local name="$2"
             if ! in_state "$addr"; then
@@ -269,7 +274,7 @@ jobs:
             must_exist_in_state "$addr"
           }
 
-          # cred composto (usado no Flyway) — e garante presença
+          # cred composto (Flyway)
           if ! in_state aws_secretsmanager_secret.db_app_creds; then
             aws secretsmanager describe-secret --secret-id "/${NAME_PREFIX}/db-app-creds" >/dev/null
             terraform import aws_secretsmanager_secret.db_app_creds "/${NAME_PREFIX}/db-app-creds"
@@ -290,9 +295,6 @@ jobs:
 
           echo "----- STATE (depois) -----"
           terraform state list || true
-
-
-
 
       - name: Terraform plan
         working-directory: ${{ env.INFRA_DIR }}
