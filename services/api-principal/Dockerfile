@@ -34,13 +34,7 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 # Boas práticas para Java em containers
-ENV JAVA_TOOL_OPTIONS="-XX:+UseG1GC -XX:MaxRAMPercentage=75 -XX:+HeapDumpOnOutOfMemoryError -Djava.security.egd=file:/dev/./urandom"
-
-# (Opcional) timezone e fontes, se sua app precisar:
-# RUN apk add --no-cache tzdata fontconfig ttf-dejavu
-
+ENV JAVA_OPTS="-XX:+UseG1GC -XX:MaxRAMPercentage=75 -XX:+HeapDumpOnOutOfMemoryError -Djava.security.egd=file:/dev/./urandom"
 COPY --from=build /workspace/target/*.jar /app/app.jar
 EXPOSE 8080
-
-# Use exec form; sem 'sh -c'
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/app.jar"]
