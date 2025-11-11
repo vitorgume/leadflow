@@ -133,7 +133,7 @@ jobs:
       - name: Terraform Init (backend S3)
         working-directory: ${{ env.INFRA_DIR }}
         run: |
-          terraform init -input=false \
+          terraform init -input=false -upgrade -reconfigure \
             -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
             -backend-config="key=apprunner/pr-${{ github.event.pull_request.number }}/terraform.tfstate" \
             -backend-config="region=${{ vars.AWS_REGION }}"
@@ -237,6 +237,12 @@ jobs:
               aws secretsmanager describe-secret --secret-id "$name" >/dev/null
               terraform import "$addr" "$name"
             fi
+
+            if ! in_state aws_secretsmanager_secret.db_app_creds; then
+              aws secretsmanager describe-secret --secret-id "/${NAME_PREFIX}/db-app-creds" >/dev/null
+              terraform import aws_secretsmanager_secret.db_app_creds "/${NAME_PREFIX}/db-app-creds"
+            fi
+            must_exist_in_state aws_secretsmanager_secret.db_app_creds
             must_exist_in_state "$addr"
           }
 
