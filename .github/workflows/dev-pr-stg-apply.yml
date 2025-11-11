@@ -259,6 +259,16 @@ jobs:
             must_exist_in_state "$addr"
           }
 
+          # ---------- IAM Managed Policy do App Runner ----------
+          POLICY_NAME="${NAME_PREFIX}-apprunner-policy"
+          POLICY_ARN=$(aws iam list-policies --scope Local \
+            --query "Policies[?PolicyName=='${POLICY_NAME}'].Arn" --output text)
+
+          if [ -n "$POLICY_ARN" ] && ! in_state aws_iam_policy.apprunner_policy; then
+            terraform import aws_iam_policy.apprunner_policy "$POLICY_ARN"
+          fi
+          must_exist_in_state aws_iam_policy.apprunner_policy
+
           import_secret aws_secretsmanager_secret.url_bd                 "/${NAME_PREFIX}/URL_BD"
           import_secret aws_secretsmanager_secret.user_bd                "/${NAME_PREFIX}/USER_BD"
           import_secret aws_secretsmanager_secret.password_bd            "/${NAME_PREFIX}/PASSWORD_BD"

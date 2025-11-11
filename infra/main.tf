@@ -3,7 +3,7 @@ locals {
   db_host        = aws_db_instance.mysql.address
   # JDBC para as APIs Java (Spring)
   jdbc_url       = "jdbc:mysql://${local.db_host}:3306/${var.rds_db_name}?useSSL=false&allowPublicKeyRetrieval=true"
-  # SQLAlchemy para a API Python (FastAPI) — agora usando a senha gerada
+  # SQLAlchemy para a API Python (FastAPI)
   sqlalchemy_url = "mysql+pymysql://${var.rds_username}:${random_password.rds_appuser.result}@${local.db_host}:3306/${var.rds_db_name}"
 }
 
@@ -15,9 +15,9 @@ resource "aws_sqs_queue" "fifo" {
   fifo_queue                  = true
   content_based_deduplication = true
 
-  visibility_timeout_seconds = 180  # 3 minutes
-  delay_seconds              = 30   # 30 seconds
-  receive_wait_time_seconds  = 15   # 15 seconds
+  visibility_timeout_seconds = 180
+  delay_seconds              = 30
+  receive_wait_time_seconds  = 15
 
   tags = local.labels
 }
@@ -30,18 +30,9 @@ resource "aws_dynamodb_table" "contexto" {
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
 
-  attribute {
-    name = "id"
-    type = "S"
-  }
-  attribute {
-    name = "telefone"
-    type = "S"
-  }
-  attribute {
-    name = "status"
-    type = "S"
-  }
+  attribute { name = "id"       type = "S" }
+  attribute { name = "telefone" type = "S" }
+  attribute { name = "status"   type = "S" }
 
   global_secondary_index {
     name            = "TelefoneStatusIndex"
@@ -58,18 +49,9 @@ resource "aws_dynamodb_table" "outro_contato" {
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
 
-  attribute {
-    name = "id"
-    type = "S"
-  }
-  attribute {
-    name = "telefone"
-    type = "S"
-  }
-  attribute {
-    name = "status"
-    type = "S"
-  }
+  attribute { name = "id"       type = "S" }
+  attribute { name = "telefone" type = "S" }
+  attribute { name = "status"   type = "S" }
 
   global_secondary_index {
     name            = "TelefoneStatusIndex"
@@ -82,7 +64,7 @@ resource "aws_dynamodb_table" "outro_contato" {
 }
 
 # =========================
-# RDS MySQL (simples para staging)
+# RDS MySQL (staging)
 # =========================
 data "aws_vpc" "default" {
   default = true
@@ -128,14 +110,9 @@ resource "aws_security_group" "mysql" {
   tags = local.labels
 }
 
-# =========================
-# Random password para o RDS (appuser)
-# =========================
 resource "random_password" "rds_appuser" {
   length           = 20
   special          = true
-  # RDS MySQL não permite: / " @ (e espaço). Já não usamos /, " e espaço aqui.
-  # Removido o @ da lista.
   override_special = "!#$%&()*+,-.:;<=>?[]^_{|}~"
 }
 
@@ -159,33 +136,26 @@ resource "aws_db_instance" "mysql" {
 # =========================
 # Secrets Manager (sensíveis)
 # =========================
-# Intermediária / Principal (BD)
 resource "aws_secretsmanager_secret" "url_bd" {
   name = "/${var.name_prefix}/URL_BD"
   tags = local.labels
 }
-
 resource "aws_secretsmanager_secret" "user_bd" {
   name = "/${var.name_prefix}/USER_BD"
   tags = local.labels
 }
-
 resource "aws_secretsmanager_secret" "password_bd" {
   name = "/${var.name_prefix}/PASSWORD_BD"
   tags = local.labels
 }
-
-# >> ALTERADO: gravar URL_BD a partir do RDS (local.jdbc_url)
 resource "aws_secretsmanager_secret_version" "url_bd_v" {
   secret_id     = aws_secretsmanager_secret.url_bd.id
   secret_string = local.jdbc_url
 }
-
 resource "aws_secretsmanager_secret_version" "user_bd_v" {
   secret_id     = aws_secretsmanager_secret.user_bd.id
   secret_string = var.rds_username
 }
-
 resource "aws_secretsmanager_secret_version" "password_bd_v" {
   secret_id     = aws_secretsmanager_secret.password_bd.id
   secret_string = random_password.rds_appuser.result
@@ -196,49 +166,40 @@ resource "aws_secretsmanager_secret" "database_url" {
   name = "/${var.name_prefix}/DATABASE_URL"
   tags = local.labels
 }
-
 resource "aws_secretsmanager_secret" "openai_api_key" {
   name = "/${var.name_prefix}/OPENAI_API_KEY"
   tags = local.labels
 }
-
-# >> ALTERADO: gravar DATABASE_URL a partir do RDS (local.sqlalchemy_url)
 resource "aws_secretsmanager_secret_version" "database_url_v" {
   secret_id     = aws_secretsmanager_secret.database_url.id
   secret_string = local.sqlalchemy_url
 }
-
 resource "aws_secretsmanager_secret_version" "openai_api_key_v" {
   secret_id     = aws_secretsmanager_secret.openai_api_key.id
   secret_string = var.OPENAI_API_KEY
 }
 
-# Principal (mesmo que antes)
+# Principal
 resource "aws_secretsmanager_secret" "app_crm_acess_token" {
   name = "/${var.name_prefix}/APP_CRM_ACESS_TOKEN"
   tags = local.labels
 }
-
 resource "aws_secretsmanager_secret" "api_principal_api_key" {
   name = "/${var.name_prefix}/API_PRINCIPAL_API_KEY"
   tags = local.labels
 }
-
 resource "aws_secretsmanager_secret" "api_principal_secret_key" {
   name = "/${var.name_prefix}/API_PRINCIPAL_SECRET_KEY"
   tags = local.labels
 }
-
 resource "aws_secretsmanager_secret" "whatsapp_client_token" {
   name = "/${var.name_prefix}/WHASTAPP_CLIENT_TOKEN"
   tags = local.labels
 }
-
 resource "aws_secretsmanager_secret" "whatsapp_instance_id" {
   name = "/${var.name_prefix}/WHASTAPP_INSTANCE_ID"
   tags = local.labels
 }
-
 resource "aws_secretsmanager_secret" "whatsapp_token" {
   name = "/${var.name_prefix}/WHASTAPP_TOKEN"
   tags = local.labels
@@ -248,27 +209,22 @@ resource "aws_secretsmanager_secret_version" "app_crm_acess_token_v" {
   secret_id     = aws_secretsmanager_secret.app_crm_acess_token.id
   secret_string = var.APP_CRM_ACESS_TOKEN
 }
-
 resource "aws_secretsmanager_secret_version" "api_principal_api_key_v" {
   secret_id     = aws_secretsmanager_secret.api_principal_api_key.id
   secret_string = var.API_PRINCIPAL_API_KEY
 }
-
 resource "aws_secretsmanager_secret_version" "api_principal_secret_key_v" {
   secret_id     = aws_secretsmanager_secret.api_principal_secret_key.id
   secret_string = var.API_PRINCIPAL_SECRET_KEY
 }
-
 resource "aws_secretsmanager_secret_version" "whatsapp_client_token_v" {
   secret_id     = aws_secretsmanager_secret.whatsapp_client_token.id
   secret_string = var.WHASTAPP_CLIENT_TOKEN
 }
-
 resource "aws_secretsmanager_secret_version" "whatsapp_instance_id_v" {
   secret_id     = aws_secretsmanager_secret.whatsapp_instance_id.id
   secret_string = var.WHASTAPP_INSTANCE_ID
 }
-
 resource "aws_secretsmanager_secret_version" "whatsapp_token_v" {
   secret_id     = aws_secretsmanager_secret.whatsapp_token.id
   secret_string = var.WHASTAPP_TOKEN
@@ -278,7 +234,6 @@ resource "aws_secretsmanager_secret" "db_app_creds" {
   name = "/${var.name_prefix}/db-app-creds"
   tags = local.labels
 }
-
 resource "aws_secretsmanager_secret_version" "db_app_creds_v" {
   secret_id     = aws_secretsmanager_secret.db_app_creds.id
   secret_string = jsonencode({
@@ -294,26 +249,70 @@ resource "aws_secretsmanager_secret_version" "db_app_creds_v" {
 # =========================
 # IAM p/ App Runner
 # =========================
-data "aws_iam_policy_document" "apprunner_assume" {
+
+# --- Access Role (puxar imagem do ECR) ---
+data "aws_iam_policy_document" "apprunner_access_trust" {
   statement {
     actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["build.apprunner.amazonaws.com"]
+    }
+  }
+}
 
+resource "aws_iam_role" "apprunner_access_role" {
+  name               = "${var.name_prefix}-apprunner-access-role"
+  assume_role_policy = data.aws_iam_policy_document.apprunner_access_trust.json
+  tags               = local.labels
+}
+
+data "aws_iam_policy_document" "apprunner_access_ecr" {
+  statement {
+    actions   = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
+  }
+  statement {
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "apprunner_access_ecr" {
+  name   = "${var.name_prefix}-apprunner-access-ecr"
+  policy = data.aws_iam_policy_document.apprunner_access_ecr.json
+}
+
+resource "aws_iam_role_policy_attachment" "apprunner_access_attach" {
+  role       = aws_iam_role.apprunner_access_role.name
+  policy_arn = aws_iam_policy.apprunner_access_ecr.arn
+}
+
+# --- Instance Role (runtime: Secrets, SQS, Logs) ---
+data "aws_iam_policy_document" "apprunner_instance_trust" {
+  statement {
+    actions = ["sts:AssumeRole"]
     principals {
       type        = "Service"
       identifiers = [
-        "build.apprunner.amazonaws.com",
-        "tasks.apprunner.amazonaws.com"
+        "tasks.apprunner.amazonaws.com",
+        "apprunner.amazonaws.com"
       ]
     }
   }
 }
 
-resource "aws_iam_role" "apprunner_role" {
-  name               = "${var.name_prefix}-apprunner-role"
-  assume_role_policy = data.aws_iam_policy_document.apprunner_assume.json
+resource "aws_iam_role" "apprunner_instance_role" {
+  name               = "${var.name_prefix}-apprunner-instance-role"
+  assume_role_policy = data.aws_iam_policy_document.apprunner_instance_trust.json
   tags               = local.labels
 }
 
+# Política de runtime (SQS + Secrets + Logs + ECR pulls se necessário)
 data "aws_iam_policy_document" "apprunner_policy" {
   statement {
     actions   = ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl"]
@@ -321,7 +320,7 @@ data "aws_iam_policy_document" "apprunner_policy" {
   }
 
   statement {
-    actions = ["secretsmanager:GetSecretValue"]
+    actions = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
     resources = [
       aws_secretsmanager_secret.url_bd.arn,
       aws_secretsmanager_secret.user_bd.arn,
@@ -343,6 +342,7 @@ data "aws_iam_policy_document" "apprunner_policy" {
     resources = ["*"]
   }
 
+  # (Opcional) pulls no ECR durante runtime (normalmente não necessário)
   statement {
     actions = [
       "ecr:GetAuthorizationToken",
@@ -359,8 +359,8 @@ resource "aws_iam_policy" "apprunner_policy" {
   policy = data.aws_iam_policy_document.apprunner_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "apprunner_attach" {
-  role       = aws_iam_role.apprunner_role.name
+resource "aws_iam_role_policy_attachment" "apprunner_instance_attach" {
+  role       = aws_iam_role.apprunner_instance_role.name
   policy_arn = aws_iam_policy.apprunner_policy.arn
 }
 
@@ -373,7 +373,9 @@ resource "aws_apprunner_service" "api_intermediaria" {
   depends_on = [
     aws_secretsmanager_secret_version.url_bd_v,
     aws_secretsmanager_secret_version.user_bd_v,
-    aws_secretsmanager_secret_version.password_bd_v
+    aws_secretsmanager_secret_version.password_bd_v,
+    aws_iam_role_policy_attachment.apprunner_instance_attach,
+    aws_iam_role_policy_attachment.apprunner_access_attach
   ]
 
   service_name = "${var.name_prefix}-api-intermediaria"
@@ -400,10 +402,14 @@ resource "aws_apprunner_service" "api_intermediaria" {
     }
 
     authentication_configuration {
-      access_role_arn = aws_iam_role.apprunner_role.arn
+      access_role_arn = aws_iam_role.apprunner_access_role.arn
     }
 
     auto_deployments_enabled = true
+  }
+
+  instance_configuration {
+    instance_role_arn = aws_iam_role.apprunner_instance_role.arn
   }
 
   health_check_configuration {
@@ -421,7 +427,9 @@ resource "aws_apprunner_service" "api_intermediaria" {
 resource "aws_apprunner_service" "api_agente" {
   depends_on = [
     aws_secretsmanager_secret_version.database_url_v,
-    aws_secretsmanager_secret_version.openai_api_key_v
+    aws_secretsmanager_secret_version.openai_api_key_v,
+    aws_iam_role_policy_attachment.apprunner_instance_attach,
+    aws_iam_role_policy_attachment.apprunner_access_attach
   ]
 
   service_name = "${var.name_prefix}-api-agente"
@@ -442,10 +450,14 @@ resource "aws_apprunner_service" "api_agente" {
     }
 
     authentication_configuration {
-      access_role_arn = aws_iam_role.apprunner_role.arn
+      access_role_arn = aws_iam_role.apprunner_access_role.arn
     }
 
     auto_deployments_enabled = true
+  }
+
+  instance_configuration {
+    instance_role_arn = aws_iam_role.apprunner_instance_role.arn
   }
 
   health_check_configuration {
@@ -470,7 +482,9 @@ resource "aws_apprunner_service" "api_principal" {
     aws_secretsmanager_secret_version.api_principal_secret_key_v,
     aws_secretsmanager_secret_version.whatsapp_client_token_v,
     aws_secretsmanager_secret_version.whatsapp_instance_id_v,
-    aws_secretsmanager_secret_version.whatsapp_token_v
+    aws_secretsmanager_secret_version.whatsapp_token_v,
+    aws_iam_role_policy_attachment.apprunner_instance_attach,
+    aws_iam_role_policy_attachment.apprunner_access_attach
   ]
 
   service_name = "${var.name_prefix}-api-principal"
@@ -505,10 +519,14 @@ resource "aws_apprunner_service" "api_principal" {
     }
 
     authentication_configuration {
-      access_role_arn = aws_iam_role.apprunner_role.arn
+      access_role_arn = aws_iam_role.apprunner_access_role.arn
     }
 
     auto_deployments_enabled = true
+  }
+
+  instance_configuration {
+    instance_role_arn = aws_iam_role.apprunner_instance_role.arn
   }
 
   health_check_configuration {
