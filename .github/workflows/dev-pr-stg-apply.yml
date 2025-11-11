@@ -147,8 +147,7 @@ jobs:
           echo "TF_VAR_WHASTAPP_CLIENT_TOKEN=${{ secrets.WHASTAPP_CLIENT_TOKEN_STG }}" >> $GITHUB_ENV
           echo "TF_VAR_WHASTAPP_INSTANCE_ID=${{ secrets.WHASTAPP_INSTANCE_ID_STG }}" >> $GITHUB_ENV
           echo "TF_VAR_WHASTAPP_TOKEN=${{ secrets.WHASTAPP_TOKEN_STG }}" >> $GITHUB_ENV
-          # STOPGAP opcional (apenas se ainda existir variable "rds_password" sem default):
-          # echo "TF_VAR_rds_password=" >> $GITHUB_ENV
+          echo "TF_VAR_rds_password=" >> $GITHUB_ENV   # ← stopgap para não travar o plan
 
       - name: Terraform validate
         working-directory: ${{ env.INFRA_DIR }}
