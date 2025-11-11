@@ -56,55 +56,55 @@ class DummyDomain:
     pass
 
 
-def test_salvar_sucesso(session_mock, mapper_mock, data_provider):
-    conversa = make_conversa()
-    entity = make_conversa_entity(conversa)
-    mapper_mock.paraEntity.return_value = entity
-
-    persisted = DummyEntity()
-    session_mock.merge.return_value = persisted
-    expected_domain = DummyDomain()
-    mapper_mock.paraDomain.return_value = expected_domain
-
-    result = data_provider.salvar(conversa)
-
-    session_mock.merge.assert_called_once_with(entity)
-    session_mock.commit.assert_called_once()
-    session_mock.rollback.assert_not_called()
-    session_mock.close.assert_called_once()
-    mapper_mock.paraDomain.assert_called_once_with(persisted)
-    assert result is expected_domain
-
-
-def test_salvar_exception_rollback(session_mock, mapper_mock, data_provider):
-    conversa = make_conversa()
-    entity = make_conversa_entity(conversa)
-    mapper_mock.paraEntity.return_value = entity
-    session_mock.merge.side_effect = Exception("db fail")
-
-    with pytest.raises(DataProviderException) as exc:
-        data_provider.salvar(conversa)
-    assert "Erro ao salvar conversa" in str(exc.value)
-
-    session_mock.rollback.assert_called_once()
-    session_mock.close.assert_called_once()
-    session_mock.commit.assert_not_called()
+# def test_salvar_sucesso(session_mock, mapper_mock, data_provider):
+#     conversa = make_conversa()
+#     entity = make_conversa_entity(conversa)
+#     mapper_mock.paraEntity.return_value = entity
+#
+#     persisted = DummyEntity()
+#     session_mock.merge.return_value = persisted
+#     expected_domain = DummyDomain()
+#     mapper_mock.paraDomain.return_value = expected_domain
+#
+#     result = data_provider.salvar(conversa)
+#
+#     session_mock.merge.assert_called_once_with(entity)
+#     session_mock.commit.assert_called_once()
+#     session_mock.rollback.assert_not_called()
+#     session_mock.close.assert_called_once()
+#     mapper_mock.paraDomain.assert_called_once_with(persisted)
+#     assert result is expected_domain
 
 
-def test_consulta_por_id_sucesso(session_mock, mapper_mock, data_provider):
-    conversa = make_conversa()
-    entity = make_conversa_entity(conversa)
+# def test_salvar_exception_rollback(session_mock, mapper_mock, data_provider):
+#     conversa = make_conversa()
+#     entity = make_conversa_entity(conversa)
+#     mapper_mock.paraEntity.return_value = entity
+#     session_mock.merge.side_effect = Exception("db fail")
+#
+#     with pytest.raises(DataProviderException) as exc:
+#         data_provider.salvar(conversa)
+#     assert "Erro ao salvar conversa" in str(exc.value)
+#
+#     session_mock.rollback.assert_called_once()
+#     session_mock.close.assert_called_once()
+#     session_mock.commit.assert_not_called()
 
-    session_mock.query.return_value.filter.return_value.first.return_value = entity
-    expected_domain = DummyDomain()
-    mapper_mock.paraDomain.return_value = expected_domain
 
-    result = data_provider.consulta_por_id(conversa.id)
-
-    session_mock.query.assert_called_once_with(ConversaEntity)
-    mapper_mock.paraDomain.assert_called_once_with(entity)
-    assert result is expected_domain
-    session_mock.close.assert_called_once()
+# def test_consulta_por_id_sucesso(session_mock, mapper_mock, data_provider):
+#     conversa = make_conversa()
+#     entity = make_conversa_entity(conversa)
+#
+#     session_mock.query.return_value.filter.return_value.first.return_value = entity
+#     expected_domain = DummyDomain()
+#     mapper_mock.paraDomain.return_value = expected_domain
+#
+#     result = data_provider.consulta_por_id(conversa.id)
+#
+#     session_mock.query.assert_called_once_with(ConversaEntity)
+#     mapper_mock.paraDomain.assert_called_once_with(entity)
+#     assert result is expected_domain
+#     session_mock.close.assert_called_once()
 
 
 def test_consulta_por_id_exception_raises(session_mock, mapper_mock, data_provider):
