@@ -111,10 +111,17 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      # (Opcional) endurece o CLI para todo comando
+      - name: Terraform CLI defaults
+        run: |
+          echo 'TF_CLI_ARGS=-no-color' >> $GITHUB_ENV
+          echo 'TF_CLI_ARGS_plan=-input=false -lock-timeout=5m -parallelism=10' >> $GITHUB_ENV
+          echo 'TF_CLI_ARGS_apply=-input=false -lock-timeout=5m -parallelism=10' >> $GITHUB_ENV
+
       - name: Terraform Init (backend S3)
         working-directory: ${{ env.INFRA_DIR }}
         run: |
-          terraform init \
+          terraform init -input=false \
             -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
             -backend-config="key=apprunner/pr-${{ github.event.pull_request.number }}/terraform.tfstate" \
             -backend-config="region=${{ vars.AWS_REGION }}"
@@ -129,10 +136,28 @@ jobs:
           echo "TF_VAR_WHASTAPP_CLIENT_TOKEN=${{ secrets.WHASTAPP_CLIENT_TOKEN_STG }}" >> $GITHUB_ENV
           echo "TF_VAR_WHASTAPP_INSTANCE_ID=${{ secrets.WHASTAPP_INSTANCE_ID_STG }}" >> $GITHUB_ENV
           echo "TF_VAR_WHASTAPP_TOKEN=${{ secrets.WHASTAPP_TOKEN_STG }}" >> $GITHUB_ENV
+          # --- STOPGAP OPCIONAL ---
+          # Se seu variables.tf ainda declara "variable \"rds_password\"" sem default,
+          # descomente a linha abaixo TEMPORARIAMENTE até remover/neutralizar essa var no código:
+          # echo "TF_VAR_rds_password=" >> $GITHUB_ENV
 
-      - name: Terraform Apply
+      # Checks rápidos para falhar cedo (sem travar no apply)
+      - name: Terraform fmt (check)
         working-directory: ${{ env.INFRA_DIR }}
-        run: terraform apply -auto-approve
+        run: terraform fmt -check -recursive
+
+      - name: Terraform validate
+        working-directory: ${{ env.INFRA_DIR }}
+        run: terraform validate
+
+      - name: Terraform plan
+        working-directory: ${{ env.INFRA_DIR }}
+        run: terraform plan -out=tfplan
+
+      - name: Terraform apply
+        working-directory: ${{ env.INFRA_DIR }}
+        run: terraform apply -auto-approve tfplan
+
 
       # ---------- Flyway ----------
       - name: Install tools (jq)
