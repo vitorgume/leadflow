@@ -19,8 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 
 # Instala dependências com cache do pip
 COPY requirements.txt .
-# Se tiver, inclua também o arquivo de dev
-COPY requirements-dev.txt requirements-dev.txt
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
     pip install -r requirements.txt && \
