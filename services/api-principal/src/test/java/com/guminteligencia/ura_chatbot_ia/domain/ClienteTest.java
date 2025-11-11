@@ -16,10 +16,7 @@ class ClienteTest {
                 .id(UUID.randomUUID())
                 .nome("Nome teste")
                 .telefone("000000000000")
-                .regiao(Regiao.REGIAO_MARINGA)
-                .segmento(Segmento.MEDICINA_SAUDE)
                 .inativo(false)
-                .descricaoMaterial("Descrição teste")
                 .build();
     }
 
@@ -29,10 +26,7 @@ class ClienteTest {
                 .id(UUID.randomUUID())
                 .nome("Nome teste 2")
                 .telefone("00000000001")
-                .regiao(Regiao.MARINGA)
-                .segmento(Segmento.ALIMENTOS)
                 .inativo(true)
-                .descricaoMaterial("Descrição teste 2")
                 .build();
 
         cliente.setDados(novosDados);
@@ -40,9 +34,6 @@ class ClienteTest {
         Assertions.assertNotEquals(cliente.getId(), novosDados.getId());
         Assertions.assertEquals(cliente.getNome(), novosDados.getNome());
         Assertions.assertNotEquals(cliente.getTelefone(), novosDados.getTelefone());
-        Assertions.assertEquals(cliente.getRegiao(), novosDados.getRegiao());
-        Assertions.assertEquals(cliente.getSegmento(), novosDados.getSegmento());
         Assertions.assertFalse(cliente.isInativo());
-        Assertions.assertEquals(cliente.getDescricaoMaterial(), novosDados.getDescricaoMaterial());
     }
 }

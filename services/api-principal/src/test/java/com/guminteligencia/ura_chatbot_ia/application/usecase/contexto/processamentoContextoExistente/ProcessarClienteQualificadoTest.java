@@ -78,9 +78,6 @@ class ProcessarClienteQualificadoTest {
     void deveProcessarExecutarFluxoCompleto() {
         Qualificacao qual = new Qualificacao();
         qual.setNome("João");
-        qual.setRegiao(Regiao.MARINGA.getCodigo());
-        qual.setSegmento(Segmento.MEDICINA_SAUDE.getCodigo());
-        qual.setDescricaoMaterial("Descrito");
         when(agenteUseCase.enviarJsonTrasformacao(resposta)).thenReturn(qual);
         when(conversaAgente.getCliente()).thenReturn(originalCliente);
         when(originalCliente.getId()).thenReturn(originalId);
@@ -118,9 +115,6 @@ class ProcessarClienteQualificadoTest {
 
         Cliente built = capCliente.getValue();
         assertEquals("João", built.getNome());
-        assertEquals(1, built.getRegiao().getCodigo());
-        assertEquals(1, built.getSegmento().getCodigo());
-        assertEquals("Descrito", built.getDescricaoMaterial());
 
         inOrder.verify(clienteUseCase).alterar(any(), eq(originalId));
 

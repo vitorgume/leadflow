@@ -53,9 +53,6 @@ class ProcessarConversaInativaTest {
         when(cliente.getTelefone()).thenReturn("+5511999999999");
         when(vendedor.getNome()).thenReturn("Vendedor Teste");
 
-        // Roleta vendedor
-        when(vendedorUseCase.roletaVendedoresConversaInativa(cliente)).thenReturn(vendedor);
-
         // Mensagem do builder
         when(mensagemBuilder.getMensagem(
                 eq(TipoMensagem.REDIRECIONAMENTO_RECONTATO),
@@ -70,7 +67,6 @@ class ProcessarConversaInativaTest {
         InOrder inOrder = inOrder(conversa, vendedorUseCase, mensagemBuilder, mensagemUseCase, crmUseCase);
 
         inOrder.verify(conversa).setFinalizada(true);
-        inOrder.verify(vendedorUseCase).roletaVendedoresConversaInativa(cliente);
         inOrder.verify(conversa).setVendedor(vendedor);
 
         inOrder.verify(mensagemBuilder).getMensagem(
@@ -89,25 +85,6 @@ class ProcessarConversaInativaTest {
     }
 
     @Test
-    void devePropagarExcecaoQuandoFalhaAoSortearVendedor() {
-        ConversaAgente conversa = mock(ConversaAgente.class);
-        Cliente cliente = mock(Cliente.class);
-
-        when(vendedorUseCase.roletaVendedoresConversaInativa(cliente))
-                .thenThrow(new IllegalStateException("erro-roleta"));
-
-        IllegalStateException ex = assertThrows(IllegalStateException.class,
-                () -> processador.processar("resp", conversa, cliente));
-        assertEquals("erro-roleta", ex.getMessage());
-
-        // Garantir que nada prossegue após a falha
-        verify(conversa).setFinalizada(true); // foi chamado antes da roleta
-        verifyNoInteractions(mensagemBuilder);
-        verifyNoInteractions(crmUseCase);
-        verifyNoMoreInteractions(mensagemUseCase);
-    }
-
-    @Test
     void devePropagarExcecaoQuandoFalhaAoEnviarMensagemInicial() {
         ConversaAgente conversa = mock(ConversaAgente.class);
         Cliente cliente = mock(Cliente.class);
@@ -115,7 +92,6 @@ class ProcessarConversaInativaTest {
 
         when(cliente.getTelefone()).thenReturn("+5544999999999");
         when(vendedor.getNome()).thenReturn("João");
-        when(vendedorUseCase.roletaVendedoresConversaInativa(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(
                 eq(TipoMensagem.REDIRECIONAMENTO_RECONTATO),
                 eq("João"), isNull()))
@@ -143,7 +119,6 @@ class ProcessarConversaInativaTest {
 
         when(cliente.getTelefone()).thenReturn("+5533999999999");
         when(vendedor.getNome()).thenReturn("Maria");
-        when(vendedorUseCase.roletaVendedoresConversaInativa(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(
                 eq(TipoMensagem.REDIRECIONAMENTO_RECONTATO),
                 eq("Maria"), isNull()))
@@ -183,7 +158,6 @@ class ProcessarConversaInativaTest {
 
         when(cliente.getTelefone()).thenReturn("+5577999999999");
         when(vendedor.getNome()).thenReturn("Ana");
-        when(vendedorUseCase.roletaVendedoresConversaInativa(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(
                 eq(TipoMensagem.REDIRECIONAMENTO_RECONTATO),
                 eq("Ana"), isNull()))

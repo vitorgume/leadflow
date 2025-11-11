@@ -155,7 +155,6 @@ class ConversaInativaUseCaseTest {
             when(conversaAgenteUseCase.listarNaoFinalizados()).thenReturn(List.of(conv));
 
             Vendedor vendedor = Vendedor.builder().id(1L).nome("Nome teste").build();
-            when(vendedorUseCase.roletaVendedoresConversaInativa(cliente)).thenReturn(vendedor);
 
             doNothing().when(crmUseCase).atualizarCrm(any(), any(), any());
 
@@ -168,7 +167,6 @@ class ConversaInativaUseCaseTest {
 
             inOrder.verify(conv).setStatus(StatusConversa.INATIVO_G2);
             inOrder.verify(conv).setFinalizada(true);
-            inOrder.verify(vendedorUseCase).roletaVendedoresConversaInativa(cliente);
             inOrder.verify(conv).setVendedor(vendedor);
             inOrder.verify(crmUseCase).atualizarCrm(eq(vendedor), eq(cliente), eq(conv));
             inOrder.verify(conversaAgenteUseCase).salvar(conv);

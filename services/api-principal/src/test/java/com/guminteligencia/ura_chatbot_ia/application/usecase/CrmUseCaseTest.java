@@ -24,9 +24,6 @@ class CrmUseCaseTest {
     @Mock
     private CrmGateway gateway;
 
-    @Mock
-    private ChatUseCase chatUseCase;
-
     @InjectMocks
     private CrmUseCase useCase;
 
@@ -43,7 +40,6 @@ class CrmUseCaseTest {
     void setUp() {
         useCase = new CrmUseCase(
                 gateway,
-                chatUseCase,
                 "prod"
         );
 
@@ -67,18 +63,6 @@ class CrmUseCaseTest {
         int idLead = 42;
 
         when(cliente.getTelefone()).thenReturn(tel);
-        when(cliente.getDescricaoMaterial()).thenReturn("desc-material");
-        when(cliente.getEnderecoReal()).thenReturn("Rua A, 123");
-
-        // segmento e região (evita NPE em getSegmento().getIdCrm())
-        Segmento segmento = mock(Segmento.class);
-        when(segmento.getIdCrm()).thenReturn(10);
-        when(cliente.getSegmento()).thenReturn(segmento);
-
-        Regiao regiao = mock(Regiao.class);
-        when(regiao.getIdCrm()).thenReturn(20);
-        when(cliente.getRegiao()).thenReturn(regiao);
-
         // vendedor e chat
         when(vendedor.getIdVendedorCrm()).thenReturn(999);;
 //        when(chatUseCase.criar(conversaAgente.getId())).thenReturn(urlChat);
@@ -115,17 +99,6 @@ class CrmUseCaseTest {
         int idLead = 42;
 
         when(cliente.getTelefone()).thenReturn(tel);
-        when(cliente.getDescricaoMaterial()).thenReturn("desc-material");
-        when(cliente.getEnderecoReal()).thenReturn("Rua A, 123");
-
-        // segmento e região (evita NPE em getSegmento().getIdCrm())
-        Segmento segmento = mock(Segmento.class);
-        when(segmento.getIdCrm()).thenReturn(10);
-        when(cliente.getSegmento()).thenReturn(segmento);
-
-        Regiao regiao = mock(Regiao.class);
-        when(regiao.getIdCrm()).thenReturn(20);
-        when(cliente.getRegiao()).thenReturn(regiao);
 
         // vendedor e chat
         when(vendedor.getIdVendedorCrm()).thenReturn(999);

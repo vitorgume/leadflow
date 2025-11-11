@@ -17,8 +17,6 @@ class VendedorTest {
                 .nome("Nome teste")
                 .telefone("000000000000")
                 .inativo(false)
-                .segmentos(List.of(Segmento.ALIMENTOS, Segmento.OUTROS))
-                .regioes(List.of(Regiao.REGIAO_MARINGA, Regiao.MARINGA))
                 .prioridade(new Prioridade(1, true))
                 .build();
     }
@@ -30,8 +28,6 @@ class VendedorTest {
                 .nome("Nome teste 2")
                 .telefone("000000000001")
                 .inativo(true)
-                .segmentos(List.of(Segmento.MEDICINA_SAUDE, Segmento.ENGENHARIA_ARQUITETURA))
-                .regioes(List.of(Regiao.MARINGA))
                 .prioridade(new Prioridade(0, false))
                 .build();
 
@@ -41,8 +37,6 @@ class VendedorTest {
         Assertions.assertEquals(vendedor.getNome(), novosDados.getNome());
         Assertions.assertEquals(vendedor.getTelefone(), novosDados.getTelefone());
         Assertions.assertTrue(vendedor.getInativo());
-        Assertions.assertEquals(vendedor.getSegmentos(), novosDados.getSegmentos());
-        Assertions.assertEquals(vendedor.getRegioes(), novosDados.getRegioes());
         Assertions.assertEquals(vendedor.getPrioridade(), novosDados.getPrioridade());
     }
 }

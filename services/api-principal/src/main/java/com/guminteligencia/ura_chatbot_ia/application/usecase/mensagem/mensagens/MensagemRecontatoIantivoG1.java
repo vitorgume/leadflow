@@ -31,7 +31,7 @@ public class MensagemRecontatoIantivoG1 implements MensagemType {
 
             mensagem.append("Podemos dar sequência agora? A agenda do Dr. Felipe está com poucos horários disponíveis, e gostaria de garantir que você de início ao seu tratamento! 😊");
         }
-        
+
         return mensagem.toString();
     }
 
