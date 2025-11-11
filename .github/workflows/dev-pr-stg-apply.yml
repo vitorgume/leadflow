@@ -222,6 +222,19 @@ jobs:
           fi
           must_exist_in_state aws_security_group.mysql
 
+          # ---------- RDS Instance ----------
+          DB_ID="${NAME_PREFIX}-mysql"
+
+          if ! in_state aws_db_instance.mysql; then
+            # Verifica se o DB existe na conta/região
+            aws rds describe-db-instances \
+              --db-instance-identifier "$DB_ID" >/dev/null
+
+            # Importa no state (para o Terraform assumir o controle)
+            terraform import aws_db_instance.mysql "$DB_ID"
+          fi
+          must_exist_in_state aws_db_instance.mysql
+
           # ---------- IAM Role App Runner ----------
           ROLE_NAME="${NAME_PREFIX}-apprunner-role"
           if ! in_state aws_iam_role.apprunner_role; then
