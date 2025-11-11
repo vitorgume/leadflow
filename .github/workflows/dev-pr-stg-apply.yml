@@ -107,6 +107,16 @@ jobs:
           build-args: |
             RUN_TESTS=false
 
+      # Formata escrevendo (não falha)
+      - name: Terraform fmt (write)
+        working-directory: ${{ env.INFRA_DIR }}
+        run: terraform fmt -recursive
+
+      # (opcional) Verifica e mostra diff do que ainda faltou
+      - name: Terraform fmt (check)
+        working-directory: ${{ env.INFRA_DIR }}
+        run: terraform fmt -check -diff -recursive
+
       # ---------- Terraform ----------
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
