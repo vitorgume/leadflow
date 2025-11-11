@@ -153,6 +153,39 @@ jobs:
         working-directory: ${{ env.INFRA_DIR }}
         run: terraform validate
 
+      - name: Terraform imports (idempotente)
+        working-directory: ${{ env.INFRA_DIR }}
+        run: |
+          set -euo pipefail
+
+          imp() { terraform state show "$1" >/dev/null 2>&1 || terraform import "$1" "$2" || true; }
+
+          # SQS
+          imp aws_sqs_queue.fifo https://sqs.us-east-1.amazonaws.com/096863132967/entradas.fifo
+
+          # DynamoDB (use os nomes que o seu apply mostrou)
+          imp aws_dynamodb_table.contexto       contexto_entity_leadflow
+          imp aws_dynamodb_table.outro_contato  outro_contato_entity_leadflow
+
+          # RDS Subnet Group / SG / IAM Role
+          imp aws_db_subnet_group.this  ura-chatbot-ia-pr-1-mysql-subnets
+          imp aws_security_group.mysql  sg-0c54eef38b3a9e9c1
+          imp aws_iam_role.apprunner_role  ura-chatbot-ia-pr-1-apprunner-role
+
+          # Secrets Manager
+          imp aws_secretsmanager_secret.url_bd                 /${{ env.NAME_PREFIX }}/URL_BD
+          imp aws_secretsmanager_secret.user_bd                /${{ env.NAME_PREFIX }}/USER_BD
+          imp aws_secretsmanager_secret.password_bd            /${{ env.NAME_PREFIX }}/PASSWORD_BD
+          imp aws_secretsmanager_secret.database_url           /${{ env.NAME_PREFIX }}/DATABASE_URL
+          imp aws_secretsmanager_secret.openai_api_key         /${{ env.NAME_PREFIX }}/OPENAI_API_KEY
+          imp aws_secretsmanager_secret.app_crm_acess_token    /${{ env.NAME_PREFIX }}/APP_CRM_ACESS_TOKEN
+          imp aws_secretsmanager_secret.api_principal_api_key  /${{ env.NAME_PREFIX }}/API_PRINCIPAL_API_KEY
+          imp aws_secretsmanager_secret.api_principal_secret_key /${{ env.NAME_PREFIX }}/API_PRINCIPAL_SECRET_KEY
+          imp aws_secretsmanager_secret.whatsapp_client_token  /${{ env.NAME_PREFIX }}/WHASTAPP_CLIENT_TOKEN
+          imp aws_secretsmanager_secret.whatsapp_instance_id   /${{ env.NAME_PREFIX }}/WHASTAPP_INSTANCE_ID
+          imp aws_secretsmanager_secret.whatsapp_token         /${{ env.NAME_PREFIX }}/WHASTAPP_TOKEN
+
+
       - name: Terraform plan
         working-directory: ${{ env.INFRA_DIR }}
         run: terraform plan -out=tfplan
