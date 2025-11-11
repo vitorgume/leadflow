@@ -189,7 +189,6 @@ jobs:
           must_exist_in_state aws_sqs_queue.fifo
 
           # ---------- DynamoDB ----------
-          # Use os nomes que seu apply mostrou no log:
           CTX_TABLE="contexto_entity_leadflow"
           OUTRO_TABLE="outro_contato_entity_leadflow"
 
@@ -214,8 +213,7 @@ jobs:
           must_exist_in_state aws_db_subnet_group.this
 
           # ---------- Security Group ----------
-          # Use o ID real (do seu log). Se mudou, atualize a variável abaixo:
-          SG_ID="sg-0c54eef38b3a9e9c1"
+          SG_ID="sg-0c54eef38b3a9e9c1"  # ajuste se necessário
           if ! in_state aws_security_group.mysql; then
             aws ec2 describe-security-groups --group-ids "$SG_ID" >/dev/null
             terraform import aws_security_group.mysql "$SG_ID"
@@ -224,24 +222,42 @@ jobs:
 
           # ---------- RDS Instance ----------
           DB_ID="${NAME_PREFIX}-mysql"
-
           if ! in_state aws_db_instance.mysql; then
-            # Verifica se o DB existe na conta/região
-            aws rds describe-db-instances \
-              --db-instance-identifier "$DB_ID" >/dev/null
-
-            # Importa no state (para o Terraform assumir o controle)
+            aws rds describe-db-instances --db-instance-identifier "$DB_ID" >/dev/null
             terraform import aws_db_instance.mysql "$DB_ID"
           fi
           must_exist_in_state aws_db_instance.mysql
 
-          # ---------- IAM Role App Runner ----------
-          ROLE_NAME="${NAME_PREFIX}-apprunner-role"
-          if ! in_state aws_iam_role.apprunner_role; then
-            aws iam get-role --role-name "$ROLE_NAME" >/dev/null
-            terraform import aws_iam_role.apprunner_role "$ROLE_NAME"
+          # ---------- IAM Roles (NOVAS) ----------
+          ROLE_ACCESS_NAME="${NAME_PREFIX}-apprunner-access-role"
+          if ! in_state aws_iam_role.apprunner_access_role; then
+            aws iam get-role --role-name "$ROLE_ACCESS_NAME" >/dev/null
+            terraform import aws_iam_role.apprunner_access_role "$ROLE_ACCESS_NAME"
           fi
-          must_exist_in_state aws_iam_role.apprunner_role
+          must_exist_in_state aws_iam_role.apprunner_access_role
+
+          ROLE_INSTANCE_NAME="${NAME_PREFIX}-apprunner-instance-role"
+          if ! in_state aws_iam_role.apprunner_instance_role; then
+            aws iam get-role --role-name "$ROLE_INSTANCE_NAME" >/dev/null
+            terraform import aws_iam_role.apprunner_instance_role "$ROLE_INSTANCE_NAME"
+          fi
+          must_exist_in_state aws_iam_role.apprunner_instance_role
+
+          # ---------- IAM Policies (se já existirem) ----------
+          # Managed policy do access (ECR)
+          POLICY_NAME_ACCESS="${NAME_PREFIX}-apprunner-access-ecr"
+          POLICY_ARN_ACCESS=$(aws iam list-policies --scope Local \
+            --query "Policies[?PolicyName=='${POLICY_NAME_ACCESS}'].Arn" --output text || true)
+          if [ -n "${POLICY_ARN_ACCESS}" ] && ! in_state aws_iam_policy.apprunner_access_ecr; then
+            terraform import aws_iam_policy.apprunner_access_ecr "${POLICY_ARN_ACCESS}"
+          fi
+          # Managed policy do instance (runtime)
+          POLICY_NAME_INSTANCE="${NAME_PREFIX}-apprunner-policy"
+          POLICY_ARN_INSTANCE=$(aws iam list-policies --scope Local \
+            --query "Policies[?PolicyName=='${POLICY_NAME_INSTANCE}'].Arn" --output text || true)
+          if [ -n "${POLICY_ARN_INSTANCE}" ] && ! in_state aws_iam_policy.apprunner_policy; then
+            terraform import aws_iam_policy.apprunner_policy "${POLICY_ARN_INSTANCE}"
+          fi
 
           # ---------- Secrets Manager ----------
           import_secret () {
@@ -250,39 +266,31 @@ jobs:
               aws secretsmanager describe-secret --secret-id "$name" >/dev/null
               terraform import "$addr" "$name"
             fi
-
-            if ! in_state aws_secretsmanager_secret.db_app_creds; then
-              aws secretsmanager describe-secret --secret-id "/${NAME_PREFIX}/db-app-creds" >/dev/null
-              terraform import aws_secretsmanager_secret.db_app_creds "/${NAME_PREFIX}/db-app-creds"
-            fi
-            must_exist_in_state aws_secretsmanager_secret.db_app_creds
             must_exist_in_state "$addr"
           }
 
-          # ---------- IAM Managed Policy do App Runner ----------
-          POLICY_NAME="${NAME_PREFIX}-apprunner-policy"
-          POLICY_ARN=$(aws iam list-policies --scope Local \
-            --query "Policies[?PolicyName=='${POLICY_NAME}'].Arn" --output text)
-
-          if [ -n "$POLICY_ARN" ] && ! in_state aws_iam_policy.apprunner_policy; then
-            terraform import aws_iam_policy.apprunner_policy "$POLICY_ARN"
+          # cred composto (usado no Flyway) — e garante presença
+          if ! in_state aws_secretsmanager_secret.db_app_creds; then
+            aws secretsmanager describe-secret --secret-id "/${NAME_PREFIX}/db-app-creds" >/dev/null
+            terraform import aws_secretsmanager_secret.db_app_creds "/${NAME_PREFIX}/db-app-creds"
           fi
-          must_exist_in_state aws_iam_policy.apprunner_policy
+          must_exist_in_state aws_secretsmanager_secret.db_app_creds
 
-          import_secret aws_secretsmanager_secret.url_bd                 "/${NAME_PREFIX}/URL_BD"
-          import_secret aws_secretsmanager_secret.user_bd                "/${NAME_PREFIX}/USER_BD"
-          import_secret aws_secretsmanager_secret.password_bd            "/${NAME_PREFIX}/PASSWORD_BD"
-          import_secret aws_secretsmanager_secret.database_url           "/${NAME_PREFIX}/DATABASE_URL"
-          import_secret aws_secretsmanager_secret.openai_api_key         "/${NAME_PREFIX}/OPENAI_API_KEY"
-          import_secret aws_secretsmanager_secret.app_crm_acess_token    "/${NAME_PREFIX}/APP_CRM_ACESS_TOKEN"
-          import_secret aws_secretsmanager_secret.api_principal_api_key  "/${NAME_PREFIX}/API_PRINCIPAL_API_KEY"
+          import_secret aws_secretsmanager_secret.url_bd                  "/${NAME_PREFIX}/URL_BD"
+          import_secret aws_secretsmanager_secret.user_bd                 "/${NAME_PREFIX}/USER_BD"
+          import_secret aws_secretsmanager_secret.password_bd             "/${NAME_PREFIX}/PASSWORD_BD"
+          import_secret aws_secretsmanager_secret.database_url            "/${NAME_PREFIX}/DATABASE_URL"
+          import_secret aws_secretsmanager_secret.openai_api_key          "/${NAME_PREFIX}/OPENAI_API_KEY"
+          import_secret aws_secretsmanager_secret.app_crm_acess_token     "/${NAME_PREFIX}/APP_CRM_ACESS_TOKEN"
+          import_secret aws_secretsmanager_secret.api_principal_api_key   "/${NAME_PREFIX}/API_PRINCIPAL_API_KEY"
           import_secret aws_secretsmanager_secret.api_principal_secret_key "/${NAME_PREFIX}/API_PRINCIPAL_SECRET_KEY"
-          import_secret aws_secretsmanager_secret.whatsapp_client_token  "/${NAME_PREFIX}/WHASTAPP_CLIENT_TOKEN"
-          import_secret aws_secretsmanager_secret.whatsapp_instance_id   "/${NAME_PREFIX}/WHASTAPP_INSTANCE_ID"
-          import_secret aws_secretsmanager_secret.whatsapp_token         "/${NAME_PREFIX}/WHASTAPP_TOKEN"
+          import_secret aws_secretsmanager_secret.whatsapp_client_token   "/${NAME_PREFIX}/WHASTAPP_CLIENT_TOKEN"
+          import_secret aws_secretsmanager_secret.whatsapp_instance_id    "/${NAME_PREFIX}/WHASTAPP_INSTANCE_ID"
+          import_secret aws_secretsmanager_secret.whatsapp_token          "/${NAME_PREFIX}/WHASTAPP_TOKEN"
 
           echo "----- STATE (depois) -----"
           terraform state list || true
+
 
 
 
