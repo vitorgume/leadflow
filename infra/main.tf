@@ -30,9 +30,46 @@ resource "aws_dynamodb_table" "contexto" {
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
 
-  attribute { name = "id"       type = "S" }
-  attribute { name = "telefone" type = "S" }
-  attribute { name = "status"   type = "S" }
+  attribute {
+    name = "id"
+    type = "S"
+  }
+  attribute {
+    name = "telefone"
+    type = "S"
+  }
+  attribute {
+    name = "status"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "TelefoneStatusIndex"
+    hash_key        = "telefone"
+    range_key       = "status"
+    projection_type = "ALL"
+  }
+
+  tags = local.labels
+}
+
+resource "aws_dynamodb_table" "outro_contato" {
+  name         = var.dynamo_outro_contato_table
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+  attribute {
+    name = "telefone"
+    type = "S"
+  }
+  attribute {
+    name = "status"
+    type = "S"
+  }
 
   global_secondary_index {
     name            = "TelefoneStatusIndex"
