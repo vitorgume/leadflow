@@ -114,14 +114,6 @@ jobs:
           build-args: |
             RUN_TESTS=false
 
-
-      # 1) Credenciais AWS (exemplo com OIDC; se usa chaves, mantenha como já está)
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/<ROLE_GITHUB_OIDC>
-          aws-region: ${{ vars.AWS_REGION }}
-
       # 2) (opcional) Garantir a tabela de lock do Terraform
       - name: Ensure DynamoDB lock table exists
         run: |
