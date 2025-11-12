@@ -14,9 +14,11 @@ output "rds_mysql_endpoint" {
 }
 
 output "apprunner_urls" {
-  value = {
-    api_intermediaria = aws_apprunner_service.api_intermediaria.service_url
-    api_agente        = aws_apprunner_service.api_agente.service_url
-    api_principal     = aws_apprunner_service.api_principal.service_url
-  }
+  description = "URLs dos serviços App Runner"
+
+  value = var.create_services ? {
+    api_intermediaria = aws_apprunner_service.api_intermediaria[0].service_url
+    api_agente        = aws_apprunner_service.api_agente[0].service_url
+    api_principal     = aws_apprunner_service.api_principal[0].service_url
+  } : {}
 }
