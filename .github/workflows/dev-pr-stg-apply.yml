@@ -157,6 +157,13 @@ jobs:
           set -euo pipefail
           aws iam get-role --role-name "AWSServiceRoleForRDS" >/dev/null 2>&1 || \
           aws iam create-service-linked-role --aws-service-name "rds.amazonaws.com"
+      
+      - name: Ensure App Runner service-linked role
+        run: |
+          set -euo pipefail
+          aws iam get-role --role-name "AWSServiceRoleForAppRunner" >/dev/null 2>&1 || \
+          aws iam create-service-linked-role --aws-service-name "apprunner.amazonaws.com"
+
 
       # ---------- Imports idempotentes (com import de Secrets via ARN) ----------
       - name: Terraform imports (idempotente, verificado)
