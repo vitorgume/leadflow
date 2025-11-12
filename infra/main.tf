@@ -95,6 +95,30 @@ data "aws_subnets" "default" {
   }
 }
 
+# Data de cada subnet para ler o availability_zone_id
+data "aws_subnet" "default_by_id" {
+  for_each = toset(data.aws_subnets.default.ids)
+  id       = each.value
+}
+
+# Bloqueia AZs não suportadas pelo App Runner em us-east-1
+locals {
+  # Se em algum momento a AWS bloquear outra AZ, basta adicionar aqui.
+  apprunner_az_blocklist = ["use1-az3"]
+
+  # Subnets válidas para o VPC Connector (exclui as de AZs bloqueadas)
+  apprunner_subnet_ids = [
+    for s in data.aws_subnet.default_by_id :
+    s.id if !contains(local.apprunner_az_blocklist, s.availability_zone_id)
+  ]
+
+  # (Opcional) AZs distintas presentes após o filtro — útil para sanity-check
+  apprunner_subnet_az_ids = distinct([
+    for s in data.aws_subnet.default_by_id :
+    s.availability_zone_id if !contains(local.apprunner_az_blocklist, s.availability_zone_id)
+  ])
+}
+
 resource "aws_apprunner_vpc_connector" "this" {
   vpc_connector_name = "${var.name_prefix}-apprunner-vpc"
   subnets            = data.aws_subnets.default.ids
