@@ -159,6 +159,14 @@ jobs:
           aws iam get-role --role-name "AWSServiceRoleForRDS" >/dev/null 2>&1 || \
           aws iam create-service-linked-role --aws-service-name "rds.amazonaws.com" || true
       
+      - name: Ensure App Runner & VPC Lattice service-linked roles
+        run: |
+          set -euo pipefail
+          aws iam get-role --role-name "AWSServiceRoleForAppRunner"  >/dev/null 2>&1 || \
+            aws iam create-service-linked-role --aws-service-name "apprunner.amazonaws.com"
+          aws iam get-role --role-name "AWSServiceRoleForVpcLattice" >/dev/null 2>&1 || \
+            aws iam create-service-linked-role --aws-service-name "vpc-lattice.amazonaws.com"
+
       - name: Verify App Runner service-linked role exists
         run: |
           set -euo pipefail
