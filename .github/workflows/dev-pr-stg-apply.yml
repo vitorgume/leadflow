@@ -152,18 +152,32 @@ jobs:
         working-directory: ${{ env.INFRA_DIR }}
         run: terraform validate
 
+      # CORREÇÃO: Criar service-linked roles ANTES dos imports
       - name: Ensure RDS service-linked role
         run: |
           set -euo pipefail
           aws iam get-role --role-name "AWSServiceRoleForRDS" >/dev/null 2>&1 || \
-          aws iam create-service-linked-role --aws-service-name "rds.amazonaws.com"
+          aws iam create-service-linked-role --aws-service-name "rds.amazonaws.com" || true
       
-      - name: Ensure App Runner service-linked role
+      - name: Verify App Runner service-linked role exists
         run: |
           set -euo pipefail
-          aws iam get-role --role-name "AWSServiceRoleForAppRunner" >/dev/null 2>&1 || \
-          aws iam create-service-linked-role --aws-service-name "apprunner.amazonaws.com"
-
+          
+          echo "=== Verificando service-linked role do App Runner ==="
+          
+          if aws iam get-role --role-name "AWSServiceRoleForAppRunner" >/dev/null 2>&1; then
+            echo "✓ Service-linked role AWSServiceRoleForAppRunner existe!"
+            aws iam get-role --role-name "AWSServiceRoleForAppRunner" --query 'Role.{Name:RoleName,Created:CreateDate,Arn:Arn}' --output table
+          else
+            echo "❌ ERRO: Service-linked role AWSServiceRoleForAppRunner NÃO existe!"
+            echo ""
+            echo "AÇÃO NECESSÁRIA:"
+            echo "Execute manualmente no AWS CloudShell ou AWS CLI:"
+            echo "  aws iam create-service-linked-role --aws-service-name apprunner.amazonaws.com"
+            echo ""
+            echo "Este comando precisa ser executado apenas UMA VEZ por conta AWS."
+            exit 1
+          fi
 
       # ---------- Imports idempotentes (com import de Secrets via ARN) ----------
       - name: Terraform imports (idempotente, verificado)
@@ -296,7 +310,7 @@ jobs:
             echo "Policy ${POLICY_NAME_INSTANCE} inexistente (ainda) ou já no state; apply cuidará."
           fi
 
-          # ---------- Secrets Manager (pré-existentes) — IMPORT VIA ARN ----------
+          # ---------- Secrets Manager (pré-existentes) – IMPORT VIA ARN ----------
           import_secret_by_name db_app_creds              "/${NAME_PREFIX}/db-app-creds"
           import_secret_by_name url_bd                    "/${NAME_PREFIX}/URL_BD"
           import_secret_by_name user_bd                   "/${NAME_PREFIX}/USER_BD"
