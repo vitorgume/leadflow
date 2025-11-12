@@ -496,6 +496,8 @@ resource "aws_apprunner_vpc_connector" "this" {
 
 # 1) API Intermediária (Java/Spring)
 resource "aws_apprunner_service" "api_intermediaria" {
+  count = var.create_services ? 1 : 0
+
   depends_on = [
     aws_secretsmanager_secret_version.url_bd_v,
     aws_secretsmanager_secret_version.user_bd_v,
@@ -558,6 +560,8 @@ resource "aws_apprunner_service" "api_intermediaria" {
 
 # 2) API do Agente (Python/FastAPI)
 resource "aws_apprunner_service" "api_agente" {
+  count = var.create_services ? 1 : 0
+
   depends_on = [
     aws_secretsmanager_secret_version.database_url_v,
     aws_secretsmanager_secret_version.openai_api_key_v,
@@ -613,6 +617,8 @@ resource "aws_apprunner_service" "api_agente" {
 
 # 3) API Principal (Java/Spring)
 resource "aws_apprunner_service" "api_principal" {
+  count = var.create_services ? 1 : 0
+
   depends_on = [
     aws_secretsmanager_secret_version.url_bd_v,
     aws_secretsmanager_secret_version.user_bd_v,
@@ -638,7 +644,7 @@ resource "aws_apprunner_service" "api_principal" {
         port = tostring(var.api_principal_port)
 
         runtime_environment_variables = {
-          AGENTE_URL             = aws_apprunner_service.api_agente.service_url
+          AGENTE_URL = aws_apprunner_service.api_agente[0].service_url
           APP_CRM_URL            = var.APP_CRM_URL
           AWS_SQS_URL            = aws_sqs_queue.fifo.url
           SPRING_PROFILES_ACTIVE = "prod"

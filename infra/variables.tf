@@ -192,3 +192,10 @@ variable "api_principal_port" {
   type    = number
   default = 8080
 }
+
+variable "create_services" {
+  description = "Se true, cria os serviços do App Runner. Se false, apenas infra (RDS, VPC connector, SG, secrets, SQS, Dynamo, IAM, etc.)"
+  type        = bool
+  default     = true
+}
+
