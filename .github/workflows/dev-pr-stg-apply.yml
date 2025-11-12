@@ -108,6 +108,18 @@ jobs:
           build-args: |
             RUN_TESTS=false
 
+
+      # ---------- Terraform CLI ----------
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8   # pode fixar a versão que você usa
+
+      # ---------- Terraform init (backend/providers) ----------
+      - name: Terraform init
+        working-directory: ${{ env.INFRA_DIR }}
+        run: terraform init -input=false -upgrade
+
             # ---------- Terraform PASSO 1: só infra (sem serviços) ----------
       - name: Terraform plan (infra only)
         working-directory: ${{ env.INFRA_DIR }}
