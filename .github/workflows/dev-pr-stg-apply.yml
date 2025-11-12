@@ -149,7 +149,17 @@ jobs:
         working-directory: ${{ env.INFRA_DIR }}
         env:
           TF_VAR_create_services: "false"
-        run: terraform plan -out=tfplan_infra
+          TF_LOG: INFO
+          TF_LOG_PATH: terraform-plan.log
+        run: terraform plan -input=false -no-color -lock-timeout=300s -parallelism=10 -out=tfplan_infra
+        
+      - name: Upload TF plan log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: tf-plan-log
+          path: infra/terraform-plan.log
+
 
       - name: Terraform apply (infra only)
         working-directory: ${{ env.INFRA_DIR }}
