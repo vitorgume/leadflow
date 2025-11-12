@@ -30,18 +30,9 @@ resource "aws_dynamodb_table" "contexto" {
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
 
-  attribute {
-    name = "id"
-    type = "S"
-  }
-  attribute {
-    name = "telefone"
-    type = "S"
-  }
-  attribute {
-    name = "status"
-    type = "S"
-  }
+  attribute { name = "id"       type = "S" }
+  attribute { name = "telefone" type = "S" }
+  attribute { name = "status"   type = "S" }
 
   global_secondary_index {
     name            = "TelefoneStatusIndex"
@@ -58,18 +49,9 @@ resource "aws_dynamodb_table" "outro_contato" {
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
 
-  attribute {
-    name = "id"
-    type = "S"
-  }
-  attribute {
-    name = "telefone"
-    type = "S"
-  }
-  attribute {
-    name = "status"
-    type = "S"
-  }
+  attribute { name = "id"       type = "S" }
+  attribute { name = "telefone" type = "S" }
+  attribute { name = "status"   type = "S" }
 
   global_secondary_index {
     name            = "TelefoneStatusIndex"
@@ -82,7 +64,7 @@ resource "aws_dynamodb_table" "outro_contato" {
 }
 
 # =========================
-# RDS MySQL (staging)
+# VPC / Subnets (default)
 # =========================
 data "aws_vpc" "default" {
   default = true
@@ -95,38 +77,46 @@ data "aws_subnets" "default" {
   }
 }
 
-# Data de cada subnet para ler o availability_zone_id
+# Lê cada subnet para obter availability_zone_id
 data "aws_subnet" "default_by_id" {
   for_each = toset(data.aws_subnets.default.ids)
   id       = each.value
 }
 
-# Bloqueia AZs não suportadas pelo App Runner em us-east-1
-locals {
-  # Se em algum momento a AWS bloquear outra AZ, basta adicionar aqui.
-  apprunner_az_blocklist = ["use1-az3"]
+# ========= Filtros para VPC Connector (App Runner) =========
+variable "apprunner_az_blocklist" {
+  type        = list(string)
+  description = "AZ IDs bloqueadas para App Runner VPC Connector"
+  default     = ["use1-az3"] # a do erro atual
+}
 
-  # Subnets válidas para o VPC Connector (exclui as de AZs bloqueadas)
+variable "apprunner_subnet_id_blocklist" {
+  type        = list(string)
+  description = "Subnet IDs a bloquear no VPC Connector"
+  default     = []  # ex.: ["subnet-0123abcd", "subnet-0456efgh"]
+}
+
+locals {
+  # Subnets válidas: exclui AZs bloqueadas e subnets bloqueadas
   apprunner_subnet_ids = [
     for s in data.aws_subnet.default_by_id :
-    s.id if !contains(local.apprunner_az_blocklist, s.availability_zone_id)
+    s.id
+    if !contains(var.apprunner_az_blocklist, s.availability_zone_id)
+    && !contains(var.apprunner_subnet_id_blocklist, s.id)
   ]
 
-  # (Opcional) AZs distintas presentes após o filtro — útil para sanity-check
+  # (opcional) AZs distintas após o filtro, útil p/ sanity-check
   apprunner_subnet_az_ids = distinct([
     for s in data.aws_subnet.default_by_id :
-    s.availability_zone_id if !contains(local.apprunner_az_blocklist, s.availability_zone_id)
+    s.availability_zone_id
+    if !contains(var.apprunner_az_blocklist, s.availability_zone_id)
+    && !contains(var.apprunner_subnet_id_blocklist, s.id)
   ])
 }
 
-resource "aws_apprunner_vpc_connector" "this" {
-  vpc_connector_name = "${var.name_prefix}-apprunner-vpc"
-  subnets            = data.aws_subnets.default.ids
-  security_groups    = [aws_security_group.apprunner_connector_sg.id]
-  tags               = local.labels
-}
-
-
+# =========================
+# RDS MySQL (staging)
+# =========================
 resource "aws_db_subnet_group" "this" {
   name       = "${var.name_prefix}-mysql-subnets"
   subnet_ids = data.aws_subnets.default.ids
@@ -187,7 +177,6 @@ resource "aws_security_group_rule" "mysql_from_apprunner" {
   source_security_group_id = aws_security_group.apprunner_connector_sg.id
 }
 
-
 resource "random_password" "rds_appuser" {
   length           = 20
   special          = true
@@ -214,104 +203,33 @@ resource "aws_db_instance" "mysql" {
 # =========================
 # Secrets Manager (sensíveis)
 # =========================
-resource "aws_secretsmanager_secret" "url_bd" {
-  name = "/${var.name_prefix}/URL_BD"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret" "user_bd" {
-  name = "/${var.name_prefix}/USER_BD"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret" "password_bd" {
-  name = "/${var.name_prefix}/PASSWORD_BD"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret_version" "url_bd_v" {
-  secret_id     = aws_secretsmanager_secret.url_bd.id
-  secret_string = local.jdbc_url
-}
-resource "aws_secretsmanager_secret_version" "user_bd_v" {
-  secret_id     = aws_secretsmanager_secret.user_bd.id
-  secret_string = var.rds_username
-}
-resource "aws_secretsmanager_secret_version" "password_bd_v" {
-  secret_id     = aws_secretsmanager_secret.password_bd.id
-  secret_string = random_password.rds_appuser.result
-}
+resource "aws_secretsmanager_secret" "url_bd"           { name = "/${var.name_prefix}/URL_BD"           tags = local.labels }
+resource "aws_secretsmanager_secret" "user_bd"          { name = "/${var.name_prefix}/USER_BD"          tags = local.labels }
+resource "aws_secretsmanager_secret" "password_bd"      { name = "/${var.name_prefix}/PASSWORD_BD"      tags = local.labels }
+resource "aws_secretsmanager_secret" "database_url"     { name = "/${var.name_prefix}/DATABASE_URL"     tags = local.labels }
+resource "aws_secretsmanager_secret" "openai_api_key"   { name = "/${var.name_prefix}/OPENAI_API_KEY"   tags = local.labels }
+resource "aws_secretsmanager_secret" "app_crm_acess_token" { name = "/${var.name_prefix}/APP_CRM_ACESS_TOKEN" tags = local.labels }
+resource "aws_secretsmanager_secret" "api_principal_api_key"   { name = "/${var.name_prefix}/API_PRINCIPAL_API_KEY"   tags = local.labels }
+resource "aws_secretsmanager_secret" "api_principal_secret_key" { name = "/${var.name_prefix}/API_PRINCIPAL_SECRET_KEY" tags = local.labels }
+resource "aws_secretsmanager_secret" "whatsapp_client_token"   { name = "/${var.name_prefix}/WHASTAPP_CLIENT_TOKEN"     tags = local.labels }
+resource "aws_secretsmanager_secret" "whatsapp_instance_id"    { name = "/${var.name_prefix}/WHASTAPP_INSTANCE_ID"      tags = local.labels }
+resource "aws_secretsmanager_secret" "whatsapp_token"          { name = "/${var.name_prefix}/WHASTAPP_TOKEN"            tags = local.labels }
+resource "aws_secretsmanager_secret" "db_app_creds"            { name = "/${var.name_prefix}/db-app-creds"              tags = local.labels }
 
-# Agente
-resource "aws_secretsmanager_secret" "database_url" {
-  name = "/${var.name_prefix}/DATABASE_URL"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret" "openai_api_key" {
-  name = "/${var.name_prefix}/OPENAI_API_KEY"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret_version" "database_url_v" {
-  secret_id     = aws_secretsmanager_secret.database_url.id
-  secret_string = local.sqlalchemy_url
-}
-resource "aws_secretsmanager_secret_version" "openai_api_key_v" {
-  secret_id     = aws_secretsmanager_secret.openai_api_key.id
-  secret_string = var.OPENAI_API_KEY
-}
+resource "aws_secretsmanager_secret_version" "url_bd_v"      { secret_id = aws_secretsmanager_secret.url_bd.id      secret_string = local.jdbc_url }
+resource "aws_secretsmanager_secret_version" "user_bd_v"     { secret_id = aws_secretsmanager_secret.user_bd.id     secret_string = var.rds_username }
+resource "aws_secretsmanager_secret_version" "password_bd_v" { secret_id = aws_secretsmanager_secret.password_bd.id secret_string = random_password.rds_appuser.result }
 
-# Principal
-resource "aws_secretsmanager_secret" "app_crm_acess_token" {
-  name = "/${var.name_prefix}/APP_CRM_ACESS_TOKEN"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret" "api_principal_api_key" {
-  name = "/${var.name_prefix}/API_PRINCIPAL_API_KEY"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret" "api_principal_secret_key" {
-  name = "/${var.name_prefix}/API_PRINCIPAL_SECRET_KEY"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret" "whatsapp_client_token" {
-  name = "/${var.name_prefix}/WHASTAPP_CLIENT_TOKEN"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret" "whatsapp_instance_id" {
-  name = "/${var.name_prefix}/WHASTAPP_INSTANCE_ID"
-  tags = local.labels
-}
-resource "aws_secretsmanager_secret" "whatsapp_token" {
-  name = "/${var.name_prefix}/WHASTAPP_TOKEN"
-  tags = local.labels
-}
+resource "aws_secretsmanager_secret_version" "database_url_v" { secret_id = aws_secretsmanager_secret.database_url.id secret_string = local.sqlalchemy_url }
+resource "aws_secretsmanager_secret_version" "openai_api_key_v" { secret_id = aws_secretsmanager_secret.openai_api_key.id secret_string = var.OPENAI_API_KEY }
 
-resource "aws_secretsmanager_secret_version" "app_crm_acess_token_v" {
-  secret_id     = aws_secretsmanager_secret.app_crm_acess_token.id
-  secret_string = var.APP_CRM_ACESS_TOKEN
-}
-resource "aws_secretsmanager_secret_version" "api_principal_api_key_v" {
-  secret_id     = aws_secretsmanager_secret.api_principal_api_key.id
-  secret_string = var.API_PRINCIPAL_API_KEY
-}
-resource "aws_secretsmanager_secret_version" "api_principal_secret_key_v" {
-  secret_id     = aws_secretsmanager_secret.api_principal_secret_key.id
-  secret_string = var.API_PRINCIPAL_SECRET_KEY
-}
-resource "aws_secretsmanager_secret_version" "whatsapp_client_token_v" {
-  secret_id     = aws_secretsmanager_secret.whatsapp_client_token.id
-  secret_string = var.WHASTAPP_CLIENT_TOKEN
-}
-resource "aws_secretsmanager_secret_version" "whatsapp_instance_id_v" {
-  secret_id     = aws_secretsmanager_secret.whatsapp_instance_id.id
-  secret_string = var.WHASTAPP_INSTANCE_ID
-}
-resource "aws_secretsmanager_secret_version" "whatsapp_token_v" {
-  secret_id     = aws_secretsmanager_secret.whatsapp_token.id
-  secret_string = var.WHASTAPP_TOKEN
-}
+resource "aws_secretsmanager_secret_version" "app_crm_acess_token_v" { secret_id = aws_secretsmanager_secret.app_crm_acess_token.id secret_string = var.APP_CRM_ACESS_TOKEN }
+resource "aws_secretsmanager_secret_version" "api_principal_api_key_v" { secret_id = aws_secretsmanager_secret.api_principal_api_key.id secret_string = var.API_PRINCIPAL_API_KEY }
+resource "aws_secretsmanager_secret_version" "api_principal_secret_key_v" { secret_id = aws_secretsmanager_secret.api_principal_secret_key.id secret_string = var.API_PRINCIPAL_SECRET_KEY }
+resource "aws_secretsmanager_secret_version" "whatsapp_client_token_v" { secret_id = aws_secretsmanager_secret.whatsapp_client_token.id secret_string = var.WHASTAPP_CLIENT_TOKEN }
+resource "aws_secretsmanager_secret_version" "whatsapp_instance_id_v"  { secret_id = aws_secretsmanager_secret.whatsapp_instance_id.id  secret_string = var.WHASTAPP_INSTANCE_ID }
+resource "aws_secretsmanager_secret_version" "whatsapp_token_v"        { secret_id = aws_secretsmanager_secret.whatsapp_token.id        secret_string = var.WHASTAPP_TOKEN }
 
-resource "aws_secretsmanager_secret" "db_app_creds" {
-  name = "/${var.name_prefix}/db-app-creds"
-  tags = local.labels
-}
 resource "aws_secretsmanager_secret_version" "db_app_creds_v" {
   secret_id     = aws_secretsmanager_secret.db_app_creds.id
   secret_string = jsonencode({
@@ -440,6 +358,23 @@ resource "aws_iam_policy" "apprunner_policy" {
 resource "aws_iam_role_policy_attachment" "apprunner_instance_attach" {
   role       = aws_iam_role.apprunner_instance_role.name
   policy_arn = aws_iam_policy.apprunner_policy.arn
+}
+
+# =========================
+# VPC Connector do App Runner
+# =========================
+resource "aws_apprunner_vpc_connector" "this" {
+  vpc_connector_name = "${var.name_prefix}-apprunner-vpc"
+  subnets            = local.apprunner_subnet_ids
+  security_groups    = [aws_security_group.apprunner_connector_sg.id]
+  tags               = local.labels
+
+  lifecycle {
+    precondition {
+      condition     = length(local.apprunner_subnet_ids) > 0
+      error_message = "Nenhuma subnet válida para o VPC Connector (ajuste apprunner_az_blocklist/apprunner_subnet_id_blocklist)."
+    }
+  }
 }
 
 # =========================
