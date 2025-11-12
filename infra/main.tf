@@ -95,6 +95,14 @@ data "aws_subnets" "default" {
   }
 }
 
+resource "aws_apprunner_vpc_connector" "this" {
+  vpc_connector_name = "${var.name_prefix}-apprunner-vpc"
+  subnets            = data.aws_subnets.default.ids
+  security_groups    = [aws_security_group.apprunner_connector_sg.id]
+  tags               = local.labels
+}
+
+
 resource "aws_db_subnet_group" "this" {
   name       = "${var.name_prefix}-mysql-subnets"
   subnet_ids = data.aws_subnets.default.ids
@@ -127,6 +135,34 @@ resource "aws_security_group" "mysql" {
 
   tags = local.labels
 }
+
+# SG usado pelo VPC Connector do App Runner (egress liberado)
+resource "aws_security_group" "apprunner_connector_sg" {
+  name        = "${var.name_prefix}-apprunner-connector-sg"
+  description = "SG do VPC Connector do App Runner"
+  vpc_id      = data.aws_vpc.default.id
+  tags        = local.labels
+
+  egress {
+    description = "All egress"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Permite MySQL (3306) do SG do VPC Connector -> SG do RDS
+resource "aws_security_group_rule" "mysql_from_apprunner" {
+  type                     = "ingress"
+  description              = "Permite MySQL (3306) a partir do VPC Connector do App Runner"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.mysql.id
+  source_security_group_id = aws_security_group.apprunner_connector_sg.id
+}
+
 
 resource "random_password" "rds_appuser" {
   length           = 20
@@ -438,6 +474,13 @@ resource "aws_apprunner_service" "api_intermediaria" {
     unhealthy_threshold  = 5
   }
 
+  network_configuration {
+    egress_configuration {
+      egress_type       = "VPC"
+      vpc_connector_arn = aws_apprunner_vpc_connector.this.arn
+    }
+  }
+
   tags = local.labels
 }
 
@@ -484,6 +527,13 @@ resource "aws_apprunner_service" "api_agente" {
     timeout              = 5
     healthy_threshold    = 1
     unhealthy_threshold  = 5
+  }
+
+  network_configuration {
+    egress_configuration {
+      egress_type       = "VPC"
+      vpc_connector_arn = aws_apprunner_vpc_connector.this.arn
+    }
   }
 
   tags = local.labels
@@ -553,6 +603,13 @@ resource "aws_apprunner_service" "api_principal" {
     timeout              = 5
     healthy_threshold    = 1
     unhealthy_threshold  = 5
+  }
+
+  network_configuration {
+    egress_configuration {
+      egress_type       = "VPC"
+      vpc_connector_arn = aws_apprunner_vpc_connector.this.arn
+    }
   }
 
   tags = local.labels
