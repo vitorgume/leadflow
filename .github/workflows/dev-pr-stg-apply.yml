@@ -44,8 +44,21 @@ env:
   TF_VAR_image_tag_api_agente:        pr-${{ github.event.pull_request.number }}-agent
   TF_VAR_image_tag_api_principal:     pr-${{ github.event.pull_request.number }}-principal
   TF_VAR_rds_db_name: app_stg
+
+  # 👇 ajuste aqui, alinhando com o variables.tf e com seus SECRETS do GitHub
+  TF_VAR_APP_CRM_ACESS_TOKEN:        ${{ secrets.APP_CRM_ACESS_TOKEN_STG }}
+  TF_VAR_API_PRINCIPAL_API_KEY:      ${{ secrets.API_PRINCIPAL_API_KEY_STG }}
+  TF_VAR_API_PRINCIPAL_SECRET_KEY:   ${{ secrets.API_PRINCIPAL_SECRET_KEY_STG }}
+  TF_VAR_WHASTAPP_CLIENT_TOKEN:      ${{ secrets.WHASTAPP_CLIENT_TOKEN_STG }}
+  TF_VAR_WHASTAPP_INSTANCE_ID:       ${{ secrets.WHASTAPP_INSTANCE_ID_STG }}
+  TF_VAR_WHASTAPP_TOKEN:             ${{ secrets.WHASTAPP_TOKEN_STG }}
+
+  TF_VAR_OPENAI_API_KEY:             ${{ secrets.OPENAI_API_KEY_STG }}
+
+  
+  
   TF_VAR_APP_CRM_URL: ${{ vars.APP_CRM_URL }}
-  TF_VAR_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_STG }}
+  
 
   # --- diretórios ---
   SERVICE_INTER_PATH: services/api-intermediaria
