@@ -226,63 +226,75 @@ resource "aws_db_instance" "mysql" {
 # Secrets Manager (sensíveis)
 # =========================
 resource "aws_secretsmanager_secret" "url_bd" {
-  name = "/${var.name_prefix}/URL_BD"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/URL_BD"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "user_bd" {
-  name = "/${var.name_prefix}/USER_BD"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/USER_BD"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "password_bd" {
-  name = "/${var.name_prefix}/PASSWORD_BD"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/PASSWORD_BD"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "database_url" {
-  name = "/${var.name_prefix}/DATABASE_URL"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/DATABASE_URL"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "openai_api_key" {
-  name = "/${var.name_prefix}/OPENAI_API_KEY"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/OPENAI_API_KEY"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "app_crm_acess_token" {
-  name = "/${var.name_prefix}/APP_CRM_ACESS_TOKEN"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/APP_CRM_ACESS_TOKEN"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "api_principal_api_key" {
-  name = "/${var.name_prefix}/API_PRINCIPAL_API_KEY"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/API_PRINCIPAL_API_KEY"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "api_principal_secret_key" {
-  name = "/${var.name_prefix}/API_PRINCIPAL_SECRET_KEY"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/API_PRINCIPAL_SECRET_KEY"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "whatsapp_client_token" {
-  name = "/${var.name_prefix}/WHASTAPP_CLIENT_TOKEN"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/WHASTAPP_CLIENT_TOKEN"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "whatsapp_instance_id" {
-  name = "/${var.name_prefix}/WHASTAPP_INSTANCE_ID"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/WHASTAPP_INSTANCE_ID"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "whatsapp_token" {
-  name = "/${var.name_prefix}/WHASTAPP_TOKEN"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/WHASTAPP_TOKEN"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 resource "aws_secretsmanager_secret" "db_app_creds" {
-  name = "/${var.name_prefix}/db-app-creds"
-  tags = local.labels
+  name                          = "/${var.name_prefix}/stg/db-app-creds"
+  tags                          = local.labels
+  force_delete_without_recovery = true
 }
 
 # -------- Secret Versions --------

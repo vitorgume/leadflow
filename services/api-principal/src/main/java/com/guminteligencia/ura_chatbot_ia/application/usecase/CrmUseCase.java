@@ -6,9 +6,7 @@ import com.guminteligencia.ura_chatbot_ia.application.gateways.CrmGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.CardDto;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.CustomFieldDto;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.CustomFieldValueDto;
-import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
-import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,25 +43,25 @@ public class CrmUseCase {
 
             List<CustomFieldDto> customFieldDtos = new ArrayList<>();
 
-//            addTextIfPresent(customFieldDtos, 1484843, cliente.getDescricaoMaterial());
-//
-//            customFieldDtos.add(selectField(1486843, cliente.getSegmento() == null ? 1242461 : cliente.getSegmento().getIdCrm()));
-//
-//            customFieldDtos.add(selectField(1486845, cliente.getRegiao() == null ? 1242469 : cliente.getRegiao().getIdCrm()));
-//
-//            addTextIfPresent(customFieldDtos, 1486847, cliente.getEnderecoReal());
+            addTextIfPresent(customFieldDtos, 2760738, cliente.getCpf());
 
-            addTextIfPresent(customFieldDtos, 1486849, "");
+            customFieldDtos.add(selectField(2760990, cliente.getConsentimentoAtendimnento() ? 2191554 : 2191556));
+
+            customFieldDtos.add(selectField(2761160, cliente.getTipoConsulta() == null ? TipoConsulta.NAO_INFORMADO.getCodigoCrm() : cliente.getTipoConsulta().getCodigoCrm()));
+
+            addTextIfPresent(customFieldDtos,2761314, cliente.getDorDesejoPaciente());
+
+            addTextIfPresent(customFieldDtos, 2761366, cliente.getLinkMidia());
+
+            customFieldDtos.add(selectField(2761418, cliente.getPreferenciaHorario() == null ? PreferenciaHorario.NAO_INFORMADO.getCodigoCrm() : cliente.getPreferenciaHorario().getCodigoCrm()));
 
             Map<String, Integer> tagItem = conversaAgente.getStatus().getCodigo().equals(2) || conversaAgente.getStatus().getCodigo().equals(0)
-                    ? Map.of("id", 117527)
-                    : Map.of("id", 111143);
+                    ? Map.of("id", 100738)
+                    : Map.of("id", 100736);
 
-            Integer statusId = conversaAgente.getStatus().getCodigo().equals(1) ? 95198915 : 93572343;
+            Integer statusId = conversaAgente.getStatus().getCodigo().equals(1) ? 96488527 : 96488979;
 
-            Map<String, Integer> tagIdentificador = Map.of("id", 126472);
-
-            Map<String, Object> embedded = Map.of("tags", List.of(tagItem, tagIdentificador));
+            Map<String, Object> embedded = Map.of("tags", List.of(tagItem));
 
             CardDto cardDto = CardDto.builder()
                     .responsibleUserId(vendedor.getIdVendedorCrm())
