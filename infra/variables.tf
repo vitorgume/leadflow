@@ -33,13 +33,13 @@ variable "sqs_name" {
 # Tabela 1: contexto_entity (com GSI TelefoneStatusIndex)
 variable "dynamo_contexto_table" {
   type    = string
-  default = "contexto_entity_leadflow"
+  default = "contexto_entity_leadflow_teste"
 }
 
 # Tabela 2: outro_contato_entity (com GSI TelefoneStatusIndex)
 variable "dynamo_outro_contato_table" {
   type    = string
-  default = "outro_contato_entity_leadflow"
+  default = "outro_contato_entity_leadflow_teste"
 }
 
 #############################

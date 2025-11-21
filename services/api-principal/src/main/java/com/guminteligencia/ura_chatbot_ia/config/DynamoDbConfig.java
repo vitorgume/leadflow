@@ -50,14 +50,4 @@ public class DynamoDbConfig {
     ) {
         return enhancedClient.table(tableName, TableSchema.fromBean(ContextoEntity.class));
     }
-
-    // 4) Tabela: Outro Contato
-    @Bean
-    public DynamoDbTable<OutroContatoEntity> outroContatoTable(
-            DynamoDbEnhancedClient enhancedClient,
-            @Value("${app.dynamo.outro-contato-table:${DYNAMO_OUTRO_CONTATO_TABLE:outro_contato_entity_leadflow}}")
-            String tableName
-    ) {
-        return enhancedClient.table(tableName, TableSchema.fromBean(OutroContatoEntity.class));
-    }
 }

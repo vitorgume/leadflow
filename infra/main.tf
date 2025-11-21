@@ -223,151 +223,6 @@ resource "aws_db_instance" "mysql" {
 }
 
 # =========================
-# Secrets Manager (sensíveis)
-# =========================
-resource "aws_secretsmanager_secret" "url_bd" {
-  name                          = "/${var.name_prefix}/stg/URL_BD"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "user_bd" {
-  name                          = "/${var.name_prefix}/stg/USER_BD"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "password_bd" {
-  name                          = "/${var.name_prefix}/stg/PASSWORD_BD"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "database_url" {
-  name                          = "/${var.name_prefix}/stg/DATABASE_URL"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "openai_api_key" {
-  name                          = "/${var.name_prefix}/stg/OPENAI_API_KEY"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "app_crm_acess_token" {
-  name                          = "/${var.name_prefix}/stg/APP_CRM_ACESS_TOKEN"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "api_principal_api_key" {
-  name                          = "/${var.name_prefix}/stg/API_PRINCIPAL_API_KEY"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "api_principal_secret_key" {
-  name                          = "/${var.name_prefix}/stg/API_PRINCIPAL_SECRET_KEY"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "whatsapp_client_token" {
-  name                          = "/${var.name_prefix}/stg/WHASTAPP_CLIENT_TOKEN"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "whatsapp_instance_id" {
-  name                          = "/${var.name_prefix}/stg/WHASTAPP_INSTANCE_ID"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "whatsapp_token" {
-  name                          = "/${var.name_prefix}/stg/WHASTAPP_TOKEN"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-resource "aws_secretsmanager_secret" "db_app_creds" {
-  name                          = "/${var.name_prefix}/stg/db-app-creds"
-  tags                          = local.labels
-  force_delete_without_recovery = true
-}
-
-# -------- Secret Versions --------
-
-resource "aws_secretsmanager_secret_version" "url_bd_v" {
-  secret_id     = aws_secretsmanager_secret.url_bd.id
-  secret_string = local.jdbc_url
-}
-
-resource "aws_secretsmanager_secret_version" "user_bd_v" {
-  secret_id     = aws_secretsmanager_secret.user_bd.id
-  secret_string = var.rds_username
-}
-
-resource "aws_secretsmanager_secret_version" "password_bd_v" {
-  secret_id     = aws_secretsmanager_secret.password_bd.id
-  secret_string = random_password.rds_appuser.result
-}
-
-resource "aws_secretsmanager_secret_version" "database_url_v" {
-  secret_id     = aws_secretsmanager_secret.database_url.id
-  secret_string = local.sqlalchemy_url
-}
-
-resource "aws_secretsmanager_secret_version" "openai_api_key_v" {
-  secret_id     = aws_secretsmanager_secret.openai_api_key.id
-  secret_string = var.OPENAI_API_KEY
-}
-
-resource "aws_secretsmanager_secret_version" "app_crm_acess_token_v" {
-  secret_id     = aws_secretsmanager_secret.app_crm_acess_token.id
-  secret_string = var.APP_CRM_ACESS_TOKEN
-}
-
-resource "aws_secretsmanager_secret_version" "api_principal_api_key_v" {
-  secret_id     = aws_secretsmanager_secret.api_principal_api_key.id
-  secret_string = var.API_PRINCIPAL_API_KEY
-}
-
-resource "aws_secretsmanager_secret_version" "api_principal_secret_key_v" {
-  secret_id     = aws_secretsmanager_secret.api_principal_secret_key.id
-  secret_string = var.API_PRINCIPAL_SECRET_KEY
-}
-
-resource "aws_secretsmanager_secret_version" "whatsapp_client_token_v" {
-  secret_id     = aws_secretsmanager_secret.whatsapp_client_token.id
-  secret_string = var.WHASTAPP_CLIENT_TOKEN
-}
-
-resource "aws_secretsmanager_secret_version" "whatsapp_instance_id_v" {
-  secret_id     = aws_secretsmanager_secret.whatsapp_instance_id.id
-  secret_string = var.WHASTAPP_INSTANCE_ID
-}
-
-resource "aws_secretsmanager_secret_version" "whatsapp_token_v" {
-  secret_id     = aws_secretsmanager_secret.whatsapp_token.id
-  secret_string = var.WHASTAPP_TOKEN
-}
-
-
-resource "aws_secretsmanager_secret_version" "db_app_creds_v" {
-  secret_id     = aws_secretsmanager_secret.db_app_creds.id
-  secret_string = jsonencode({
-    username = var.rds_username
-    password = random_password.rds_appuser.result
-    host     = local.db_host
-    dbname   = var.rds_db_name
-    port     = 3306
-    jdbc_url = local.jdbc_url
-  })
-}
-
-# =========================
 # IAM p/ App Runner
 # =========================
 
@@ -413,7 +268,7 @@ resource "aws_iam_role_policy_attachment" "apprunner_access_attach" {
   policy_arn = aws_iam_policy.apprunner_access_ecr.arn
 }
 
-# --- Instance Role (runtime: Secrets, SQS, Logs) ---
+# --- Instance Role (runtime: SQS, Logs, ECR se preciso) ---
 data "aws_iam_policy_document" "apprunner_instance_trust" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -433,31 +288,14 @@ resource "aws_iam_role" "apprunner_instance_role" {
   tags               = local.labels
 }
 
-# Política de runtime (SQS + Secrets + Logs + ECR pulls se necessário)
 data "aws_iam_policy_document" "apprunner_policy" {
+  # SQS
   statement {
     actions   = ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl"]
     resources = [aws_sqs_queue.fifo.arn]
   }
 
-  statement {
-    actions = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-    resources = [
-      aws_secretsmanager_secret.url_bd.arn,
-      aws_secretsmanager_secret.user_bd.arn,
-      aws_secretsmanager_secret.password_bd.arn,
-      aws_secretsmanager_secret.database_url.arn,
-      aws_secretsmanager_secret.openai_api_key.arn,
-      aws_secretsmanager_secret.app_crm_acess_token.arn,
-      aws_secretsmanager_secret.api_principal_api_key.arn,
-      aws_secretsmanager_secret.api_principal_secret_key.arn,
-      aws_secretsmanager_secret.whatsapp_client_token.arn,
-      aws_secretsmanager_secret.whatsapp_instance_id.arn,
-      aws_secretsmanager_secret.whatsapp_token.arn,
-      aws_secretsmanager_secret.db_app_creds.arn
-    ]
-  }
-
+  # Logs
   statement {
     actions   = ["logs:*"]
     resources = ["*"]
@@ -511,9 +349,6 @@ resource "aws_apprunner_service" "api_intermediaria" {
   count = var.create_services ? 1 : 0
 
   depends_on = [
-    aws_secretsmanager_secret_version.url_bd_v,
-    aws_secretsmanager_secret_version.user_bd_v,
-    aws_secretsmanager_secret_version.password_bd_v,
     aws_iam_role_policy_attachment.apprunner_instance_attach,
     aws_iam_role_policy_attachment.apprunner_access_attach
   ]
@@ -531,12 +366,11 @@ resource "aws_apprunner_service" "api_intermediaria" {
         runtime_environment_variables = {
           AWS_SQS_URL            = aws_sqs_queue.fifo.url
           SPRING_PROFILES_ACTIVE = "prod"
-        }
 
-        runtime_environment_secrets = {
-          URL_BD      = aws_secretsmanager_secret.url_bd.arn
-          USER_BD     = aws_secretsmanager_secret.user_bd.arn
-          PASSWORD_BD = aws_secretsmanager_secret.password_bd.arn
+          # banco direto, sem Secrets Manager
+          URL_BD      = local.jdbc_url
+          USER_BD     = var.rds_username
+          PASSWORD_BD = random_password.rds_appuser.result
         }
       }
     }
@@ -575,8 +409,6 @@ resource "aws_apprunner_service" "api_agente" {
   count = var.create_services ? 1 : 0
 
   depends_on = [
-    aws_secretsmanager_secret_version.database_url_v,
-    aws_secretsmanager_secret_version.openai_api_key_v,
     aws_iam_role_policy_attachment.apprunner_instance_attach,
     aws_iam_role_policy_attachment.apprunner_access_attach
   ]
@@ -591,9 +423,9 @@ resource "aws_apprunner_service" "api_agente" {
       image_configuration {
         port = tostring(var.api_agente_port)
 
-        runtime_environment_secrets = {
-          DATABASE_URL   = aws_secretsmanager_secret.database_url.arn
-          OPENAI_API_KEY = aws_secretsmanager_secret.openai_api_key.arn
+        runtime_environment_variables = {
+          DATABASE_URL   = local.sqlalchemy_url
+          OPENAI_API_KEY = var.OPENAI_API_KEY
         }
       }
     }
@@ -632,15 +464,6 @@ resource "aws_apprunner_service" "api_principal" {
   count = var.create_services ? 1 : 0
 
   depends_on = [
-    aws_secretsmanager_secret_version.url_bd_v,
-    aws_secretsmanager_secret_version.user_bd_v,
-    aws_secretsmanager_secret_version.password_bd_v,
-    aws_secretsmanager_secret_version.app_crm_acess_token_v,
-    aws_secretsmanager_secret_version.api_principal_api_key_v,
-    aws_secretsmanager_secret_version.api_principal_secret_key_v,
-    aws_secretsmanager_secret_version.whatsapp_client_token_v,
-    aws_secretsmanager_secret_version.whatsapp_instance_id_v,
-    aws_secretsmanager_secret_version.whatsapp_token_v,
     aws_iam_role_policy_attachment.apprunner_instance_attach,
     aws_iam_role_policy_attachment.apprunner_access_attach
   ]
@@ -656,22 +479,27 @@ resource "aws_apprunner_service" "api_principal" {
         port = tostring(var.api_principal_port)
 
         runtime_environment_variables = {
-          AGENTE_URL = aws_apprunner_service.api_agente[0].service_url
-          APP_CRM_URL            = var.APP_CRM_URL
-          AWS_SQS_URL            = aws_sqs_queue.fifo.url
+          AGENTE_URL            = aws_apprunner_service.api_agente[0].service_url
+          APP_CRM_URL           = var.APP_CRM_URL
+          AWS_SQS_URL           = aws_sqs_queue.fifo.url
           SPRING_PROFILES_ACTIVE = "prod"
-        }
 
-        runtime_environment_secrets = {
-          PASSWORD_BD              = aws_secretsmanager_secret.password_bd.arn
-          URL_BD                   = aws_secretsmanager_secret.url_bd.arn
-          USER_BD                  = aws_secretsmanager_secret.user_bd.arn
-          API_PRINCIPAL_API_KEY    = aws_secretsmanager_secret.api_principal_api_key.arn
-          API_PRINCIPAL_SECRET_KEY = aws_secretsmanager_secret.api_principal_secret_key.arn
-          WHASTAPP_CLIENT_TOKEN    = aws_secretsmanager_secret.whatsapp_client_token.arn
-          WHASTAPP_INSTANCE_ID     = aws_secretsmanager_secret.whatsapp_instance_id.arn
-          WHASTAPP_TOKEN           = aws_secretsmanager_secret.whatsapp_token.arn
-          APP_CRM_ACESS_TOKEN      = aws_secretsmanager_secret.app_crm_acess_token.arn
+          # banco
+          URL_BD      = local.jdbc_url
+          USER_BD     = var.rds_username
+          PASSWORD_BD = random_password.rds_appuser.result
+
+          # chaves da API
+          API_PRINCIPAL_API_KEY    = var.API_PRINCIPAL_API_KEY
+          API_PRINCIPAL_SECRET_KEY = var.API_PRINCIPAL_SECRET_KEY
+
+          # WhatsApp
+          WHASTAPP_CLIENT_TOKEN    = var.WHASTAPP_CLIENT_TOKEN
+          WHASTAPP_INSTANCE_ID     = var.WHASTAPP_INSTANCE_ID
+          WHASTAPP_TOKEN           = var.WHASTAPP_TOKEN
+
+          # CRM
+          APP_CRM_ACESS_TOKEN      = var.APP_CRM_ACESS_TOKEN
         }
       }
     }
