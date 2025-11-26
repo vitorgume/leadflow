@@ -17,14 +17,17 @@ public class MensagemUseCase {
     private final MensagemBuilder mensagemBuilder;
 
     public void enviarMensagem(String mensagem, String telefone, boolean semEspacos) {
-        log.info("Enviando mensagem para usuário. Resposta: {}, Telefone: {}", mensagem, telefone);
+        log.info("Enviando mensagem para usuケrio. Resposta: {}, Telefone: {}", mensagem, telefone);
 
-        String mensagemAEnviar = mensagem.replaceAll("^\"|\"$", "");
+        String mensagemAEnviar = mensagem
+                .replaceAll("^\"|\"$", "")
+                .replace("\\r\\n", "\n")
+                .replace("\\n", "\n")
+                .replace("\r\n", "\n");
 
         if (semEspacos) {
             mensagemAEnviar = mensagemAEnviar
-                    .replace("\\n", " ")
-                    .replace("\r\n", " ")
+                    .replace("\r", " ")
                     .replace("\n", " ")
                     .trim();
         }
@@ -49,8 +52,8 @@ public class MensagemUseCase {
     }
 
     public void enviarRelatorio(String arquivo, String fileName, String telefone) {
-        log.info("Enviando relatório de vendedores.");
+        log.info("Enviando relatИrio de vendedores.");
         gateway.enviarRelatorio(arquivo, fileName, telefone);
-        log.info("Relatório enviado com sucesso.");
+        log.info("RelatИrio enviado com sucesso.");
     }
 }
