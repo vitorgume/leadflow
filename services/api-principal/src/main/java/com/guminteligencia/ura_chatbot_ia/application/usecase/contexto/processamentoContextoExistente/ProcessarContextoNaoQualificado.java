@@ -18,7 +18,7 @@ public class ProcessarContextoNaoQualificado implements ProcessamentoContextoExi
 
     @Override
     public void processar(String resposta, ConversaAgente conversaAgente, Cliente cliente) {
-        mensagemUseCase.enviarMensagem(resposta, conversaAgente.getCliente().getTelefone(), true);
+        mensagemUseCase.enviarMensagem(resposta, conversaAgente.getCliente().getTelefone(), false);
 
         if(conversaAgente.getFinalizada()) {
             conversaAgente.setRecontato(true);

@@ -138,7 +138,7 @@ Sempre iniciar assim:
 >
 > Vou conduzir seu pré-atendimento para entendermos sua necessidade.
 >
-> Qual é o seu nome completo?”
+> Qual é o seu nome ?”
 >
 
 ---

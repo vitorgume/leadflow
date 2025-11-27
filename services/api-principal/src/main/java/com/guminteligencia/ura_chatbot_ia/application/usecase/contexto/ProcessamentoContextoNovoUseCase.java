@@ -30,7 +30,7 @@ public class ProcessamentoContextoNovoUseCase {
         Cliente clienteSalvo = clienteUseCase.cadastrar(contexto.getTelefone());
         ConversaAgente novaConversa = conversaAgenteUseCase.criar(clienteSalvo);
         String resposta = agenteUseCase.enviarMensagem(clienteSalvo, novaConversa, contexto.getMensagens());
-        mensagemUseCase.enviarMensagem(resposta, clienteSalvo.getTelefone(), true);
+        mensagemUseCase.enviarMensagem(resposta, clienteSalvo.getTelefone(), false);
         novaConversa.setDataUltimaMensagem(LocalDateTime.now());
         conversaAgenteUseCase.salvar(novaConversa);
 
