@@ -16,6 +16,14 @@ class AgenteUseCase:
         with open(caminho, "r", encoding="utf-8") as file:
             return file.read()
 
+    def _carregar_base_conhecimento(self) -> str:
+        caminho = Path("src/resources/base_conhecimento_agente.txt")
+        if not caminho.exists():
+            logger.warning("Base de conhecimento não encontrada em %s", caminho)
+            return ""
+        with open(caminho, "r", encoding="utf-8") as file:
+            return file.read()
+
     def _carregar_estado(self, estado: int) -> str:
         match estado:
             case 0:
@@ -51,7 +59,15 @@ class AgenteUseCase:
             "content": self._carregar_prompt_padrao()
         }
 
+        base_conhecimento = self._carregar_base_conhecimento()
+        base_conhecimento_system = {
+            "role": "system",
+            "content": f"BASE_DE_CONHECIMENTO:\n{base_conhecimento}"
+        }
+
         historico = [estado_system, prompt_system]
+        if base_conhecimento:
+            historico.append(base_conhecimento_system)
 
         # 4) Janela deslizante dos últimos N turnos + papeis corretos
         ultimas = conversa.mensagens[-15:]  # ajuste conforme seu limite de tokens
