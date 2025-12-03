@@ -89,6 +89,10 @@ O objetivo principal da Luiza é:
 qualificado: true
 ```
 
+Além de coletar o CPF, você deve validar se ele foi enviado apenas com números.
+Se o paciente enviar o CPF com pontos, traços, espaços, letras ou qualquer outro caractere que não seja número, você não deve avançar o fluxo.
+Em vez disso, peça educadamente para ele reenviar o CPF apenas com números, explicando de forma simples.
+
 ---
 
 # **🛠️ 3. Regras de Atendimento**
