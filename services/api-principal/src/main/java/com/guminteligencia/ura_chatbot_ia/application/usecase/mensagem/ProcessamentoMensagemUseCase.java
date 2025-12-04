@@ -1,17 +1,24 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem;
 
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConversaAgenteNaoEncontradoException;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.ClienteUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.ConversaAgenteUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.MensageriaUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.ContextoUseCase;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processamentoContextoExistente.ProcessamentoContextoExistente;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.ProcessamentoContextoNovoUseCase;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.*;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processamentoContextoExistente.ProcessamentoContextoExistente;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.validador.ContextoValidadorComposite;
-import com.guminteligencia.ura_chatbot_ia.domain.*;
+import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Semaphore;
 
 @Service
 @RequiredArgsConstructor
@@ -24,56 +31,97 @@ public class ProcessamentoMensagemUseCase {
     private final ContextoValidadorComposite contextoValidadorComposite;
     private final ProcessamentoContextoExistente processamentoContextoExistente;
     private final ProcessamentoContextoNovoUseCase processamentoContextoNovoUseCase;
+    private final ConversaAgenteUseCase conversaAgenteUseCase;
+
+    private final Semaphore processingSemaphore = new Semaphore(3);
 
     @Scheduled(fixedDelay = 5000)
     public void consumirFila() {
-        log.info("Consumindo mensagens da fila.");
 
-        var recebidas = mensageriaUseCase.listarContextos();
+        long inicio = System.currentTimeMillis();
+        log.info("[INICIO] processamentoDeMensagens");
 
-        log.info("Recebidas da SQS: {}", recebidas.size());
+        if (!processingSemaphore.tryAcquire()) {
+            log.warn("Processamento anterior ainda em andamento, pulando esta execucao");
+            return;
+        }
 
-        var processaveis = recebidas.stream()
-                .filter(contextoValidadorComposite::permitirProcessar)
-                .toList();
+        try {
+            log.info("Consumindo mensagens da fila.");
 
-        var ignoradas = recebidas.stream()
-                .filter(c -> !contextoValidadorComposite.permitirProcessar(c))
-                .toList();
+            var recebidas = mensageriaUseCase.listarAvisos();
 
-        log.info("Processáveis: {}, Ignoradas: {}", processaveis.size(), ignoradas.size());
+            List<Contexto> contextosRecebidos = recebidas.stream()
+                    .map(avisoContexto -> {
+                        try {
+                            var contexto = contextoUseCase.consultarPeloId(avisoContexto.getIdContexto());
+                            contextoUseCase.deletar(contexto.getId());
+                            contexto.setMensagemFila(avisoContexto.getMensagemFila());
+                            return contexto;
+                        } catch (Exception e) {
+                            log.warn("Contexto {} nao encontrado para a mensagem da fila. Deletando mensagem.", avisoContexto.getIdContexto());
+                            mensageriaUseCase.deletarMensagem(avisoContexto.getMensagemFila());
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .toList();
 
-        processaveis.forEach(contexto -> {
-            try {
-                log.info("Processando: id={}, tel={}", contexto.getId(), contexto.getTelefone());
-                processarMensagem(contexto);
+            log.info("Recebidas da SQS: {}", recebidas.size());
+
+            var processaveis = contextosRecebidos.stream()
+                    .filter(contextoValidadorComposite::permitirProcessar)
+                    .toList();
+
+            var ignoradas = contextosRecebidos.stream()
+                    .filter(c -> !contextoValidadorComposite.permitirProcessar(c))
+                    .toList();
+
+            log.info("Processaveis: {}, Ignoradas: {}", processaveis.size(), ignoradas.size());
+
+            processaveis.forEach(contexto -> {
+                try {
+                    log.info("Processando: id={}, tel={}", contexto.getId(), contexto.getTelefone());
+                    processarMensagem(contexto);
+                    mensageriaUseCase.deletarMensagem(contexto.getMensagemFila());
+
+                } catch (Exception e) {
+                    log.error("Falha ao processar id={}, tel={}.", contexto.getId(), contexto.getTelefone(), e);
+                    mensageriaUseCase.deletarMensagem(contexto.getMensagemFila());
+                }
+            });
+
+            ignoradas.forEach(contexto -> {
+                log.info("Ignorando: {}", contexto);
                 mensageriaUseCase.deletarMensagem(contexto.getMensagemFila());
-                contextoUseCase.deletar(contexto.getId());
-            } catch (Exception e) {
-                log.error("Falha ao processar id={}, tel={}.",
-                        contexto.getId(), contexto.getTelefone(), e);
-                mensageriaUseCase.deletarMensagem(contexto.getMensagemFila());
-                contextoUseCase.deletar(contexto.getId());
-            }
-        });
+            });
 
-        ignoradas.forEach(contexto -> {
-            log.info("Ignorando: {}", contexto);
-            mensageriaUseCase.deletarMensagem(contexto.getMensagemFila());
-            contextoUseCase.deletar(contexto.getId());
-        });
+        } finally {
+            long total = System.currentTimeMillis() - inicio;
+            log.info("[FIM] processamentoDeMensagens - tempoTotal={}ms", total);
+            processingSemaphore.release();
+            log.info("Consumo concluido.");
+        }
 
-        log.info("Consumo concluído.");
     }
 
     private void processarMensagem(Contexto contexto) {
         log.info("Processando nova mensagem. Contexto: {}", contexto);
 
-        clienteUseCase.consultarPorTelefone(contexto.getTelefone())
-                .ifPresentOrElse(
-                        cl -> processamentoContextoExistente.processarContextoExistente(cl, contexto),
-                        () -> processamentoContextoNovoUseCase.processarContextoNovo(contexto)
-                );
+        Optional<Cliente> cliente = clienteUseCase.consultarPorTelefone(contexto.getTelefone());
+
+        if (cliente.isPresent()) {
+            try {
+                conversaAgenteUseCase.consultarPorCliente(cliente.get().getId());
+            } catch (ConversaAgenteNaoEncontradoException exception) {
+                processamentoContextoNovoUseCase.processarContextoNovo(contexto);
+                return;
+            }
+
+            processamentoContextoExistente.processarContextoExistente(cliente.get(), contexto);
+        } else {
+            processamentoContextoNovoUseCase.processarContextoNovo(contexto);
+        }
 
         log.info("Mensagem nova processada com sucesso.");
     }

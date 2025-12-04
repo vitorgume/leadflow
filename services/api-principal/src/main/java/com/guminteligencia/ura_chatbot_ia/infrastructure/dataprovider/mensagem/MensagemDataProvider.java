@@ -48,7 +48,7 @@ public class MensagemDataProvider implements MensagemGateway {
                 .message(resposta)
                 .build();
 
-        if (profile.equals("prod")) {
+        if (profile.equals("dev")) {
             Map<String, String> headers = Map.of("Client-Token", clienteToken);
 
             String uri = String.format("https://api.z-api.io/instances/%s/token/%s/send-text", idInstance, token);
@@ -69,7 +69,7 @@ public class MensagemDataProvider implements MensagemGateway {
                 .contactPhone(cliente.getTelefone())
                 .build();
 
-        if(profile.equals("prod")) {
+        if(profile.equals("dev")) {
             Map<String, String> headers = Map.of("Client-Token", clienteToken);
 
             String uri = String.format("https://api.z-api.io/instances/%s/token/%s/send-contact", idInstance, token);
@@ -85,7 +85,7 @@ public class MensagemDataProvider implements MensagemGateway {
         String base64ComPrefixo = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + arquivo;
         DocumentoRequestDto body = new DocumentoRequestDto(telefone, base64ComPrefixo, fileName);
 
-        if(profile.equals("prod")) {
+        if(profile.equals("dev")) {
             Map<String, String> headers = Map.of("Client-Token", clienteToken);
 
             String uri = String.format("/instances/%s/token/%s/send-document/xlsx", idInstance, token);

@@ -8,12 +8,16 @@ class MensagemMapper:
         return Mensagem(
             cliente_id=dto.cliente_id,
             conversa_id=dto.conversa_id,
-            message=dto.message
+            message=dto.message,
+            audios_url=dto.audios_url,
+            imagens_url=dto.imagens_url
         )
         
     def paraDto(self, domain: Mensagem) -> MensagemDto:
         return MensagemDto(
             cliente_id=domain.cliente_id,
             conversa_id=domain.conversa_id,
-            message=domain.message
+            message=domain.message,
+            audios_url=domain.audios_url,
+            imagens_url=domain.imagens_url
         )

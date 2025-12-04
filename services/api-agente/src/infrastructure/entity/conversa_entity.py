@@ -13,6 +13,5 @@ class ConversaEntity(Base):
     finalizada = Column(Boolean, default=False)
     cliente_id_cliente = Column(BINARY(16), ForeignKey("clientes.id_cliente"), nullable=True)
     vendedor_id_vendedor = Column(BigInteger, ForeignKey("vendedores.id_vendedor"), nullable=True)
-    status = Column(BigInteger, nullable=True)
 
     mensagens = relationship("MensagemConversaEntity", back_populates="conversa", cascade="all, delete-orphan")

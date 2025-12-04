@@ -34,7 +34,7 @@ public class CrmUseCase {
     }
 
     public void atualizarCrm(Vendedor vendedor, Cliente cliente, ConversaAgente conversaAgente) {
-        if(profile.equals("prod")) {
+        if(profile.equals("dev")) {
             log.info("Atualizando crm. Vendedor: {}, Cliente: {}, Conversa: {}", vendedor, cliente, conversaAgente);
 
             Integer idLead = this.consultaLeadPeloTelefone(cliente.getTelefone());
@@ -50,8 +50,6 @@ public class CrmUseCase {
             customFieldDtos.add(selectField(2761160, cliente.getTipoConsulta() == null ? TipoConsulta.NAO_INFORMADO.getCodigoCrm() : cliente.getTipoConsulta().getCodigoCrm()));
 
             addTextIfPresent(customFieldDtos,2761314, cliente.getDorDesejoPaciente());
-
-            addTextIfPresent(customFieldDtos, 2761366, cliente.getLinkMidia());
 
             customFieldDtos.add(selectField(2761418, cliente.getPreferenciaHorario() == null ? PreferenciaHorario.NAO_INFORMADO.getCodigoCrm() : cliente.getPreferenciaHorario().getCodigoCrm()));
 

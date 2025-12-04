@@ -1,20 +1,15 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.mapper;
 
 import com.gumeinteligencia.api_intermidiaria.domain.Contexto;
+import com.gumeinteligencia.api_intermidiaria.domain.MensagemContexto;
 import com.gumeinteligencia.api_intermidiaria.domain.StatusContexto;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import software.amazon.awssdk.enhanced.dynamodb.Key;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
 import java.util.List;
 import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 class ContextoMapperTest {
 
@@ -27,14 +22,14 @@ class ContextoMapperTest {
                 .id(UUID.randomUUID())
                 .telefone("000000000000")
                 .status(StatusContexto.ATIVO)
-                .mensagens(List.of("Olá"))
+                .mensagens(List.of(MensagemContexto.builder().mensagem("Ola").build()))
                 .build();
 
         contextoEntity = ContextoEntity.builder()
                 .id(UUID.randomUUID())
                 .telefone("000000000000")
                 .status(StatusContexto.ATIVO)
-                .mensagens(List.of("Olá"))
+                .mensagens(List.of(MensagemContexto.builder().mensagem("Ola").build()))
                 .build();
     }
 

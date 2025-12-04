@@ -5,7 +5,7 @@ import src.infrastructure.entity
 
 engine = create_engine(
     DATABASE_URL,
-    pool_pre_ping=True,      # testa a conexão antes de usar
+    pool_pre_ping=True,
     pool_recycle=280,
     future=True
 )

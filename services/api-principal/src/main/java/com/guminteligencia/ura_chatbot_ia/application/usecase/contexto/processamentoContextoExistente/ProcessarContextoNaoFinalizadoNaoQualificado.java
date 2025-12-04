@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Order(4)
-public class ProcessarContextoNaoQualificado implements ProcessamentoContextoExistenteType {
+public class ProcessarContextoNaoFinalizadoNaoQualificado implements ProcessamentoContextoExistenteType {
 
     private final MensagemUseCase mensagemUseCase;
     private final ConversaAgenteUseCase conversaAgenteUseCase;
@@ -19,15 +19,10 @@ public class ProcessarContextoNaoQualificado implements ProcessamentoContextoExi
     @Override
     public void processar(String resposta, ConversaAgente conversaAgente, Cliente cliente) {
         mensagemUseCase.enviarMensagem(resposta, conversaAgente.getCliente().getTelefone(), false);
-
-        if(conversaAgente.getFinalizada()) {
-            conversaAgente.setRecontato(true);
-            conversaAgenteUseCase.salvar(conversaAgente);
-        }
     }
 
     @Override
     public boolean deveProcessar(String resposta, ConversaAgente conversaAgente) {
-        return true;
+        return !conversaAgente.getFinalizada();
     }
 }

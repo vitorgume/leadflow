@@ -17,7 +17,6 @@ public class Cliente {
     private Boolean consentimentoAtendimnento;
     private TipoConsulta tipoConsulta;
     private String dorDesejoPaciente;
-    private String linkMidia;
     private PreferenciaHorario preferenciaHorario;
     private boolean inativo;
 
@@ -27,7 +26,6 @@ public class Cliente {
         this.consentimentoAtendimnento = cliente.getConsentimentoAtendimnento();
         this.tipoConsulta = cliente.getTipoConsulta();
         this.dorDesejoPaciente = cliente.getDorDesejoPaciente();
-        this.linkMidia = cliente.getLinkMidia();
         this.preferenciaHorario = cliente.getPreferenciaHorario();
     }
 }

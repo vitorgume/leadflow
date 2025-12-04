@@ -47,7 +47,11 @@ class AgenteUseCaseTest {
 
     @Test
     void deveEnviarMensagemConcatenarListaEChamarGateway() {
-        List<String> msgs = List.of("oi", "tudo bem?", "até logo");
+        List<MensagemContexto> msgs = List.of(
+                MensagemContexto.builder().mensagem("oi").audioUrl("a1").imagemUrl("i1").build(),
+                MensagemContexto.builder().mensagem("tudo bem?").audioUrl("a2").imagemUrl("i2").build(),
+                MensagemContexto.builder().mensagem("até logo").build()
+        );
         String esperadoConcat = "oi, tudo bem?, até logo";
         MensagemAgenteDto capturado;
         when(gateway.enviarMensagem(any())).thenReturn("resp-ok");
@@ -64,6 +68,8 @@ class AgenteUseCaseTest {
         assertEquals(clienteId.toString(), capturado.getClienteId());
         assertEquals(conversaId.toString(), capturado.getConversaId());
         assertEquals(esperadoConcat, capturado.getMensagem());
+        assertEquals(List.of("a1", "a2", null), capturado.getAudiosUrl());
+        assertEquals(List.of("i1", "i2", null), capturado.getImagensUrl());
     }
 
     @Test

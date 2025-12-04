@@ -1,5 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.repository;
 
+import com.gumeinteligencia.api_intermidiaria.domain.MensagemContexto;
 import com.gumeinteligencia.api_intermidiaria.domain.StatusContexto;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
@@ -50,7 +51,7 @@ class ContextoRepositoryTest {
                 .id(id)
                 .telefone(telefone)
                 .status(StatusContexto.ATIVO)
-                .mensagens(List.of("Olá"))
+                .mensagens(List.of(MensagemContexto.builder().mensagem("Ola").build()))
                 .build();
     }
 

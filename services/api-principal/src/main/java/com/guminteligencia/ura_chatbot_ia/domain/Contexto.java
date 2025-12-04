@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.domain;
 
+import com.guminteligencia.ura_chatbot_ia.domain.MensagemContexto;
 import lombok.*;
 import software.amazon.awssdk.services.sqs.model.Message;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
 public class Contexto {
     private UUID id;
     private String telefone;
-    private List<String> mensagens;
+    private List<MensagemContexto> mensagens;
     private StatusContexto status;
     private Message mensagemFila;
 }

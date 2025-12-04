@@ -7,7 +7,6 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemU
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
-import com.guminteligencia.ura_chatbot_ia.domain.RespostaAgente;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,10 +26,12 @@ public class ProcessamentoContextoNovoUseCase {
     public void processarContextoNovo(Contexto contexto) {
         log.info("Processando novo contexto. Contexto: {}", contexto);
 
-        Cliente clienteSalvo = clienteUseCase.cadastrar(contexto.getTelefone());
+        Cliente clienteSalvo = clienteUseCase.consultarPorTelefone(contexto.getTelefone())
+                .orElseGet(() -> clienteUseCase.cadastrar(contexto.getTelefone()));
+
         ConversaAgente novaConversa = conversaAgenteUseCase.criar(clienteSalvo);
         String resposta = agenteUseCase.enviarMensagem(clienteSalvo, novaConversa, contexto.getMensagens());
-        mensagemUseCase.enviarMensagem(resposta, clienteSalvo.getTelefone(), false);
+        mensagemUseCase.enviarMensagem(resposta, clienteSalvo.getTelefone(), true);
         novaConversa.setDataUltimaMensagem(LocalDateTime.now());
         conversaAgenteUseCase.salvar(novaConversa);
 

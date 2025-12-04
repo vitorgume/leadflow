@@ -26,7 +26,7 @@ class ProcessarContextoNaoFinalizadoNaoQualificadoTest {
     private Cliente cliente;
 
     @InjectMocks
-    private ProcessarContextoNaoQualificado processarContextoNaoFinalizadoNaoQualificado;
+    private ProcessarContextoNaoFinalizadoNaoQualificado processarContextoNaoFinalizadoNaoQualificado;
 
     private final String resposta = "alguma mensagem";
     private final String telefone = "+5511999887766";

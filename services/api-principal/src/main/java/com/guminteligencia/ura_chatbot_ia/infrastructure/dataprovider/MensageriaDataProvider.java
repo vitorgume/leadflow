@@ -1,9 +1,9 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
 import com.guminteligencia.ura_chatbot_ia.application.gateways.MensageriaGateway;
-import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
+import com.guminteligencia.ura_chatbot_ia.domain.AvisoContexto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.ContextoMapper;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.AvisoContextoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,7 @@ public class MensageriaDataProvider implements MensageriaGateway {
 
 
     @Override
-    public List<Contexto> listarMensagens() {
+    public List<AvisoContexto> listarAvisos() {
 
         try {
             ReceiveMessageRequest request = ReceiveMessageRequest.builder()
@@ -47,7 +47,7 @@ public class MensageriaDataProvider implements MensageriaGateway {
             List<Message> messages = sqsClient.receiveMessage(request).messages();
 
             return messages.stream()
-                    .map(ContextoMapper::paraDomainDeMessage)
+                    .map(AvisoContextoMapper::paraDomainDeMessage)
                     .toList();
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_LISTAR_CONTEXTOS_SQS, ex);

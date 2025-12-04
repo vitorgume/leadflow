@@ -17,7 +17,6 @@ class ConversaMapper:
             cliente_id_cliente=uuid.UUID(conversa.cliente_id_cliente).bytes if conversa.cliente_id_cliente else None,
             vendedor_id_vendedor=int(conversa.vendedor_id_vendedor) if conversa.vendedor_id_vendedor else None,
             mensagens=[self.mensagem_conversa_mapper.paraEntity(m) for m in conversa.mensagens],
-            status=conversa.status
         )
 
     def paraDomain(self, conversa_entity: ConversaEntity) -> Conversa:
@@ -29,5 +28,4 @@ class ConversaMapper:
             vendedor_id_vendedor=str(conversa_entity.vendedor_id_vendedor) if conversa_entity.vendedor_id_vendedor else None,
             cliente_id=str(uuid.UUID(bytes=conversa_entity.cliente_id_cliente)) if conversa_entity.cliente_id_cliente else None,
             mensagens=[self.mensagem_conversa_mapper.paraDomain(m) for m in conversa_entity.mensagens],
-            status=conversa_entity.status
         )

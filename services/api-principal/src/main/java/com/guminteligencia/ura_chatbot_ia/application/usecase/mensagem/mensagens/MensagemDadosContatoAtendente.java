@@ -50,12 +50,6 @@ public class MensagemDadosContatoAtendente implements MensagemType {
             mensagem.append("Dor do Paciente: ").append("Dor do paciente não informada").append("\n");
         }
 
-        if(cliente.getLinkMidia() != null) {
-            mensagem.append("Link da Mídia: ").append(cliente.getLinkMidia()).append("\n");
-        } else {
-            mensagem.append("Link da Mídia: ").append("Link da mídia do usuário não recebida.").append("\n");
-        }
-
         if(cliente.getPreferenciaHorario() != null) {
             mensagem.append("Preferência de Horário: ").append(cliente.getPreferenciaHorario().getDescricao()).append("\n");
         } else {

@@ -14,7 +14,6 @@ public class ClienteMapper {
                 .consentimentoAtendimnento(cliente.getConsentimentoAtendimnento())
                 .tipoConsulta(cliente.getTipoConsulta())
                 .dorDesejoPaciente(cliente.getDorDesejoPaciente())
-                .linkMidia(cliente.getLinkMidia())
                 .preferenciaHorario(cliente.getPreferenciaHorario())
                 .inativo(cliente.isInativo())
                 .build();

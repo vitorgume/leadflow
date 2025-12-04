@@ -11,7 +11,9 @@ class JsonUseCase:
         self.agente_data_provider = agente_data_provider
 
     def _carregar_prompt_padrao(self) -> str:
-        caminho = Path("src/resources/system_prompt_agent_json.txt")
+        # Caminho absoluto para evitar falhas quando a suite roda em subdiretórios (ex.: src/test)
+        base = Path(__file__).resolve().parents[2]
+        caminho = base / "resources" / "system_prompt_agent_json.txt"
         with open(caminho, "r", encoding="utf-8") as file:
             return file.read()
 

@@ -38,7 +38,6 @@ public class ProcessarClienteQualificado implements ProcessamentoContextoExisten
                 .consentimentoAtendimnento(qualificacao.getConsentimentoAtendimnento())
                 .tipoConsulta(EnumMapper.tipoConsultaMapper(qualificacao.getTipoConsulta()))
                 .dorDesejoPaciente(qualificacao.getDorDesejoPaciente())
-                .linkMidia(qualificacao.getLinkMidia())
                 .preferenciaHorario(EnumMapper.preferenciaHorarioMapper(qualificacao.getPreferenciaHorario()))
                 .build();
 

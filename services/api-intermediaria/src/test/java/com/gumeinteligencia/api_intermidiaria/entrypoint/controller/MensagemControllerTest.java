@@ -6,6 +6,7 @@ import com.gumeinteligencia.api_intermidiaria.application.usecase.ContextoUseCas
 import com.gumeinteligencia.api_intermidiaria.application.usecase.validadorMensagens.ValidadorMensagemUseCase;
 import com.gumeinteligencia.api_intermidiaria.domain.Contexto;
 import com.gumeinteligencia.api_intermidiaria.domain.Mensagem;
+import com.gumeinteligencia.api_intermidiaria.domain.MensagemContexto;
 import com.gumeinteligencia.api_intermidiaria.domain.StatusContexto;
 import com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.MensagemDto;
 import com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.TextoDto;
@@ -99,7 +100,7 @@ class MensagemControllerTest {
                 .id(UUID.randomUUID())
                 .telefone("45999999999")
                 .status(StatusContexto.ATIVO)
-                .mensagens(List.of("Olá"))
+                .mensagens(List.of(MensagemContexto.builder().mensagem("Ola").build()))
                 .build();
     }
 
@@ -123,7 +124,7 @@ class MensagemControllerTest {
     @Test
     void deveProcessarMensagemDeUmContextoExistenteComSucesso() throws Exception {
         when(outroContatoRepository.listar()).thenReturn(List.of());
-        when(contextoUseCase.consultarPorTelefoneAtivo(any())).thenReturn(Optional.of(ContextoMapper.paraDomain(contextoEntity)));
+        when(contextoUseCase.consultarPorTelefone(any())).thenReturn(Optional.of(ContextoMapper.paraDomain(contextoEntity)));
         when(contextoRepository.salvar(any())).thenReturn(contextoEntity);
         when(mensageriaGateway.enviarParaFila(any())).thenReturn(null);
 

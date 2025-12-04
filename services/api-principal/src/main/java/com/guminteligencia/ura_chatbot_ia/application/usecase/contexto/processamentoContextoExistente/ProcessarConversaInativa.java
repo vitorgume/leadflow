@@ -26,12 +26,21 @@ public class ProcessarConversaInativa implements ProcessamentoContextoExistenteT
 
     @Override
     public void processar(String resposta, ConversaAgente conversaAgente, Cliente cliente) {
+
         log.info("Processando conversa inativa. Resposta: {}, Conversa: {}, Cliente: {}", resposta, conversaAgente, cliente);
         conversaAgente.setFinalizada(true);
         Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
         conversaAgente.setVendedor(vendedor);
-        mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, vendedor.getNome(), null), cliente.getTelefone(), false);
-        mensagemUseCase.enviarContato(vendedor, cliente);
+        mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.RECONTATO_INATIVO_G1, vendedor.getNome(), cliente), cliente.getTelefone(), true);
+
+        try {
+            log.info("Tentando enviar contato do vendedor...");
+            mensagemUseCase.enviarContato(vendedor, cliente);
+            log.info("Contato enviado com sucesso");
+        } catch (Exception e) {
+            log.error("Erro ao enviar contato do vendedor, continuando processamento", e);
+        }
+
         crmUseCase.atualizarCrm(vendedor, cliente, conversaAgente);
         log.info("Processamento de conversa inativa concluida com sucesso.");
     }

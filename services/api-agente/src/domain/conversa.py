@@ -11,4 +11,3 @@ class Conversa:
     finalizada: bool
     cliente_id_cliente: str
     vendedor_id_vendedor: str
-    status: int

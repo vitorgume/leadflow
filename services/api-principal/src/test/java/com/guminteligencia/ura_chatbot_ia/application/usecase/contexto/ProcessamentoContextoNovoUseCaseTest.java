@@ -50,7 +50,8 @@ class ProcessamentoContextoNovoUseCaseTest {
     private ConversaAgente novaConversa;
 
     private final String telefone = "+5511999000111";
-    private final List<String> mensagens = List.of("oi");
+    private final List<com.guminteligencia.ura_chatbot_ia.domain.MensagemContexto> mensagens =
+            List.of(com.guminteligencia.ura_chatbot_ia.domain.MensagemContexto.builder().mensagem("oi").build());
 
     @Test
     void deveProcessarFluxoCompletoContextoNovo() {
@@ -74,7 +75,7 @@ class ProcessamentoContextoNovoUseCaseTest {
         ord.verify(clienteUseCase).cadastrar(telefone);
         ord.verify(conversaAgenteUseCase).criar(clienteSalvo);
         ord.verify(agenteUseCase).enviarMensagem(clienteSalvo, novaConversa, mensagens);
-        ord.verify(mensagemUseCase).enviarMensagem("resposta", telefone, true);
+        ord.verify(mensagemUseCase).enviarMensagem("resposta", telefone, false);
         ord.verify(novaConversa).setDataUltimaMensagem(Mockito.any(LocalDateTime.class));
         ord.verify(conversaAgenteUseCase).salvar(novaConversa);
         ord.verifyNoMoreInteractions();

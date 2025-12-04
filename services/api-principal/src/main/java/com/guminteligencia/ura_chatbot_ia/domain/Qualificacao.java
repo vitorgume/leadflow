@@ -23,9 +23,6 @@ public class Qualificacao {
     @JsonProperty("dor_desejo_paciente")
     private String dorDesejoPaciente;
 
-    @JsonProperty("link_midia")
-    private String linkMidia;
-
     @JsonProperty("preferencia_horario")
     private Integer preferenciaHorario;
 }

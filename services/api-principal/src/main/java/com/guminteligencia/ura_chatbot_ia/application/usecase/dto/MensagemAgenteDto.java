@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @AllArgsConstructor
 @Getter
 @Setter
@@ -13,4 +15,6 @@ public class MensagemAgenteDto {
     private String clienteId;
     private String conversaId;
     private String mensagem;
+    private List<String> audiosUrl;
+    private List<String> imagensUrl;
 }

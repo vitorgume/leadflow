@@ -2,9 +2,11 @@ package com.gumeinteligencia.api_intermidiaria.infrastructure.dataprovider;
 
 import com.gumeinteligencia.api_intermidiaria.application.gateways.ContextoGateway;
 import com.gumeinteligencia.api_intermidiaria.domain.Contexto;
+import com.gumeinteligencia.api_intermidiaria.domain.MensagemContexto;
 import com.gumeinteligencia.api_intermidiaria.domain.StatusContexto;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.ContextoMapper;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.MensagemContextoListConverter;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ContextoRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,6 @@ import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -29,19 +30,14 @@ public class ContextoDataProvider implements ContextoGateway {
     private final String MENSAGEM_ERRO_SALVAR_CONTEXTO = "Erro ao salvar contexto.";
 
     @Override
-    public Optional<Contexto> consultarPorTelefoneAtivo(String telefone) {
+    public Optional<Contexto> consultarPorTelefone(String telefone) {
         Map<String, AttributeValue> expressionValues = new HashMap<>();
         expressionValues.put(":telefone", AttributeValue.builder().s(telefone).build());
-        expressionValues.put(":status", AttributeValue.builder().s("ATIVO").build());
-
-        Map<String, String> expressionNames = new HashMap<>();
-        expressionNames.put("#status", "status");
 
         QueryRequest queryRequest = QueryRequest.builder()
                 .tableName("contexto_entity")
-                .indexName("TelefoneStatusIndex")
-                .keyConditionExpression("telefone = :telefone AND #status = :status")
-                .expressionAttributeNames(expressionNames)
+                .indexName("TelefoneIndex")
+                .keyConditionExpression("telefone = :telefone")
                 .expressionAttributeValues(expressionValues)
                 .limit(1)
                 .build();
@@ -49,7 +45,7 @@ public class ContextoDataProvider implements ContextoGateway {
         QueryResponse response;
 
         try {
-             response = dynamoDbClient.query(queryRequest);
+            response = dynamoDbClient.query(queryRequest);
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_CONSULTAR_CONTEXTO_PELO_TELEFONE_E_ATIVO, ex);
             throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_CONTEXTO_PELO_TELEFONE_E_ATIVO, ex.getCause());
@@ -79,25 +75,21 @@ public class ContextoDataProvider implements ContextoGateway {
     }
 
     private ContextoEntity converterParaContextoEntity(Map<String, AttributeValue> item) {
-        List<String> mensagens = List.of();
+        List<MensagemContexto> mensagens = Optional.ofNullable(item.get("mensagens"))
+                .map(MensagemContextoListConverter::fromAttributeValue)
+                .orElseGet(Collections::emptyList);
 
-        if (item.containsKey("mensagens")) {
-            AttributeValue attr = item.get("mensagens");
-
-            if (attr.ss() != null && !attr.ss().isEmpty()) {
-                mensagens = attr.ss();
-            } else if (attr.l() != null && !attr.l().isEmpty()) {
-                mensagens = attr.l().stream()
-                        .map(AttributeValue::s)
-                        .collect(Collectors.toList());
-            }
-        }
+        StatusContexto status = Optional.ofNullable(item.get("status"))
+                .map(AttributeValue::s)
+                .filter(s -> !s.isBlank())
+                .map(StatusContexto::valueOf)
+                .orElse(StatusContexto.ATIVO);
 
         return ContextoEntity.builder()
                 .id(UUID.fromString(item.get("id").s()))
                 .telefone(item.get("telefone").s())
                 .mensagens(mensagens)
-                .status(StatusContexto.valueOf(item.get("status").s()))
+                .status(status)
                 .build();
     }
 }

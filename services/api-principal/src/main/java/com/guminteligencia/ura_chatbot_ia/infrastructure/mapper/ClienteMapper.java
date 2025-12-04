@@ -13,7 +13,6 @@ public class ClienteMapper {
                 .consentimentoAtendimnento(entity.getConsentimentoAtendimnento())
                 .tipoConsulta(entity.getTipoConsulta())
                 .dorDesejoPaciente(entity.getDorDesejoPaciente())
-                .linkMidia(entity.getLinkMidia())
                 .preferenciaHorario(entity.getPreferenciaHorario())
                 .inativo(entity.isInativo())
                 .build();
@@ -28,7 +27,6 @@ public class ClienteMapper {
                 .consentimentoAtendimnento(domain.getConsentimentoAtendimnento())
                 .tipoConsulta(domain.getTipoConsulta())
                 .dorDesejoPaciente(domain.getDorDesejoPaciente())
-                .linkMidia(domain.getLinkMidia())
                 .preferenciaHorario(domain.getPreferenciaHorario())
                 .inativo(domain.isInativo())
                 .build();

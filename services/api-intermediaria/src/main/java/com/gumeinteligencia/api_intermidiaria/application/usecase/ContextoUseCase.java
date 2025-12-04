@@ -4,6 +4,7 @@ import com.gumeinteligencia.api_intermidiaria.application.gateways.ContextoGatew
 import com.gumeinteligencia.api_intermidiaria.application.gateways.MensageriaGateway;
 import com.gumeinteligencia.api_intermidiaria.domain.Contexto;
 import com.gumeinteligencia.api_intermidiaria.domain.Mensagem;
+import com.gumeinteligencia.api_intermidiaria.domain.MensagemContexto;
 import com.gumeinteligencia.api_intermidiaria.domain.StatusContexto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,34 +22,37 @@ public class ContextoUseCase {
 
     private final ContextoGateway gateway;
     private final MensageriaGateway mensageriaGateway;
+    private final AvisoContextoUseCase avisoContextoUseCase;
 
-    public Optional<Contexto> consultarPorTelefoneAtivo(String telefone) {
-        Optional<Contexto> contexto = gateway.consultarPorTelefoneAtivo(telefone);
-        return contexto;
+    public Optional<Contexto> consultarPorTelefone(String telefone) {
+        return gateway.consultarPorTelefone(telefone);
     }
 
     public void processarContextoExistente(Contexto contexto, Mensagem mensagem) {
         log.info("Processando contexto existente. Contexto: {}, Mensagem: {}", contexto, mensagem);
 
-        contexto.setStatus(StatusContexto.OBSOLETO);
+        List<MensagemContexto> mensagens = contexto.getMensagens();
+
+        if (mensagens == null) {
+            mensagens = new ArrayList<>();
+        } else {
+            mensagens = new ArrayList<>(mensagens);
+        }
+
+        mensagens.add(
+                MensagemContexto.builder()
+                        .mensagem(mensagem.getMensagem())
+                        .imagemUrl(mensagem.getUrlImagem())
+                        .audioUrl(mensagem.getUrlAudio())
+                        .build()
+        );
+
+        contexto.setMensagens(mensagens);
+        if (contexto.getStatus() == null) {
+            contexto.setStatus(StatusContexto.ATIVO);
+        }
+
         gateway.salvar(contexto);
-
-        Contexto novoContexto = Contexto.builder()
-                .id(UUID.randomUUID())
-                .mensagens(new ArrayList<>(contexto.getMensagens()))
-                .status(StatusContexto.ATIVO)
-                .telefone(mensagem.getTelefone())
-                .build();
-
-        novoContexto.getMensagens().add(mensagem.getMensagem());
-
-        novoContexto = gateway.salvar(novoContexto);
-
-        log.info("Enviando contexto para a fila. Contexto: {}", contexto);
-
-        var response = mensageriaGateway.enviarParaFila(novoContexto);
-
-        log.info("Contexto enviado com sucesso. Telefone: {}, Response: {}", contexto.getTelefone(), response);
 
         log.info("Contexto processado com sucesso.");
     }
@@ -58,7 +62,13 @@ public class ContextoUseCase {
 
         Contexto novoContexto = Contexto.builder()
                 .id(UUID.randomUUID())
-                .mensagens(new ArrayList<>(List.of(mensagem.getMensagem())))
+                .mensagens(new ArrayList<>(List.of(
+                        MensagemContexto.builder()
+                                .mensagem(mensagem.getMensagem())
+                                .imagemUrl(mensagem.getUrlImagem())
+                                .audioUrl(mensagem.getUrlAudio())
+                                .build()
+                )))
                 .status(StatusContexto.ATIVO)
                 .telefone(mensagem.getTelefone())
                 .build();
@@ -67,7 +77,7 @@ public class ContextoUseCase {
 
         log.info("Enviando contexto para a fila. Contexto: {}", novoContexto);
 
-        var response = mensageriaGateway.enviarParaFila(novoContexto);
+        var response = mensageriaGateway.enviarParaFila(avisoContextoUseCase.criarAviso(novoContexto.getId()));
 
         log.info("Contexto enviado com sucesso. Telefone: {}, Response: {}", novoContexto.getTelefone(), response);
 

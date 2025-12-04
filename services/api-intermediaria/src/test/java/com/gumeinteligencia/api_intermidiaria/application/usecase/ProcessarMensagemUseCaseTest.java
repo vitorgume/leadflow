@@ -1,7 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.application.usecase;
 
 import com.gumeinteligencia.api_intermidiaria.application.usecase.validadorMensagens.ValidadorMensagemUseCase;
-import com.gumeinteligencia.api_intermidiaria.domain.Cliente;
 import com.gumeinteligencia.api_intermidiaria.domain.Contexto;
 import com.gumeinteligencia.api_intermidiaria.domain.Mensagem;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +12,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -27,9 +25,6 @@ class ProcessarMensagemUseCaseTest {
     private ContextoUseCase contextoUseCase;
 
     @Mock
-    private ClienteUseCase clienteUseCase;
-
-    @Mock
     private MidiaUseCase midiaUseCase;
 
     @InjectMocks
@@ -41,7 +36,7 @@ class ProcessarMensagemUseCaseTest {
     void setUp() {
         mensagem = Mensagem.builder()
                 .telefone("44999999999")
-                .mensagem("Olá")
+                .mensagem("Ola")
                 .build();
     }
 
@@ -51,10 +46,9 @@ class ProcessarMensagemUseCaseTest {
 
         processarMensagemUseCase.processarNovaMensagem(mensagem);
 
-        verify(contextoUseCase, never()).consultarPorTelefoneAtivo(any());
+        verify(contextoUseCase, never()).consultarPorTelefone(any());
         verify(contextoUseCase, never()).processarContextoExistente(any(), any());
         verify(contextoUseCase, never()).iniciarNovoContexto(any());
-        verifyNoInteractions(clienteUseCase);
     }
 
     @Test
@@ -62,7 +56,7 @@ class ProcessarMensagemUseCaseTest {
         Contexto contexto = Contexto.builder().telefone("44999999999").build();
 
         when(validadorMensagem.deveIngorar(mensagem)).thenReturn(false);
-        when(contextoUseCase.consultarPorTelefoneAtivo(mensagem.getTelefone()))
+        when(contextoUseCase.consultarPorTelefone(mensagem.getTelefone()))
                 .thenReturn(Optional.of(contexto));
 
         when(midiaUseCase.extrairMidias(Mockito.any())).thenReturn(mensagem);
@@ -71,21 +65,13 @@ class ProcessarMensagemUseCaseTest {
 
         verify(contextoUseCase).processarContextoExistente(contexto, mensagem);
         verify(contextoUseCase, never()).iniciarNovoContexto(any());
-        verifyNoInteractions(clienteUseCase);
     }
 
     @Test
-    void deveIniciarNovoContexto_quandoSemContextoEClienteDoCanalChatbot() {
-        // cliente presente com canal código 0 (CHATBOT)
-        Cliente clienteChatbot = Cliente.builder()
-                .id(UUID.randomUUID())
-                .build();
-
+    void deveIniciarNovoContextoQuandoNaoExistir() {
         when(validadorMensagem.deveIngorar(mensagem)).thenReturn(false);
-        when(contextoUseCase.consultarPorTelefoneAtivo(mensagem.getTelefone()))
+        when(contextoUseCase.consultarPorTelefone(mensagem.getTelefone()))
                 .thenReturn(Optional.empty());
-        when(clienteUseCase.consultarPorTelefone(mensagem.getTelefone()))
-                .thenReturn(Optional.of(clienteChatbot));
 
         when(midiaUseCase.extrairMidias(Mockito.any())).thenReturn(mensagem);
 
@@ -93,56 +79,5 @@ class ProcessarMensagemUseCaseTest {
 
         verify(contextoUseCase).iniciarNovoContexto(mensagem);
         verify(contextoUseCase, never()).processarContextoExistente(any(), any());
-    }
-
-    @Test
-    void deveEnviarParaUra_quandoSemContextoEClienteDoCanalUra() {
-        // cliente presente com canal URA (código ≠ 0)
-        Cliente clienteUra = Cliente.builder()
-                .id(UUID.randomUUID())
-                .build();
-
-        when(validadorMensagem.deveIngorar(mensagem)).thenReturn(false);
-        when(contextoUseCase.consultarPorTelefoneAtivo(mensagem.getTelefone()))
-                .thenReturn(Optional.empty());
-        when(clienteUseCase.consultarPorTelefone(mensagem.getTelefone()))
-                .thenReturn(Optional.of(clienteUra));
-
-        when(midiaUseCase.extrairMidias(Mockito.any())).thenReturn(mensagem);
-
-        processarMensagemUseCase.processarNovaMensagem(mensagem);
-
-        verify(contextoUseCase, never()).iniciarNovoContexto(any());
-        verify(contextoUseCase, never()).processarContextoExistente(any(), any());
-    }
-
-    @Test
-    void deveSeguirRoteador_quandoSemContextoEClienteInexistente_usarChatbotTrue() {
-        when(validadorMensagem.deveIngorar(mensagem)).thenReturn(false);
-        when(contextoUseCase.consultarPorTelefoneAtivo(mensagem.getTelefone()))
-                .thenReturn(Optional.empty());
-        when(clienteUseCase.consultarPorTelefone(mensagem.getTelefone()))
-                .thenReturn(Optional.empty());
-
-        when(midiaUseCase.extrairMidias(Mockito.any())).thenReturn(mensagem);
-
-        processarMensagemUseCase.processarNovaMensagem(mensagem);
-
-        verify(contextoUseCase).iniciarNovoContexto(mensagem);
-    }
-
-    @Test
-    void deveSeguirRoteador_quandoSemContextoEClienteInexistente_usarChatbotFalse() {
-        when(validadorMensagem.deveIngorar(mensagem)).thenReturn(false);
-        when(contextoUseCase.consultarPorTelefoneAtivo(mensagem.getTelefone()))
-                .thenReturn(Optional.empty());
-        when(clienteUseCase.consultarPorTelefone(mensagem.getTelefone()))
-                .thenReturn(Optional.empty());
-
-        when(midiaUseCase.extrairMidias(Mockito.any())).thenReturn(mensagem);
-
-        processarMensagemUseCase.processarNovaMensagem(mensagem);
-
-        verify(contextoUseCase, never()).iniciarNovoContexto(any());
     }
 }
