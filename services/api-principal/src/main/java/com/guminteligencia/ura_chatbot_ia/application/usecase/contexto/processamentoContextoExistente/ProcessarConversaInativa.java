@@ -31,7 +31,7 @@ public class ProcessarConversaInativa implements ProcessamentoContextoExistenteT
         conversaAgente.setFinalizada(true);
         Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
         conversaAgente.setVendedor(vendedor);
-        mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.RECONTATO_INATIVO_G1, vendedor.getNome(), cliente), cliente.getTelefone(), true);
+        mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, vendedor.getNome(), cliente), cliente.getTelefone(), true);
 
         try {
             log.info("Tentando enviar contato do vendedor...");
