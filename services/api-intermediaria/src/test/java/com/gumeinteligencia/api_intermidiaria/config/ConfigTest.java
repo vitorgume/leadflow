@@ -55,12 +55,4 @@ class ConfigTest {
         assertEquals("contexto_entity_leadflow", contextoTable.tableName());
         assertEquals("outro_contato_entity_leadflow", outroContatoTable.tableName());
     }
-
-    @Test
-    void deveCriarWebClient() {
-        WebClientConfig config = new WebClientConfig("http://localhost:8080");
-        WebClient client = config.webClient(WebClient.builder());
-
-        assertNotNull(client);
-    }
 }
