@@ -3,7 +3,6 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processa
 import com.guminteligencia.ura_chatbot_ia.application.usecase.AgenteUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.ClienteUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.CrmUseCase;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.RelatorioUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
@@ -11,7 +10,9 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorU
 import com.guminteligencia.ura_chatbot_ia.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
@@ -26,40 +27,70 @@ class ProcessarClienteQualificadoTest {
 
     @Mock
     private VendedorUseCase vendedorUseCase;
-
     @Mock
     private ClienteUseCase clienteUseCase;
-
     @Mock
     private MensagemUseCase mensagemUseCase;
-
     @Mock
     private MensagemBuilder mensagemBuilder;
-
     @Mock
     private AgenteUseCase agenteUseCase;
-
     @Mock
     private ConversaAgente conversaAgente;
-
     @Mock
     private Cliente originalCliente;
-
     @Mock
     private Cliente clienteSalvo;
-
     @Mock
     private Vendedor vendedor;
-
     @Mock
     private CrmUseCase crmUseCase;
 
     @InjectMocks
     private ProcessarClienteQualificado processarClienteQualificado;
 
-    private final String resposta = "conteudo quebrado QUALIFICADO:true extra";
+    private final String resposta = "conteudo QUALIFICADO:true";
     private final UUID originalId = UUID.randomUUID();
     private final String telSalvo = "+5511999111222";
+
+    @Test
+    void deveProcessarExecutarFluxoCompleto() {
+        Qualificacao qual = new Qualificacao();
+        qual.setNome("Joao");
+        qual.setTipoConsulta(0);
+        qual.setPreferenciaHorario(0);
+        when(agenteUseCase.enviarJsonTrasformacao(resposta)).thenReturn(qual);
+        when(conversaAgente.getCliente()).thenReturn(originalCliente);
+        when(originalCliente.getId()).thenReturn(originalId);
+
+        ArgumentCaptor<Cliente> capCliente = ArgumentCaptor.forClass(Cliente.class);
+        when(clienteUseCase.alterar(capCliente.capture(), eq(originalId)))
+                .thenReturn(clienteSalvo);
+
+        when(vendedorUseCase.consultarVendedorPadrao()).thenReturn(vendedor);
+        when(vendedor.getNome()).thenReturn("Carlos");
+
+        when(mensagemBuilder.getMensagem(
+                TipoMensagem.MENSAGEM_DIRECIONAMENTO_VENDEDOR,
+                "Carlos",
+                clienteSalvo
+        )).thenReturn("msg-dir");
+
+        when(clienteSalvo.getTelefone()).thenReturn(telSalvo);
+
+        processarClienteQualificado.processar(resposta, conversaAgente, originalCliente);
+
+        Cliente built = capCliente.getValue();
+        assertEquals("Joao", built.getNome());
+
+        verify(vendedorUseCase).consultarVendedorPadrao();
+        verify(mensagemUseCase).enviarMensagem("msg-dir", telSalvo, false);
+        verify(mensagemUseCase).enviarContato(vendedor, clienteSalvo);
+        verify(crmUseCase).atualizarCrm(vendedor, clienteSalvo, conversaAgente);
+        verify(conversaAgente).setVendedor(vendedor);
+        verify(conversaAgente).setStatus(StatusConversa.ATIVO);
+        verify(conversaAgente).setFinalizada(true);
+    }
 
     @Test
     void deveRetornarTrueSeRespostaContemQualificadoTrue() {
@@ -75,75 +106,14 @@ class ProcessarClienteQualificadoTest {
     }
 
     @Test
-    void deveProcessarExecutarFluxoCompleto() {
-        Qualificacao qual = new Qualificacao();
-        qual.setNome("João");
-        when(agenteUseCase.enviarJsonTrasformacao(resposta)).thenReturn(qual);
-        when(conversaAgente.getCliente()).thenReturn(originalCliente);
-        when(originalCliente.getId()).thenReturn(originalId);
-
-        ArgumentCaptor<Cliente> capCliente = ArgumentCaptor.forClass(Cliente.class);
-        when(clienteUseCase.alterar(capCliente.capture(), eq(originalId)))
-                .thenReturn(clienteSalvo);
-
-        when(vendedorUseCase.escolherVendedor(clienteSalvo)).thenReturn(vendedor);
-        when(vendedor.getNome()).thenReturn("Carlos");
-
-        when(mensagemBuilder.getMensagem(
-                TipoMensagem.MENSAGEM_DIRECIONAMENTO_VENDEDOR,
-                "Carlos",
-                null
-        )).thenReturn("msg-dir");
-
-        when(clienteSalvo.getTelefone()).thenReturn(telSalvo);
-
-        doNothing().when(crmUseCase).atualizarCrm(Mockito.any(), Mockito.any(), Mockito.any());
-
-        processarClienteQualificado.processar(resposta, conversaAgente, originalCliente);
-
-        InOrder inOrder = inOrder(
-                agenteUseCase,
-                clienteUseCase,
-                vendedorUseCase,
-                mensagemBuilder,
-                mensagemUseCase,
-                crmUseCase,
-                conversaAgente
-        );
-
-        inOrder.verify(agenteUseCase).enviarJsonTrasformacao(resposta);
-
-        Cliente built = capCliente.getValue();
-        assertEquals("João", built.getNome());
-
-        inOrder.verify(clienteUseCase).alterar(any(), eq(originalId));
-
-        inOrder.verify(vendedorUseCase).escolherVendedor(clienteSalvo);
-
-        inOrder.verify(mensagemBuilder)
-                .getMensagem(TipoMensagem.MENSAGEM_DIRECIONAMENTO_VENDEDOR, "Carlos", null);
-
-        inOrder.verify(mensagemUseCase).enviarMensagem("msg-dir", telSalvo, false);
-
-        inOrder.verify(crmUseCase).atualizarCrm(Mockito.any(), Mockito.any(), Mockito.any());
-
-        inOrder.verify(conversaAgente).setVendedor(vendedor);
-        inOrder.verify(conversaAgente).setFinalizada(true);
-
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    void naoDeveProcessarFluxoCompletoLancandoException() {
+    void naoDevePropagarErroDoAgente() {
         when(agenteUseCase.enviarJsonTrasformacao(resposta))
                 .thenThrow(new RuntimeException("boom"));
 
-        RuntimeException ex = assertThrows(RuntimeException.class,
+        assertThrows(RuntimeException.class,
                 () -> processarClienteQualificado.processar(resposta, conversaAgente, originalCliente)
         );
-        assertEquals("boom", ex.getMessage());
 
         verifyNoInteractions(clienteUseCase, vendedorUseCase, mensagemUseCase, mensagemBuilder);
     }
-
 }

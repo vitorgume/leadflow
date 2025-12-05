@@ -35,7 +35,7 @@ public class ValidadorTempoEspera implements ContextoValidator {
                     }
 
                     boolean aindaNoCooldown = conv.getFinalizada() &&
-                            !conv.getDataUltimaMensagem().plusSeconds(30).isBefore(LocalDateTime.now());
+                            !conv.getDataUltimaMensagem().plusMinutes(30).isBefore(LocalDateTime.now());
 
                     if (aindaNoCooldown) {
                         log.info("Ignorado pois ainda esta no cooldown");

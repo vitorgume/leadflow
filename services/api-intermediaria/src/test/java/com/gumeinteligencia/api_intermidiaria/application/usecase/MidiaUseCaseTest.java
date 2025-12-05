@@ -42,4 +42,17 @@ class MidiaUseCaseTest {
         assertNotEquals("texto", resultado.getMensagem());
         assertTrue(resultado.getMensagem().startsWith("Midia do"));
     }
+
+    @Test
+    void deveManterMensagemQuandoUrlVideoForNula() {
+        Mensagem mensagem = Mensagem.builder()
+                .telefone("111")
+                .mensagem("texto original")
+                .urlVideo(null)
+                .build();
+
+        Mensagem resultado = midiaUseCase.extrairMidias(mensagem);
+
+        assertEquals("texto original", resultado.getMensagem());
+    }
 }

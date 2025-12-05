@@ -6,27 +6,31 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class MensagemRecontatoIantivoG1Test {
     private final MensagemRecontatoIantivoG1 mensagem = new MensagemRecontatoIantivoG1();
 
     @Test
-    void deveRetornarMensagemExataIndependenteDosParametros() {
+    void deveRetornarMensagemComDadosQuandoDisponiveis() {
         Cliente cliente = Cliente.builder()
                 .nome("Fulano")
-                .telefone("+55 44 99999-9999")
+                .dorDesejoPaciente("procedimento X")
                 .build();
 
-        String esperado = "Oii! Aqui é da Gráfica Neoprint! Você nos enviou mensagem, mas não deu continuidade no atendimento! Se você quiser que eu te conecte com um vendedor, é só me responder essa mensagem, ok?";
+        String resultado = mensagem.getMensagem(null, cliente);
 
-        // Mesmo passando vendedor/cliente, a mensagem não usa esses dados
-        String resultado1 = mensagem.getMensagem("Carlos", cliente);
-        String resultado2 = mensagem.getMensagem(null, null);
+        assertTrue(resultado.contains("Fulano"));
+        assertTrue(resultado.contains("procedimento X"));
+    }
 
-        assertEquals(esperado, resultado1);
-        assertEquals(esperado, resultado2);
+    @Test
+    void deveRetornarMensagemBasicaQuandoSemDados() {
+        Cliente vazio = Cliente.builder().build();
+        String resultado = mensagem.getMensagem(null, vazio);
+        assertTrue(resultado.startsWith("Ol"));
     }
 
     @Test

@@ -1,8 +1,8 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
-import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
+import com.guminteligencia.ura_chatbot_ia.domain.AvisoContexto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.ContextoMapper;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.AvisoContextoMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,23 +57,23 @@ class MensageriaDataProviderTest {
         when(sqsClient.receiveMessage(reqCap.capture()))
                 .thenReturn(response);
 
-        Contexto ctx1 = mock(Contexto.class);
-        Contexto ctx2 = mock(Contexto.class);
-        try (MockedStatic<ContextoMapper> ms = mockStatic(ContextoMapper.class)) {
-            ms.when(() -> ContextoMapper.paraDomainDeMessage(msg1)).thenReturn(ctx1);
-            ms.when(() -> ContextoMapper.paraDomainDeMessage(msg2)).thenReturn(ctx2);
+        AvisoContexto aviso1 = mock(AvisoContexto.class);
+        AvisoContexto aviso2 = mock(AvisoContexto.class);
+        try (MockedStatic<AvisoContextoMapper> ms = mockStatic(AvisoContextoMapper.class)) {
+            ms.when(() -> AvisoContextoMapper.paraDomainDeMessage(msg1)).thenReturn(aviso1);
+            ms.when(() -> AvisoContextoMapper.paraDomainDeMessage(msg2)).thenReturn(aviso2);
 
-            List<Contexto> result = provider.listarMensagens();
+            List<AvisoContexto> result = provider.listarAvisos();
 
-            assertEquals(List.of(ctx1, ctx2), result);
+            assertEquals(List.of(aviso1, aviso2), result);
 
             ReceiveMessageRequest actualReq = reqCap.getValue();
             assertEquals(queueUrl, actualReq.queueUrl());
             assertEquals(10, actualReq.maxNumberOfMessages());
             assertEquals(5, actualReq.waitTimeSeconds());
 
-            ms.verify(() -> ContextoMapper.paraDomainDeMessage(msg1));
-            ms.verify(() -> ContextoMapper.paraDomainDeMessage(msg2));
+            ms.verify(() -> AvisoContextoMapper.paraDomainDeMessage(msg1));
+            ms.verify(() -> AvisoContextoMapper.paraDomainDeMessage(msg2));
         }
     }
 
@@ -84,7 +84,7 @@ class MensageriaDataProviderTest {
 
         DataProviderException ex = assertThrows(
                 DataProviderException.class,
-                () -> provider.listarMensagens()
+                () -> provider.listarAvisos()
         );
         assertEquals("Erro ao listar contextos da fila SQS.", ex.getMessage());
     }

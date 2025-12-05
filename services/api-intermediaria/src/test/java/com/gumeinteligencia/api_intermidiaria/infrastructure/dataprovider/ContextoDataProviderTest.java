@@ -144,6 +144,17 @@ class ContextoDataProviderTest {
     }
 
     @Test
+    void deveRetornarVazioQuandoRespostaNaoTemItemsFlag() {
+        QueryResponse responseSemFlag = QueryResponse.builder().build();
+
+        when(dynamoDbClient.query(any(QueryRequest.class))).thenReturn(responseSemFlag);
+
+        Optional<Contexto> resultado = dataProvider.consultarPorTelefone("000000000");
+
+        assertTrue(resultado.isEmpty());
+    }
+
+    @Test
     void deveLancarExcecaoAoConsultarTelefoneComErro() {
         when(dynamoDbClient.query(any(QueryRequest.class))).thenThrow(new RuntimeException("Erro simulado"));
 

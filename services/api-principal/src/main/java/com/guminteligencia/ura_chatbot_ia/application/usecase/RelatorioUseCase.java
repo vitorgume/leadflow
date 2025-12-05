@@ -34,7 +34,7 @@ public class RelatorioUseCase {
         DayOfWeek dataHoje = LocalDate.now().getDayOfWeek();
         List<RelatorioContatoDto> relatorio;
 
-        if(dataHoje.equals(DayOfWeek.MONDAY)) {
+        if (dataHoje.equals(DayOfWeek.MONDAY)) {
             relatorio = clienteUseCase.getRelatorioSegundaFeira();
         } else {
             relatorio = clienteUseCase.getRelatorio();
@@ -46,7 +46,7 @@ public class RelatorioUseCase {
 
         mensagemUseCase.enviarRelatorio(arquivo, "Relatorio.xlsx", gerencia.getTelefone());
 
-        log.info("Geração de relatório dos contatos dos vendedores concluida com sucesso.");
+        log.info("Geração de relatório dos contatos dos vendedores concluída com sucesso.");
     }
 
     private String gerarArquivo(List<RelatorioContatoDto> contatos) {

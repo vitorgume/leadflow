@@ -55,6 +55,7 @@ class ProcessamentoContextoNovoUseCaseTest {
 
     @Test
     void deveProcessarFluxoCompletoContextoNovo() {
+        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
         when(contexto.getTelefone()).thenReturn(telefone);
         when(contexto.getMensagens()).thenReturn(mensagens);
         when(clienteUseCase.cadastrar(telefone)).thenReturn(clienteSalvo);
@@ -75,7 +76,7 @@ class ProcessamentoContextoNovoUseCaseTest {
         ord.verify(clienteUseCase).cadastrar(telefone);
         ord.verify(conversaAgenteUseCase).criar(clienteSalvo);
         ord.verify(agenteUseCase).enviarMensagem(clienteSalvo, novaConversa, mensagens);
-        ord.verify(mensagemUseCase).enviarMensagem("resposta", telefone, false);
+        ord.verify(mensagemUseCase).enviarMensagem("resposta", telefone, true);
         ord.verify(novaConversa).setDataUltimaMensagem(Mockito.any(LocalDateTime.class));
         ord.verify(conversaAgenteUseCase).salvar(novaConversa);
         ord.verifyNoMoreInteractions();
@@ -83,6 +84,7 @@ class ProcessamentoContextoNovoUseCaseTest {
 
     @Test
     void fluxoNaoDeveContinuarAoTerExceptionLancadaAoCadastrarCLiente() {
+        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
         when(clienteUseCase.cadastrar(Mockito.anyString()))
                 .thenThrow(new RuntimeException("erro-cadastrar"));
 
@@ -100,6 +102,7 @@ class ProcessamentoContextoNovoUseCaseTest {
 
     @Test
     void fluxoNaoDeveContinuarAoTerExceptionLancadaAoCriarConversaAgente() {
+        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
         when(clienteUseCase.cadastrar(Mockito.anyString())).thenReturn(clienteSalvo);
         when(conversaAgenteUseCase.criar(Mockito.any()))
                 .thenThrow(new IllegalStateException("erro-criar"));
@@ -118,6 +121,7 @@ class ProcessamentoContextoNovoUseCaseTest {
 
     @Test
     void fluxoNaoDeveContinuarAoTerExceotionLancadaNoEnvioMensagemAgenteUseCase() {
+        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
         when(clienteUseCase.cadastrar(Mockito.anyString())).thenReturn(clienteSalvo);
         when(conversaAgenteUseCase.criar(Mockito.any())).thenReturn(novaConversa);
         when(agenteUseCase.enviarMensagem(any(), any(), anyList()))
@@ -138,6 +142,7 @@ class ProcessamentoContextoNovoUseCaseTest {
 
     @Test
     void processarContextoNovo_quandoSalvarFalha_propagatesEParaFluxo() {
+        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
         when(contexto.getTelefone()).thenReturn(telefone);
         when(contexto.getMensagens()).thenReturn(mensagens);
         when(clienteUseCase.cadastrar(telefone)).thenReturn(clienteSalvo);

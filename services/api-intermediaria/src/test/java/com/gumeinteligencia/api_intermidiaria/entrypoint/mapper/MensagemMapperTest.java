@@ -30,4 +30,36 @@ class MensagemMapperTest {
         Assertions.assertEquals(resultado.getMensagem(), mensagemDto.getText().getMessage());
         Assertions.assertEquals(resultado.getTelefone(), mensagemDto.getPhone());
     }
+
+    @Test
+    void devePreencherCamposVaziosQuandoDtoSemMidiasENemTexto() {
+        MensagemDto dtoSemCampos = MensagemDto.builder()
+                .phone("123456")
+                .build();
+
+        Mensagem resultado = MensagemMapper.paraDomain(dtoSemCampos);
+
+        assertEquals("", resultado.getMensagem());
+        assertEquals("", resultado.getUrlAudio());
+        assertEquals("", resultado.getUrlVideo());
+        assertEquals("", resultado.getUrlImagem());
+    }
+
+    @Test
+    void deveMapearMidiasQuandoPresentes() {
+        var mensagemDtoCompleta = MensagemDto.builder()
+                .phone("9999")
+                .text(TextoDto.builder().message("texto").build())
+                .audio(com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.AudioDto.builder().audioUrl("audio-url").build())
+                .video(com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.VideoDto.builder().videoUrl("video-url").build())
+                .image(com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.ImageDto.builder().imageUrl("image-url").build())
+                .build();
+
+        Mensagem resultado = MensagemMapper.paraDomain(mensagemDtoCompleta);
+
+        assertEquals("texto", resultado.getMensagem());
+        assertEquals("audio-url", resultado.getUrlAudio());
+        assertEquals("video-url", resultado.getUrlVideo());
+        assertEquals("image-url", resultado.getUrlImagem());
+    }
 }

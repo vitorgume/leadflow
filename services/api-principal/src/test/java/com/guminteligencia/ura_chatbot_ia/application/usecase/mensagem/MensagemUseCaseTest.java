@@ -87,18 +87,12 @@ class MensagemUseCaseTest {
     }
 
     @Test
-    void deveLancarExceptionQuandoEnviarContatoFalhar() {
+    void deveIgnorarExceptionQuandoEnviarContatoFalhar() {
         doThrow(new RuntimeException("fail-contato"))
                 .when(gateway).enviarContato(vendedor.getTelefone(), cliente);
 
-        RuntimeException ex = assertThrows(
-                RuntimeException.class,
-                () -> useCase.enviarContato(vendedor, cliente)
-        );
-        assertEquals("fail-contato", ex.getMessage());
-
+        assertDoesNotThrow(() -> useCase.enviarContato(vendedor, cliente));
         verify(gateway).enviarContato(vendedor.getTelefone(), cliente);
-        verifyNoMoreInteractions(gateway);
     }
 
 

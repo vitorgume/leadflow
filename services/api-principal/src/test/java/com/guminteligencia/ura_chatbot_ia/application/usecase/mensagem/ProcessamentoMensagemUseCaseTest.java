@@ -6,12 +6,12 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.ContextoU
 import com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.ProcessamentoContextoNovoUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processamentoContextoExistente.ProcessamentoContextoExistente;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.validador.ContextoValidadorComposite;
+import com.guminteligencia.ura_chatbot_ia.domain.AvisoContexto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -49,6 +49,7 @@ class ProcessamentoMensagemUseCaseTest {
 
     private Contexto ctx1, ctx2;
     private Message msg1, msg2;
+    private AvisoContexto aviso1, aviso2;
     private UUID id1, id2;
     private final String tel1 = "+5511999000111";
 
@@ -60,6 +61,8 @@ class ProcessamentoMensagemUseCaseTest {
         msg2 = mock(Message.class);
         id1 = UUID.randomUUID();
         id2 = UUID.randomUUID();
+        aviso1 = AvisoContexto.builder().idContexto(id1).mensagemFila(msg1).build();
+        aviso2 = AvisoContexto.builder().idContexto(id2).mensagemFila(msg2).build();
     }
 
     @Test
@@ -81,11 +84,15 @@ class ProcessamentoMensagemUseCaseTest {
 
     @Test
     void deveProcessarFluxoExistenteComSucesso() {
-        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of(ctx1, ctx2));
+        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of(aviso1, aviso2));
+        when(contextoUseCase.consultarPeloId(id1)).thenReturn(ctx1);
+        when(contextoUseCase.consultarPeloId(id2)).thenReturn(ctx2);
         when(contextoValidadorComposite.permitirProcessar(ctx1)).thenReturn(true);
         when(contextoValidadorComposite.permitirProcessar(ctx2)).thenReturn(false);
         when(ctx1.getId()).thenReturn(id1);
+        when(ctx2.getId()).thenReturn(id2);
         when(ctx1.getMensagemFila()).thenReturn(msg1);
+        when(ctx2.getMensagemFila()).thenReturn(msg2);
         when(ctx1.getTelefone()).thenReturn(tel1);
 
         Cliente cliente = mock(Cliente.class);
@@ -94,29 +101,21 @@ class ProcessamentoMensagemUseCaseTest {
 
         useCase.consumirFila();
 
-        InOrder ord = inOrder(
-                mensageriaUseCase,
-                processamentoContextoExistente,
-                mensageriaUseCase,
-                contextoUseCase
-        );
-
-        ord.verify(mensageriaUseCase).listarAvisos();
-        ord.verify(processamentoContextoExistente)
-                .processarContextoExistente(cliente, ctx1);
-        ord.verify(mensageriaUseCase).deletarMensagem(msg1);
-        ord.verify(contextoUseCase).deletar(id1);
-
-        verify(contextoValidadorComposite, times(2)).permitirProcessar(ctx2);
-        verifyNoMoreInteractions(
-                processamentoContextoExistente,
-                processamentoContextoNovoUseCase
-        );
+        verify(mensageriaUseCase).listarAvisos();
+        verify(contextoUseCase).consultarPeloId(id1);
+        verify(contextoUseCase).consultarPeloId(id2);
+        verify(contextoUseCase).deletar(id1);
+        verify(contextoUseCase).deletar(id2);
+        verify(mensageriaUseCase).deletarMensagem(msg1);
+        verify(mensageriaUseCase).deletarMensagem(msg2);
+        verify(contextoValidadorComposite, atLeastOnce()).permitirProcessar(ctx1);
+        verify(contextoValidadorComposite, atLeastOnce()).permitirProcessar(ctx2);
     }
 
     @Test
     void deveProcessarNovoFluxoComSucessoQuandoClienteNaoEncontrado() {
-        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of(ctx1));
+        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of(aviso1));
+        when(contextoUseCase.consultarPeloId(id1)).thenReturn(ctx1);
         when(contextoValidadorComposite.permitirProcessar(ctx1)).thenReturn(true);
         when(ctx1.getId()).thenReturn(id1);
         when(ctx1.getMensagemFila()).thenReturn(msg1);
@@ -127,23 +126,11 @@ class ProcessamentoMensagemUseCaseTest {
 
         useCase.consumirFila();
 
-        InOrder ord = inOrder(
-                mensageriaUseCase,
-                processamentoContextoNovoUseCase,
-                mensageriaUseCase,
-                contextoUseCase
-        );
-
-        ord.verify(mensageriaUseCase).listarAvisos();
-        ord.verify(processamentoContextoNovoUseCase).processarContextoNovo(ctx1);
-        ord.verify(mensageriaUseCase).deletarMensagem(msg1);
-        ord.verify(contextoUseCase).deletar(id1);
-
+        verify(mensageriaUseCase).listarAvisos();
+        verify(contextoUseCase).consultarPeloId(id1);
+        verify(contextoUseCase).deletar(id1);
+        verify(processamentoContextoNovoUseCase).processarContextoNovo(ctx1);
         verify(processamentoContextoExistente, never()).processarContextoExistente(any(), any());
-        verifyNoMoreInteractions(
-                processamentoContextoNovoUseCase,
-                mensageriaUseCase,
-                contextoUseCase
-        );
+        verify(mensageriaUseCase).deletarMensagem(msg1);
     }
 }

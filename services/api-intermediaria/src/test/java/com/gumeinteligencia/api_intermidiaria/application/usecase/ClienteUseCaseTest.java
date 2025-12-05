@@ -1,7 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.application.usecase;
 
 import com.gumeinteligencia.api_intermidiaria.application.gateways.ClienteGateway;
-import com.gumeinteligencia.api_intermidiaria.domain.Canal;
 import com.gumeinteligencia.api_intermidiaria.domain.Cliente;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,19 +25,29 @@ class ClienteUseCaseTest {
     private ClienteUseCase clienteUseCase;
 
     @Test
-    void deveConsultarClientePorTelefone() {
-        var cliente = Cliente.builder()
+    void deveConsultarClientePorTelefoneQuandoExistir() {
+        Cliente cliente = Cliente.builder()
                 .id(UUID.randomUUID())
+                .nome("Fulano")
                 .telefone("44999999999")
-                .canal(Canal.CHATBOT)
                 .build();
 
-        when(clienteGateway.consultarPorTelefone(cliente.getTelefone())).thenReturn(Optional.of(cliente));
+        when(clienteGateway.consultarPorTelefone(cliente.getTelefone()))
+                .thenReturn(Optional.of(cliente));
 
         Optional<Cliente> resultado = clienteUseCase.consultarPorTelefone(cliente.getTelefone());
 
         assertTrue(resultado.isPresent());
         assertEquals(cliente.getTelefone(), resultado.get().getTelefone());
-        assertEquals(cliente.getCanal(), resultado.get().getCanal());
     }
+
+    @Test
+    void deveRetornarVazioQuandoClienteNaoExistir() {
+        when(clienteGateway.consultarPorTelefone("000")).thenReturn(Optional.empty());
+
+        Optional<Cliente> resultado = clienteUseCase.consultarPorTelefone("000");
+
+        assertTrue(resultado.isEmpty());
+    }
+
 }

@@ -1,7 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
 import com.guminteligencia.ura_chatbot_ia.application.gateways.MensageriaGateway;
-import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
+import com.guminteligencia.ura_chatbot_ia.domain.AvisoContexto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,14 +28,14 @@ class MensageriaUseCaseTest {
 
     @Test
     void deveListarAvisosDelegandoParaGateway() {
-        Contexto c1 = mock(Contexto.class);
-        List<Contexto> lista = List.of(c1);
-        when(mensageriaGateway.listarMensagens()).thenReturn(lista);
+        AvisoContexto aviso = mock(AvisoContexto.class);
+        List<AvisoContexto> lista = List.of(aviso);
+        when(mensageriaGateway.listarAvisos()).thenReturn(lista);
 
-        List<Contexto> result = useCase.listarAvisos();
+        List<AvisoContexto> result = useCase.listarAvisos();
 
         assertSame(lista, result, "Deve retornar exatamente a lista fornecida pelo gateway");
-        verify(mensageriaGateway).listarMensagens();
+        verify(mensageriaGateway).listarAvisos();
         verifyNoMoreInteractions(mensageriaGateway);
     }
 

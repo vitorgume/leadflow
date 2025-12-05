@@ -89,6 +89,41 @@ class MensagemContextoListConverterTest {
     }
 
     @Test
+    void transformToDeveConverterStringSet() {
+        AttributeValue attributeValue = AttributeValue.builder()
+                .ss("msg1", "msg2")
+                .build();
+
+        List<MensagemContexto> resultado = converter.transformTo(attributeValue);
+
+        assertEquals(2, resultado.size());
+        assertEquals("msg1", resultado.get(0).getMensagem());
+        assertEquals("msg2", resultado.get(1).getMensagem());
+    }
+
+    @Test
+    void transformToDeveConverterLista() {
+        AttributeValue attributeValue = AttributeValue.builder()
+                .l(AttributeValue.builder().s("primeiro").build(), AttributeValue.builder().s("segundo").build())
+                .build();
+
+        List<MensagemContexto> resultado = converter.transformTo(attributeValue);
+
+        assertEquals(2, resultado.size());
+        assertEquals("primeiro", resultado.get(0).getMensagem());
+        assertEquals("segundo", resultado.get(1).getMensagem());
+    }
+
+    @Test
+    void transformToDeveRetornarListaVaziaQuandoStringVazia() {
+        AttributeValue attributeValue = AttributeValue.builder().s("   ").build();
+
+        List<MensagemContexto> resultado = converter.transformTo(attributeValue);
+
+        assertTrue(resultado.isEmpty());
+    }
+
+    @Test
     void transformToDeveLancarRuntimeExceptionQuandoJsonInvalido() {
         AttributeValue attributeValue = AttributeValue.builder().s("{json-invalido").build();
 

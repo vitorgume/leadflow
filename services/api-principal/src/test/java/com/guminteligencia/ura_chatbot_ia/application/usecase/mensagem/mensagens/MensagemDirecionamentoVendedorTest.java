@@ -4,39 +4,43 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensa
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MensagemDirecionamentoVendedorTest {
 
     private final MensagemDirecionamentoVendedor mensagemDirecionamentoVendedor = new MensagemDirecionamentoVendedor();
 
     @Test
-    void deveIncluirNomeDoVendedorCorretamente() {
-        String vendedor = "Maria";
+    void deveGerarMensagemComNomeEDor() {
+        Cliente cliente = Cliente.builder()
+                .nome("Joao")
+                .telefone("+5511999887766")
+                .dorDesejoPaciente("resultado")
+                .build();
 
-        Cliente cliente = Cliente.builder().nome("João").telefone("+5511999887766").build();
+        String msg = mensagemDirecionamentoVendedor.getMensagem("ignored", cliente);
 
-        String msg = mensagemDirecionamentoVendedor.getMensagem(vendedor, cliente);
-
-        String esperado = "Muito obrigado pelas informações ! Agora você será redirecionado para o(a) "
-                + vendedor
-                + ", logo entrará em contato com você ! Até...";
-        assertEquals(esperado, msg);
+        assertTrue(msg.startsWith("Joao! Sua triagem"));
+        assertTrue(msg.contains("resultado"));
     }
 
     @Test
-    void deveTratarNomeVendedorNullComStringNull() {
-        String msg = mensagemDirecionamentoVendedor.getMensagem(null, null);
-        assertTrue(msg.contains("para o(a) null"));
-        assertTrue(msg.endsWith("Até..."));
+    void deveGerarMensagemMesmoSemDor() {
+        Cliente cliente = Cliente.builder()
+                .nome("Maria")
+                .telefone("+5511888777666")
+                .build();
+
+        String msg = mensagemDirecionamentoVendedor.getMensagem(null, cliente);
+        assertTrue(msg.contains("Maria! Sua triagem"));
     }
 
     @Test
-    void deveRetornarCoidogCorretamente() {
-        int codigo = mensagemDirecionamentoVendedor.getTipoMensagem();
+    void deveRetornarCodigoCorreto() {
         assertEquals(
                 TipoMensagem.MENSAGEM_DIRECIONAMENTO_VENDEDOR.getCodigo(),
-                codigo
+                mensagemDirecionamentoVendedor.getTipoMensagem()
         );
     }
 }

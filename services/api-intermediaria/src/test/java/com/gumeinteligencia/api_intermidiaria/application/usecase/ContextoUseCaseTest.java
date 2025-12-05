@@ -97,6 +97,30 @@ class ContextoUseCaseTest {
     }
 
     @Test
+    void deveProcessarContextoSemMensagensMantendoStatusExistente() {
+        Contexto contexto = Contexto.builder()
+                .id(UUID.randomUUID())
+                .telefone(telefone)
+                .status(StatusContexto.OBSOLETO)
+                .build();
+
+        when(gateway.salvar(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        contextoUseCase.processarContextoExistente(contexto, mensagem);
+
+        ArgumentCaptor<Contexto> captor = ArgumentCaptor.forClass(Contexto.class);
+        verify(gateway).salvar(captor.capture());
+
+        Contexto atualizado = captor.getValue();
+        assertEquals(StatusContexto.OBSOLETO, atualizado.getStatus());
+        assertEquals(1, atualizado.getMensagens().size());
+        MensagemContexto novaMensagem = atualizado.getMensagens().get(0);
+        assertEquals(mensagem.getMensagem(), novaMensagem.getMensagem());
+        assertEquals(mensagem.getUrlImagem(), novaMensagem.getImagemUrl());
+        assertEquals(mensagem.getUrlAudio(), novaMensagem.getAudioUrl());
+    }
+
+    @Test
     void deveIniciarNovoContextoEAvisarFila() {
         when(gateway.salvar(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(avisoContextoUseCase.criarAviso(any())).thenAnswer(invocation -> AvisoContexto.builder()

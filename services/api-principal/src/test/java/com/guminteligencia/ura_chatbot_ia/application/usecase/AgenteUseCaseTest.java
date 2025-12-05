@@ -68,8 +68,8 @@ class AgenteUseCaseTest {
         assertEquals(clienteId.toString(), capturado.getClienteId());
         assertEquals(conversaId.toString(), capturado.getConversaId());
         assertEquals(esperadoConcat, capturado.getMensagem());
-        assertEquals(List.of("a1", "a2", null), capturado.getAudiosUrl());
-        assertEquals(List.of("i1", "i2", null), capturado.getImagensUrl());
+        assertEquals(java.util.Arrays.asList("a1", "a2", null), capturado.getAudiosUrl());
+        assertEquals(java.util.Arrays.asList("i1", "i2", null), capturado.getImagensUrl());
     }
 
     @Test

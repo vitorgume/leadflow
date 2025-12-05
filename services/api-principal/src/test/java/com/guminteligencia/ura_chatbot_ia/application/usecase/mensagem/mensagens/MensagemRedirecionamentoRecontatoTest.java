@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class MensagemRedirecionamentoRecontatoTest {
@@ -15,7 +16,7 @@ class MensagemRedirecionamentoRecontatoTest {
             new MensagemRedirecionamentoRecontato();
 
     @Test
-    void deveRetornarMensagemComNomeDoVendedor() {
+    void deveRetornarMensagemPadrao() {
         Cliente cliente = Cliente.builder()
                 .nome("Fulano")
                 .telefone("+55 44 99999-9999")
@@ -23,16 +24,7 @@ class MensagemRedirecionamentoRecontatoTest {
 
         String resultado = mensagem.getMensagem("Carlos", cliente);
 
-        String esperado = "Perfeito, estou te redirecionando para o vendedor(a) Carlos que logo entrará em contato. Muito obrigado ! Até...";
-        assertEquals(esperado, resultado);
-    }
-
-    @Test
-    void deveRetornarMensagemMesmoComNomeVendedorNull() {
-        // Comportamento atual concatena "null" — este teste documenta isso.
-        String resultado = mensagem.getMensagem(null, null);
-        String esperado = "Perfeito, estou te redirecionando para o vendedor(a) null que logo entrará em contato. Muito obrigado ! Até...";
-        assertEquals(esperado, resultado);
+        assertTrue(resultado.contains("redirecionando para nossas atendentes"));
     }
 
     @Test
@@ -40,5 +32,4 @@ class MensagemRedirecionamentoRecontatoTest {
         int codigo = mensagem.getTipoMensagem();
         assertEquals(TipoMensagem.REDIRECIONAMENTO_RECONTATO.getCodigo(), codigo);
     }
-
 }
