@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Setter
 @Builder
-public class OutroContatoEntity {
+public class OutroContatoEntityLeadflow {
 
     private UUID id;
     private String nome;

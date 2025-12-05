@@ -1,6 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.repository;
 
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,12 +14,12 @@ public class OutroContatoRepository {
     private final DynamoDbTemplate dynamoDbTemplate;
 
 
-    public OutroContatoEntity salvar(OutroContatoEntity outroContato) {
+    public OutroContatoEntityLeadflow salvar(OutroContatoEntityLeadflow outroContato) {
         return dynamoDbTemplate.save(outroContato);
     }
 
-    public List<OutroContatoEntity> listar() {
-        return dynamoDbTemplate.scanAll(OutroContatoEntity.class)
+    public List<OutroContatoEntityLeadflow> listar() {
+        return dynamoDbTemplate.scanAll(OutroContatoEntityLeadflow.class)
                 .stream()
                 .flatMap(page -> page.items().stream())
                 .toList();

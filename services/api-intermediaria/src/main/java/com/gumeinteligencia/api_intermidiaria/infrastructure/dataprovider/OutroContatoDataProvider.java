@@ -5,7 +5,7 @@ import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.OutroContatoMapper;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ public class OutroContatoDataProvider implements OutroContatoGateway {
 
     @Override
     public List<OutroContato> listar() {
-        List<OutroContatoEntity> outroContatoEntities;
+        List<OutroContatoEntityLeadflow> outroContatoEntities;
 
         try {
             outroContatoEntities = repository.listar();

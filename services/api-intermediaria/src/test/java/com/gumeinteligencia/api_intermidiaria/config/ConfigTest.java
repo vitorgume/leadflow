@@ -1,9 +1,8 @@
 package com.gumeinteligencia.api_intermidiaria.config;
 
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.function.client.WebClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -48,8 +47,8 @@ class ConfigTest {
         DynamoDbConfig config = new DynamoDbConfig();
 
         DynamoDbEnhancedClient enhancedClient = config.dynamoDbEnhancedClient(lowLevel);
-        DynamoDbTable<ContextoEntity> contextoTable = config.contextoTable(enhancedClient, "contexto_entity_leadflow");
-        DynamoDbTable<OutroContatoEntity> outroContatoTable = config.outroContatoTable(enhancedClient, "outro_contato_entity_leadflow");
+        DynamoDbTable<ContextoEntityLeadflow> contextoTable = config.contextoTable(enhancedClient, "contexto_entity_leadflow");
+        DynamoDbTable<OutroContatoEntityLeadflow> outroContatoTable = config.outroContatoTable(enhancedClient, "outro_contato_entity_leadflow");
 
         assertNotNull(enhancedClient);
         assertEquals("contexto_entity_leadflow", contextoTable.tableName());

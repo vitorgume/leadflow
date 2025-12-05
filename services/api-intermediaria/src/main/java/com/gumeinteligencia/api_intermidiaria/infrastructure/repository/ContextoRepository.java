@@ -1,6 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.repository;
 
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,22 +16,22 @@ public class ContextoRepository {
 
     private final DynamoDbTemplate dynamoDbTemplate;
 
-    public ContextoEntity salvar(ContextoEntity contexto) {
+    public ContextoEntityLeadflow salvar(ContextoEntityLeadflow contexto) {
             return dynamoDbTemplate.save(contexto);
     }
 
-    public Optional<ContextoEntity> buscarPorId(String id) {
-        ContextoEntity contexto = dynamoDbTemplate.load(Key.builder()
+    public Optional<ContextoEntityLeadflow> buscarPorId(String id) {
+        ContextoEntityLeadflow contexto = dynamoDbTemplate.load(Key.builder()
                 .partitionValue(id)
                 .build()
-                ,ContextoEntity.class
+                , ContextoEntityLeadflow.class
         );
 
         return contexto == null ? Optional.empty() : Optional.of(contexto);
     }
 
-    public Optional<ContextoEntity> buscarPorTelefone(String telefone) {
-        PageIterable<ContextoEntity> results = dynamoDbTemplate.scan(ScanEnhancedRequest.builder().build(), ContextoEntity.class);
+    public Optional<ContextoEntityLeadflow> buscarPorTelefone(String telefone) {
+        PageIterable<ContextoEntityLeadflow> results = dynamoDbTemplate.scan(ScanEnhancedRequest.builder().build(), ContextoEntityLeadflow.class);
 
         return results.items()
                 .stream()

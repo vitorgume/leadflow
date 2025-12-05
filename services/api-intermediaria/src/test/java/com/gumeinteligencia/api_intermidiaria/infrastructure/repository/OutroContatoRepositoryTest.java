@@ -1,18 +1,14 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.repository;
 
 import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
 
@@ -33,11 +29,11 @@ class OutroContatoRepositoryTest {
     @InjectMocks
     private OutroContatoRepository outroContatoRepository;
 
-    private OutroContatoEntity outroContato;
+    private OutroContatoEntityLeadflow outroContato;
 
     @BeforeEach
     void setUp() {
-        outroContato = OutroContatoEntity.builder()
+        outroContato = OutroContatoEntityLeadflow.builder()
                 .id(UUID.randomUUID())
                 .nome("Maria")
                 .telefone("47999999999")
@@ -50,7 +46,7 @@ class OutroContatoRepositoryTest {
     void deveSalvarOutroContatoComSucesso() {
         when(dynamoDbTemplate.save(outroContato)).thenReturn(outroContato);
 
-        OutroContatoEntity salvo = outroContatoRepository.salvar(outroContato);
+        OutroContatoEntityLeadflow salvo = outroContatoRepository.salvar(outroContato);
 
         verify(dynamoDbTemplate).save(outroContato);
         assertEquals(outroContato, salvo);
@@ -59,12 +55,12 @@ class OutroContatoRepositoryTest {
     @Test
     void deveListarTodosOsContatos() {
         // Simula uma página com 1 item
-        Page<OutroContatoEntity> page = Page.create(List.of(outroContato), null);
-        PageIterable<OutroContatoEntity> iterable = PageIterable.create(() -> List.of(page).iterator());
+        Page<OutroContatoEntityLeadflow> page = Page.create(List.of(outroContato), null);
+        PageIterable<OutroContatoEntityLeadflow> iterable = PageIterable.create(() -> List.of(page).iterator());
 
-        when(dynamoDbTemplate.scanAll(OutroContatoEntity.class)).thenReturn(iterable);
+        when(dynamoDbTemplate.scanAll(OutroContatoEntityLeadflow.class)).thenReturn(iterable);
 
-        List<OutroContatoEntity> resultado = outroContatoRepository.listar();
+        List<OutroContatoEntityLeadflow> resultado = outroContatoRepository.listar();
 
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
@@ -74,12 +70,12 @@ class OutroContatoRepositoryTest {
     @Test
     void deveRetornarListaVaziaSeNaoHouverContatos() {
         // Simula uma página vazia
-        Page<OutroContatoEntity> page = Page.create(List.of(), null);
-        PageIterable<OutroContatoEntity> iterable = PageIterable.create(() -> List.of(page).iterator());
+        Page<OutroContatoEntityLeadflow> page = Page.create(List.of(), null);
+        PageIterable<OutroContatoEntityLeadflow> iterable = PageIterable.create(() -> List.of(page).iterator());
 
-        when(dynamoDbTemplate.scanAll(OutroContatoEntity.class)).thenReturn(iterable);
+        when(dynamoDbTemplate.scanAll(OutroContatoEntityLeadflow.class)).thenReturn(iterable);
 
-        List<OutroContatoEntity> resultado = outroContatoRepository.listar();
+        List<OutroContatoEntityLeadflow> resultado = outroContatoRepository.listar();
 
         assertNotNull(resultado);
         assertTrue(resultado.isEmpty());
