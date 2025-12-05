@@ -27,3 +27,44 @@ def test_mensagem_defaults_listas_vazias():
 
     assert mensagem.audios_url == []
     assert mensagem.imagens_url == []
+
+
+def test_mensagem_cliente_id_kwarg():
+    mensagem = Mensagem(
+        "conteudo",
+        "conv-4",
+        cliente_id="cli-kwarg",
+        audios_url=None,
+        imagens_url=None,
+    )
+
+    assert mensagem.cliente_id == "cli-kwarg"
+    assert mensagem.audios_url == []
+    assert mensagem.imagens_url == []
+
+
+def test_mensagem_cliente_id_usando_posicional_fallback():
+    mensagem = Mensagem(
+        "conteudo",
+        "conv-5",
+        None,
+        None,
+        None,
+        "cli-pos",
+    )
+
+    assert mensagem.cliente_id == "cli-pos"
+    assert mensagem.audios_url == []
+    assert mensagem.imagens_url == []
+
+
+def test_mensagem_cliente_id_invalido_sem_fallback():
+    mensagem = Mensagem(
+        "conteudo",
+        "conv-6",
+        999,
+        [],
+        [],
+    )
+
+    assert mensagem.cliente_id == ""

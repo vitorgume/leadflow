@@ -4,6 +4,7 @@ import pytest
 
 from src.application.usecase.agente_use_case import AgenteUseCase
 from src.domain.conversa import Conversa
+from src.domain.mensagem import Mensagem
 from src.infrastructure.dataprovider.agente_data_provider import AgenteDataProvider
 
 
@@ -41,6 +42,83 @@ def test_carregar_prompt_padrao_file_not_found(use_case, monkeypatch):
     )
     with pytest.raises(FileNotFoundError):
         use_case._carregar_prompt_padrao()
+
+
+def test_carregar_base_conhecimento_sem_arquivo(monkeypatch, use_case):
+    monkeypatch.setattr("pathlib.Path.exists", lambda self: False)
+    assert use_case._carregar_base_conhecimento() == ""
+
+
+def test_processar_com_historico_e_midias(monkeypatch, provider_mock, use_case):
+    monkeypatch.setattr(use_case, "_carregar_prompt_padrao", lambda: "PROMPT")
+    provider_mock.transcrever_audio.return_value = "fala transcrita"
+    provider_mock.baixar_imagem_como_data_uri.return_value = "data:image/png;base64,xpto"
+    provider_mock.enviar_mensagem.return_value = "RESPOSTA_FINAL"
+
+    m1 = FakeMensagem("usuario", "Oi")
+    m2 = FakeMensagem("bot", "Tudo certo")
+    conversa = Mock(spec=Conversa)
+    conversa.mensagens = [m1, m2]
+
+    mensagem = Mensagem(
+        message="texto base",
+        conversa_id="abc",
+        audios_url=["", "http://audio.com/1.mp3"],
+        imagens_url=["http://img.com/a.png"]
+    )
+
+    retorno = use_case.processar(mensagem, conversa)
+
+    esperado = [
+        {"role": "system", "content": "PROMPT"},
+        {"role": "user", "content": "Oi"},
+        {"role": "assistant", "content": "Tudo certo"},
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "texto base\n\nTranscricoes de audio:\n[Audio 1] fala transcrita"},
+                {"type": "image_url", "image_url": {"url": "data:image/png;base64,xpto"}}
+            ]
+        },
+    ]
+    provider_mock.enviar_mensagem.assert_called_once_with(esperado)
+    provider_mock.transcrever_audio.assert_called_once_with("http://audio.com/1.mp3")
+    provider_mock.baixar_imagem_como_data_uri.assert_called_once_with("http://img.com/a.png")
+    assert retorno == "RESPOSTA_FINAL"
+
+
+def test_preparar_conteudo_usuario_apenas_audio(provider_mock, use_case):
+    provider_mock.transcrever_audio.return_value = "fala clara"
+    mensagem = Mensagem(
+        message="Base",
+        conversa_id="c1",
+        audios_url=["", "http://audio.test/a.wav"],
+        imagens_url=None,
+    )
+
+    conteudo_modelo, conteudo_historico = use_case._preparar_conteudo_usuario(mensagem)
+
+    esperado_texto = "Base\n\nTranscricoes de audio:\n[Audio 1] fala clara"
+    assert conteudo_modelo == esperado_texto
+    assert conteudo_historico == esperado_texto
+    provider_mock.transcrever_audio.assert_called_once_with("http://audio.test/a.wav")
+
+
+def test_preparar_conteudo_usuario_apenas_imagem(provider_mock, use_case):
+    provider_mock.baixar_imagem_como_data_uri.return_value = "data:image/jpeg;base64,z"
+    mensagem = Mensagem(
+        message="",
+        conversa_id="c2",
+        audios_url=[],
+        imagens_url=["http://img/1.jpg"],
+    )
+
+    conteudo_modelo, conteudo_historico = use_case._preparar_conteudo_usuario(mensagem)
+
+    assert conteudo_historico == "[1 imagem(ns) anexada(s)]"
+    assert conteudo_modelo[0]["type"] == "text"
+    assert "Analise as imagens" in conteudo_modelo[0]["text"]
+    assert conteudo_modelo[1]["image_url"]["url"] == "data:image/jpeg;base64,z"
 
 # def test_processar_sem_historico(monkeypatch, provider_mock, use_case):
 #     monkeypatch.setattr(use_case, "_carregar_prompt_padrao", lambda: "PROMPT")

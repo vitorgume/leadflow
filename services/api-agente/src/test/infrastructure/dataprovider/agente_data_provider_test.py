@@ -41,7 +41,7 @@ def test_enviar_mensagem_success(stub_openai_client, agente):
     result = agente.enviar_mensagem(historico)
 
     stub_openai_client.chat.completions.create.assert_called_once_with(
-        model="gpt-4-turbo", messages=historico, temperature=0
+        model=agente.modelo_chat, messages=historico, temperature=0
     )
     assert result == "Resposta IA"
 
@@ -68,7 +68,7 @@ def test_enviar_mensagem_transformacao_success(stub_openai_client, agente):
     result = agente.enviar_mensagem_trasformacao_json(historico)
 
     stub_openai_client.chat.completions.create.assert_called_once_with(
-        model="gpt-4", messages=historico, temperature=0
+        model=agente.modelo_json, messages=historico, temperature=0
     )
     assert result == expected_json
 
