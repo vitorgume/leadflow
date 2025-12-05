@@ -1,10 +1,10 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 
 import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 
 public class OutroContatoMapper {
-    public static OutroContato paraDomain(OutroContatoEntity entity) {
+    public static OutroContato paraDomain(OutroContatoEntityLeadflow entity) {
         return OutroContato.builder()
                 .id(entity.getId())
                 .nome(entity.getNome())

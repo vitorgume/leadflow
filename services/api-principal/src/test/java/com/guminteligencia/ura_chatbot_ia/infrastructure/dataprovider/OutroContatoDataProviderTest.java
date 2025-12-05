@@ -4,7 +4,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.OutroContatoMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.OutroContatoRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,12 +30,12 @@ class OutroContatoDataProviderTest {
     private final String ERR_MSG = "Erro ao consultar por nome outro contato.";
     private final String nome = "Teste";
 
-    private OutroContatoEntity entity;
+    private OutroContatoEntityLeadflow entity;
     private OutroContato domain;
 
     @BeforeEach
     void setup() {
-        entity = mock(OutroContatoEntity.class);
+        entity = mock(OutroContatoEntityLeadflow.class);
         domain = mock(OutroContato.class);
     }
 

@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.repository;
 
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntityLeadflow;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,15 +15,15 @@ public class ContextoRepository {
 
     private final DynamoDbTemplate dynamoDbTemplate;
 
-    public void deletar(ContextoEntity contextoEntity) {
-        dynamoDbTemplate.delete(contextoEntity);
+    public void deletar(ContextoEntityLeadflow contextoEntityLeadflow) {
+        dynamoDbTemplate.delete(contextoEntityLeadflow);
     }
 
-    public Optional<ContextoEntity> consultarPorId(UUID id) {
-        ContextoEntity contexto = dynamoDbTemplate.load(Key.builder()
+    public Optional<ContextoEntityLeadflow> consultarPorId(UUID id) {
+        ContextoEntityLeadflow contexto = dynamoDbTemplate.load(Key.builder()
                         .partitionValue(id.toString())
                         .build()
-                ,ContextoEntity.class
+                , ContextoEntityLeadflow.class
         );
 
         return contexto == null ? Optional.empty() : Optional.of(contexto);

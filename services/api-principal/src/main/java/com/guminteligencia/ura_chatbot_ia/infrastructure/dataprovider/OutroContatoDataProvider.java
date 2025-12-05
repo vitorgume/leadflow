@@ -5,7 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.OutroContatoMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.OutroContatoRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ public class OutroContatoDataProvider implements OutroContatoGateway {
 
     @Override
     public Optional<OutroContato> consultarPorNome(String nome) {
-        Optional<OutroContatoEntity> outroContatoEntity;
+        Optional<OutroContatoEntityLeadflow> outroContatoEntity;
 
         try {
             outroContatoEntity = repository.findByNome(nome);

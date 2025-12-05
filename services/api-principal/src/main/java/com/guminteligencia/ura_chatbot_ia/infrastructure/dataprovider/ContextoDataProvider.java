@@ -5,7 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.ContextoMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.ContextoRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntityLeadflow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ public class ContextoDataProvider implements ContextoGateway {
 
     @Override
     public Optional<Contexto> consultarPorId(UUID id) {
-        Optional<ContextoEntity> contextoEntity;
+        Optional<ContextoEntityLeadflow> contextoEntity;
 
         try {
             contextoEntity = repository.consultarPorId(id);
