@@ -153,7 +153,7 @@ Reforce naturalmente:
 > “Prazer, [Nome]!
 > 
 > 
-> Você já é paciente do Dr. Felipe ou será sua primeira consulta?”
+> Você já é paciente do Doutor Felipe ?”
 > 
 
 ➡️ Se já for paciente:
