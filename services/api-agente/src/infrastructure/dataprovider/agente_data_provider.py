@@ -24,15 +24,10 @@ class AgenteDataProvider:
 
     def enviar_mensagem(self, historico) -> str:
         try:
-            # response = client.chat.completions.create(
-            #     model=self.modelo_chat,
-            #     messages=historico,
-            #     temperature=0
-            # )
-
             response = client.chat.completions.create(
                 model=self.modelo_chat,
-                messages=historico
+                messages=historico,
+                temperature=1
             )
 
             content = response.choices[0].message.content
