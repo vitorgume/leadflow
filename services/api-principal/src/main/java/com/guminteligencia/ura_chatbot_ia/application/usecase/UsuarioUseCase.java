@@ -17,15 +17,18 @@ import java.util.UUID;
 public class UsuarioUseCase {
 
     private final UsuarioGateway gateway;
+    private final CriptografiaUseCase criptografiaUseCase;
 
     public Usuario cadastrar(Usuario novoUsuario) {
         log.info("Cadastrando novo usuário. Usuário: {}", novoUsuario);
 
-        Optional<Usuario> usuarioExistente = gateway.consultarPorTelefone(novoUsuario.getTelefone());
+        Optional<Usuario> usuarioExistente = gateway.consultarPorEmail(novoUsuario.getEmail());
 
         if(usuarioExistente.isPresent()) {
             throw new UsuarioExistenteException();
         }
+
+        novoUsuario.setSenha(criptografiaUseCase.criptografar(novoUsuario.getSenha()));
 
         Usuario usuarioSalvo = gateway.salvar(novoUsuario);
 
@@ -47,5 +50,15 @@ public class UsuarioUseCase {
     public void deletar(UUID id) {
         this.consultarPorId(id);
         gateway.deletar(id);
+    }
+
+    public Usuario consultarPorEmail(String email) {
+        Optional<Usuario> usuario = gateway.consultarPorEmail(email);
+
+        if(usuario.isEmpty()) {
+            throw new UsuarioNaoEncotradoException();
+        }
+
+        return usuario.get();
     }
 }

@@ -21,24 +21,6 @@ public class HandlerMiddleware {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseDto.comErro(erroDto));
     }
 
-    //Administrador
-
-    @ExceptionHandler(AdministradorJaExisteException.class)
-    public ResponseEntity<ResponseDto> exceptionHandlerAdministradorJaExisteException(Exception exception) {
-        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
-                .mensagens(mensagens(exception.getMessage()))
-                .build();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.comErro(erroDto));
-    }
-
-    @ExceptionHandler(AdministradorNaoEncontradoException.class)
-    public ResponseEntity<ResponseDto> exceptionHandlerAdministradorNaoEncontradoException(Exception exception) {
-        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
-                .mensagens(mensagens(exception.getMessage()))
-                .build();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
-    }
-
     @ExceptionHandler(CredenciasIncorretasException.class)
     public ResponseEntity<ResponseDto> exceptionHandlerCredenciasIncorretasException(Exception exception) {
         ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()

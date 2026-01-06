@@ -22,7 +22,7 @@ public class UsuarioDataProvider implements UsuarioGateway {
 
     private final String MENSAGEM_ERRO_CONSULTAR_POR_ID = "Erro ao buscar usuário pelo id.";
     private final String MENSAGEM_ERRO_SALVAR = "Erro ao salvar usuário.";
-    private final String MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE = "Erro ao consultar usuário pelo telefone.";
+    private final String MENSAGEM_ERRO_CONSULTAR_POR_EMAIL = "Erro ao consultar usuário pelo email.";
     private final String MENSAGEM_ERRO_DELETAR = "Erro ao deletar usuário.";
 
     @Override
@@ -54,14 +54,14 @@ public class UsuarioDataProvider implements UsuarioGateway {
     }
 
     @Override
-    public Optional<Usuario> consultarPorTelefone(String telefone) {
+    public Optional<Usuario> consultarPorEmail(String email) {
         Optional<UsuarioEntity> usuario;
 
         try {
-            usuario = repository.findByTelefone(telefone);
+            usuario = repository.findByEmail(email);
         } catch (Exception ex) {
-            log.error(MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE, ex);
-            throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE, ex.getCause());
+            log.error(MENSAGEM_ERRO_CONSULTAR_POR_EMAIL, ex);
+            throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_POR_EMAIL, ex.getCause());
         }
 
         return usuario.map(UsuarioMapper::paraDomain);

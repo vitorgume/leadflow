@@ -10,7 +10,7 @@ public interface UsuarioGateway {
 
     Usuario salvar(Usuario novoUsuario);
 
-    Optional<Usuario> consultarPorTelefone(String telefone);
-
     void deletar(UUID id);
+
+    Optional<Usuario> consultarPorEmail(String email);
 }
