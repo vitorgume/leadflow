@@ -26,6 +26,12 @@ public class ContextoEntity {
     private List<MensagemContexto> mensagens;
     private StatusContexto status;
 
+    public String getTelefoneUsuario() {
+        return telefoneUsuario;
+    }
+
+    private String telefoneUsuario;
+
     @DynamoDbPartitionKey
     public UUID getId() {
         return id;

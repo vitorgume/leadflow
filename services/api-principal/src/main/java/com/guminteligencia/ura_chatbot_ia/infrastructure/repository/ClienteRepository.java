@@ -43,4 +43,6 @@ public interface ClienteRepository extends JpaRepository<ClienteEntity, UUID> {
                                   AND co.data_criacao <= DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 3 HOUR), '%Y-%m-%d 16:00:00')
             """, nativeQuery = true)
     List<Object[]> gerarRelatorioSegundaFeira();
+
+    Optional<ClienteEntity> findByTelefoneAndUsuario_Id(String telefone, UUID usuarioId);
 }

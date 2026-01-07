@@ -1,0 +1,1 @@
+ALTER TABLE usuarios ADD telefone_conectado VARCHAR(20) NOT NULL;

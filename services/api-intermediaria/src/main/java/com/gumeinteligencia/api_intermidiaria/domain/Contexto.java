@@ -15,4 +15,5 @@ public class Contexto {
     private String telefone;
     private List<MensagemContexto> mensagens;
     private StatusContexto status;
+    private String telefoneUsuario;
 }

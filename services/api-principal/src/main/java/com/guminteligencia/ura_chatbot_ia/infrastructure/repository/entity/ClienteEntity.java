@@ -42,5 +42,8 @@ public class ClienteEntity {
     @Column(name = "preferencia_horario")
     private PreferenciaHorario preferenciaHorario;
 
+    @ManyToOne
+    private UsuarioEntity usuario;
+
     private boolean inativo;
 }

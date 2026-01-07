@@ -13,4 +13,6 @@ public interface UsuarioGateway {
     void deletar(UUID id);
 
     Optional<Usuario> consultarPorEmail(String email);
+
+    Optional<Usuario> consultarPorTelefoneConectado(String telefoneUsuario);
 }

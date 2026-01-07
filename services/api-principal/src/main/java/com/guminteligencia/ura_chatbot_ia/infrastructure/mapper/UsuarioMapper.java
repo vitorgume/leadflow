@@ -12,6 +12,7 @@ public class UsuarioMapper {
                 .telefone(entity.getTelefone())
                 .senha(entity.getSenha())
                 .email(entity.getEmail())
+                .telefoneConcectado(entity.getTelefoneConectado())
                 .build();
     }
 
@@ -22,6 +23,7 @@ public class UsuarioMapper {
                 .telefone(domain.getTelefone())
                 .senha(domain.getSenha())
                 .email(domain.getEmail())
+                .telefoneConectado(domain.getTelefoneConcectado())
                 .build();
     }
 }

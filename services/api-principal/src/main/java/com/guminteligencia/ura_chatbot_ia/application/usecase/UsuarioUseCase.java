@@ -61,4 +61,14 @@ public class UsuarioUseCase {
 
         return usuario.get();
     }
+
+    public Usuario consultarPorTelefoneConectado(String telefoneUsuario) {
+        Optional<Usuario> usuario = gateway.consultarPorTelefoneConectado(telefoneUsuario);
+
+        if(usuario.isEmpty()) {
+            throw new UsuarioNaoEncotradoException();
+        }
+
+        return usuario.get();
+    }
 }

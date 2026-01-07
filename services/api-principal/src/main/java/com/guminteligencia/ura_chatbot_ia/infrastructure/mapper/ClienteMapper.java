@@ -15,6 +15,7 @@ public class ClienteMapper {
                 .dorDesejoPaciente(entity.getDorDesejoPaciente())
                 .preferenciaHorario(entity.getPreferenciaHorario())
                 .inativo(entity.isInativo())
+                .usuario(UsuarioMapper.paraDomain(entity.getUsuario()))
                 .build();
     }
 
@@ -29,6 +30,7 @@ public class ClienteMapper {
                 .dorDesejoPaciente(domain.getDorDesejoPaciente())
                 .preferenciaHorario(domain.getPreferenciaHorario())
                 .inativo(domain.isInativo())
+                .usuario(UsuarioMapper.paraEntity(domain.getUsuario()))
                 .build();
     }
 }

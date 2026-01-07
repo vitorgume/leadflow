@@ -17,4 +17,6 @@ public interface ClienteGateway {
     List<RelatorioContatoDto> getRelatorioContato();
 
     List<RelatorioContatoDto> getRelatorioContatoSegundaFeira();
+
+    Optional<Cliente> consultarPorTelefoneEUsuario(String telefone, UUID idUsuario);
 }

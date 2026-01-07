@@ -22,5 +22,6 @@ public class ClienteDto {
     private String dorDesejoPaciente;
     private String linkMidia;
     private PreferenciaHorario preferenciaHorario;
+    private UsuarioDto usuario;
     private boolean inativo;
 }

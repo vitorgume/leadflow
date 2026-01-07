@@ -48,6 +48,7 @@ public class ContextoUseCase {
         );
 
         contexto.setMensagens(mensagens);
+
         if (contexto.getStatus() == null) {
             contexto.setStatus(StatusContexto.ATIVO);
         }
@@ -71,6 +72,7 @@ public class ContextoUseCase {
                 )))
                 .status(StatusContexto.ATIVO)
                 .telefone(mensagem.getTelefone())
+                .telefoneUsuario(mensagem.getTelefoneConectado())
                 .build();
 
         novoContexto = gateway.salvar(novoContexto);

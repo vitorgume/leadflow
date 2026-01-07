@@ -16,6 +16,7 @@ public class ClienteMapper {
                 .dorDesejoPaciente(cliente.getDorDesejoPaciente())
                 .preferenciaHorario(cliente.getPreferenciaHorario())
                 .inativo(cliente.isInativo())
+                .usuario(UsuarioMapper.paraDto(cliente.getUsuario()))
                 .build();
     }
 }

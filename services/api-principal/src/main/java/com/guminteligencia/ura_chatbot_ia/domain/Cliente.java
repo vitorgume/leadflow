@@ -19,6 +19,7 @@ public class Cliente {
     private String dorDesejoPaciente;
     private PreferenciaHorario preferenciaHorario;
     private boolean inativo;
+    private Usuario usuario;
 
     public void setDados(Cliente cliente) {
         this.nome = cliente.getNome();

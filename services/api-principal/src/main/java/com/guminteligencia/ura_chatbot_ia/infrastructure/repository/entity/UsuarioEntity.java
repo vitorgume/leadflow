@@ -21,4 +21,7 @@ public class UsuarioEntity {
     private String telefone;
     private String senha;
     private String email;
+
+    @Column(name = "telefone_conectado")
+    private String telefoneConectado;
 }

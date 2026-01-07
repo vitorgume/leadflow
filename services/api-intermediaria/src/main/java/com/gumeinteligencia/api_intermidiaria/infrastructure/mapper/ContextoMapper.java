@@ -11,6 +11,7 @@ public class ContextoMapper {
                 .mensagens(entity.getMensagens())
                 .telefone(entity.getTelefone())
                 .status(entity.getStatus())
+                .telefoneUsuario(entity.getTelefoneUsuario())
                 .build();
     }
 
@@ -20,6 +21,7 @@ public class ContextoMapper {
                 .mensagens(domain.getMensagens())
                 .telefone(domain.getTelefone())
                 .status(domain.getStatus())
+                .telefoneUsuario(domain.getTelefoneUsuario())
                 .build();
     }
 }

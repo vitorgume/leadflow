@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 @ToString
 public class Mensagem {
+    private String telefoneConectado;
     private String telefone;
     private String mensagem;
     private String urlImagem;

@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.entrypoint.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,4 +18,7 @@ public class UsuarioDto {
     private String telefone;
     private String senha;
     private String email;
+
+    @JsonProperty("telefone_conectado")
+    private String telefoneConectado;
 }

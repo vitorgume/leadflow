@@ -26,6 +26,7 @@ public class ClienteDataProvider implements ClienteGateway {
     private final String MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE = "Erro ao consultar cliente pelo seu telefone.";
     private final String MENSAGEM_ERRO_GERAR_RELATORIO = "Erro ao gerar relatório de contatos.";
     private final String MENSAGEM_ERRO_GERAR_RELATORIO_SEGUNDA_FEIRA = "Erro ao gerar relatório de segunda feira.";
+    private final String MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE_E_USUARIO = "Erro ao consultar cliente pelo telefone e usuário.";
     private final ClienteRepository repository;
 
     @Override
@@ -97,5 +98,19 @@ public class ClienteDataProvider implements ClienteGateway {
         }
 
         return relatorios;
+    }
+
+    @Override
+    public Optional<Cliente> consultarPorTelefoneEUsuario(String telefone, UUID idUsuario) {
+        Optional<ClienteEntity> cliente;
+
+        try {
+            cliente = repository.findByTelefoneAndUsuario_Id(telefone, idUsuario);
+        } catch (Exception ex) {
+            log.error(MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE_E_USUARIO, ex);
+            throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE_E_USUARIO, ex.getCause());
+        }
+
+        return cliente.map(ClienteMapper::paraDomain);
     }
 }
