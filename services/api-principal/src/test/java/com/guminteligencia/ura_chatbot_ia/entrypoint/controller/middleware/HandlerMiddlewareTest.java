@@ -38,16 +38,6 @@ class HandlerMiddlewareTest {
             throw new RuntimeException("generic error");
         }
 
-        @GetMapping("/adminExists")
-        public void adminExists() {
-            throw new AdministradorJaExisteException();
-        }
-
-        @GetMapping("/adminNotFound")
-        public void adminNotFound() {
-            throw new AdministradorNaoEncontradoException();
-        }
-
         @GetMapping("/badCreds")
         public void badCreds() {
             throw new CredenciasIncorretasException();
@@ -112,8 +102,6 @@ class HandlerMiddlewareTest {
     @ParameterizedTest(name = "{0} → {1} / “{2}”")
     @CsvSource({
             "generic,                      500, generic error",
-            "adminExists,                  400, Administrador já cadastrado com esse email.",
-            "adminNotFound,                404, Administrador não encontrado.",
             "badCreds,                     401, Credências incorretas.",
             "clienteNotFound,              404, Cliente não encontrado.",
             "contextoNotFound,             404, Contexto não encontrado.",

@@ -2,15 +2,14 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.security.jwt.jwtAuthFi
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.MensageriaGateway;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.AdministradorUseCase;
-import com.guminteligencia.ura_chatbot_ia.domain.Administrador;
-import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.AdministradorDto;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.UsuarioUseCase;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.UsuarioDto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.security.jwt.JwtUtil;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -40,13 +39,10 @@ class JwtAuthFilterTest {
     private MensageriaGateway mensageriaGateway;
 
     @MockitoBean
-    private AdministradorUseCase administradorUseCase;
+    private UsuarioUseCase usuarioUseCase;
 
     @MockitoBean
     private RetryBackoffSpec retryBackoffSpec;
-
-    @Value("${ura-chatbot-ia.apikey}")
-    private String validApiKey;
 
     @Test
     void securedEndpoint_withoutToken_forbidden() throws Exception {
@@ -57,7 +53,7 @@ class JwtAuthFilterTest {
     @Test
     void securedEndpoint_withValidToken_ok() throws Exception {
 
-        String json = objectMapper.writeValueAsString(AdministradorDto.builder()
+        String json = objectMapper.writeValueAsString(UsuarioDto.builder()
                 .nome("Nome teste")
                 .senha("senha123")
                 .telefone("email123@gmail.com")
@@ -67,11 +63,10 @@ class JwtAuthFilterTest {
 
         String token = jwtUtil.generateToken("user1");
 
-        Mockito.when(administradorUseCase.cadastrar(Mockito.any())).thenReturn(new Administrador());
+        Mockito.when(usuarioUseCase.cadastrar(Mockito.any())).thenReturn(new Usuario());
 
-        mockMvc.perform(post("/administradores")
+        mockMvc.perform(post("/usuarios")
                         .header("Authorization", "Bearer " + token)
-                        .header("X-API-KEY", validApiKey)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
