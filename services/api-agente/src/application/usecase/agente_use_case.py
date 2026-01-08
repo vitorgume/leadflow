@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
+from src.application.usecase.prompt_usuario_usecase import PromptUsuarioUseCase
 from src.domain.conversa import Conversa
 from src.domain.mensagem import Mensagem
 from src.infrastructure.dataprovider.agente_data_provider import AgenteDataProvider
@@ -10,13 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 class AgenteUseCase:
-    def __init__(self, agente_data_provider: AgenteDataProvider):
+    def __init__(self, agente_data_provider: AgenteDataProvider, prompt_usuario_usecase: PromptUsuarioUseCase):
         self.agente_data_provider = agente_data_provider
-
-    def _carregar_prompt_padrao(self) -> str:
-        caminho = Path("src/resources/system_prompt_agent_chat.txt")
-        with open(caminho, "r", encoding="utf-8") as file:
-            return file.read()
+        self.prompt_usuario_usecase = prompt_usuario_usecase
 
     def _carregar_base_conhecimento(self) -> str:
         caminho = Path("src/resources/base_conhecimento_agente.txt")
@@ -32,7 +29,7 @@ class AgenteUseCase:
         historico = [
             {
                 "role": "system",
-                "content": self._carregar_prompt_padrao()
+                "content": self.prompt_usuario_usecase.consultar_prompt_usuario()
             }
         ]
 

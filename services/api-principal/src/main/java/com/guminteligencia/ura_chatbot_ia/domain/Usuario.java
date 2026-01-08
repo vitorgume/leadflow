@@ -2,6 +2,7 @@ package com.guminteligencia.ura_chatbot_ia.domain;
 
 import lombok.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -17,4 +18,5 @@ public class Usuario {
     private String senha;
     private String email;
     private String telefoneConcectado;
+    private Map<String, Object> atributosQualificacao;
 }

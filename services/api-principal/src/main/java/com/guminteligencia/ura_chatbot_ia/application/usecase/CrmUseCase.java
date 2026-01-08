@@ -34,7 +34,7 @@ public class CrmUseCase {
     }
 
     public void atualizarCrm(Vendedor vendedor, Cliente cliente, ConversaAgente conversaAgente) {
-        if(profile.equals("dev")) {
+        if(profile.equals("prod")) {
             log.info("Atualizando crm. Vendedor: {}, Cliente: {}, Conversa: {}", vendedor, cliente, conversaAgente);
 
             Integer idLead = this.consultaLeadPeloTelefone(cliente.getTelefone());

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Map;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -21,4 +22,7 @@ public class UsuarioDto {
 
     @JsonProperty("telefone_conectado")
     private String telefoneConectado;
+
+    @JsonProperty("atributos_qualificacao")
+    private Map<String, Object> atributosQualificacao;
 }

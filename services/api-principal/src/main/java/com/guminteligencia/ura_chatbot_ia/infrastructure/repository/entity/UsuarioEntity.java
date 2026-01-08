@@ -3,6 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Entity(name = "Usuario")
@@ -24,4 +25,7 @@ public class UsuarioEntity {
 
     @Column(name = "telefone_conectado")
     private String telefoneConectado;
+
+    @Column(name = "atributos_qualificacao")
+    private Map<String, Object> atributosQualificacao;
 }

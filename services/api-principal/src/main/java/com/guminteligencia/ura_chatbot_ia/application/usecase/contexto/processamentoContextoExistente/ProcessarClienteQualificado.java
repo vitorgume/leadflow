@@ -34,11 +34,7 @@ public class ProcessarClienteQualificado implements ProcessamentoContextoExisten
 
         Cliente clienteQualificado = Cliente.builder()
                 .nome(qualificacao.getNome())
-                .cpf(qualificacao.getCpf())
-                .consentimentoAtendimnento(qualificacao.getConsentimentoAtendimnento())
-                .tipoConsulta(EnumMapper.tipoConsultaMapper(qualificacao.getTipoConsulta()))
-                .dorDesejoPaciente(qualificacao.getDorDesejoPaciente())
-                .preferenciaHorario(EnumMapper.preferenciaHorarioMapper(qualificacao.getPreferenciaHorario()))
+                .atributosQualificacao(qualificacao.getAtributosVariaveis())
                 .build();
 
         Cliente clienteSalvo = clienteUseCase.alterar(clienteQualificado, conversaAgente.getCliente().getId());

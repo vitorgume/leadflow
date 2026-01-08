@@ -4,6 +4,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.*;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Entity(name = "Cliente")
@@ -22,25 +23,9 @@ public class ClienteEntity {
     private UUID id;
     private String nome;
     private String telefone;
-    private String cpf;
 
-    @Column(name = "consentimento_atendimento")
-    private Boolean consentimentoAtendimnento;
-
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "tipo_consulta")
-    private TipoConsulta tipoConsulta;
-
-    @Column(name = "dor_desejo_paciente")
-    private String dorDesejoPaciente;
-
-
-    @Column(name = "link_midia")
-    private String linkMidia;
-
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "preferencia_horario")
-    private PreferenciaHorario preferenciaHorario;
+    @Column(name = "atributos_qualificacao")
+    private Map<String, Object> atributosQualificacao;
 
     @ManyToOne
     private UsuarioEntity usuario;

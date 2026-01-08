@@ -31,7 +31,7 @@ public class ClienteUseCase {
 
         Cliente cliente = Cliente.builder()
                 .telefone(telefone)
-                .consentimentoAtendimnento(false)
+                .atributosQualificacao(usuario.getAtributosQualificacao())
                 .inativo(false)
                 .usuario(usuario)
                 .build();

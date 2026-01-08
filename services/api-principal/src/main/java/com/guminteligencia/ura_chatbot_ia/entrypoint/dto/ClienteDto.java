@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Map;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -16,12 +17,7 @@ public class ClienteDto {
     private UUID id;
     private String nome;
     private String telefone;
-    private String cpf;
-    private Boolean consentimentoAtendimnento;
-    private TipoConsulta tipoConsulta;
-    private String dorDesejoPaciente;
-    private String linkMidia;
-    private PreferenciaHorario preferenciaHorario;
+    private Map<String, Object> atributosQualificacao;
     private UsuarioDto usuario;
     private boolean inativo;
 }
