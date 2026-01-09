@@ -13,11 +13,11 @@ class PromptUsuarioDataprovider:
     def __init__(self, prompt_usuario_mapper: PromptUsuarioMapper):
         self.prompt_usuario_mapper = prompt_usuario_mapper
 
-    def consultar_prompt_usuario(self, id_usuario: str, tipo_prompt: int):
+    def consultar_prompt_usuario(self, id_usuario: str):
         session = SessionLocal()
         try:
             uuid_bytes = uuid.UUID(id_usuario).bytes
-            entity = session.query(PromptUsuarioEntity).filter(PromptUsuarioEntity.id_cliente == uuid_bytes, PromptUsuarioEntity.tipo == tipo_prompt).first()
+            entity = session.query(PromptUsuarioEntity).filter(PromptUsuarioEntity.id_usuario == uuid_bytes).first()
             return self.prompt_usuario_mapper.paraDomain(entity)
         except Exception as e:
             session.rollback()

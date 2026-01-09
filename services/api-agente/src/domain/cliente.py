@@ -9,4 +9,5 @@ class Cliente:
     telefone: str
     atributos_qualificacao: Dict
     inativo: bool
+    usuario_id: str
 

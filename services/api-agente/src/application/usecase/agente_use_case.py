@@ -2,6 +2,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
+from src.application.usecase.base_conhecimento_usuario_use_case import BaseConhecimentoUsuarioUseCase
+from src.application.usecase.cliente_use_case import ClienteUseCase
 from src.application.usecase.prompt_usuario_usecase import PromptUsuarioUseCase
 from src.domain.conversa import Conversa
 from src.domain.mensagem import Mensagem
@@ -11,25 +13,23 @@ logger = logging.getLogger(__name__)
 
 
 class AgenteUseCase:
-    def __init__(self, agente_data_provider: AgenteDataProvider, prompt_usuario_usecase: PromptUsuarioUseCase):
+
+    def __init__(self, agente_data_provider: AgenteDataProvider, prompt_usuario_usecase: PromptUsuarioUseCase, base_conhecimento_usuario_use_case: BaseConhecimentoUsuarioUseCase, cliente_use_case: ClienteUseCase):
         self.agente_data_provider = agente_data_provider
         self.prompt_usuario_usecase = prompt_usuario_usecase
+        self.base_conhecimento_usuario_use_case = base_conhecimento_usuario_use_case
+        self.cliente_use_case = cliente_use_case
 
-    def _carregar_base_conhecimento(self) -> str:
-        caminho = Path("src/resources/base_conhecimento_agente.txt")
-        if not caminho.exists():
-            logger.warning("Base de conhecimento nao encontrada em %s", caminho)
-            return ""
-        with open(caminho, "r", encoding="utf-8") as file:
-            return file.read()
 
     def processar(self, mensagem: Union[str, Mensagem], conversa: Conversa) -> str:
         logger.info("Processando mensagem para o agente. Mensagem: %s Conversa: %s", mensagem, conversa)
 
+        cliente = self.cliente_use_case.consutlar_por_id(conversa.cliente_id)
+
         historico = [
             {
                 "role": "system",
-                "content": self.prompt_usuario_usecase.consultar_prompt_usuario()
+                "content": self.prompt_usuario_usecase.consultar_prompt_usuario(cliente.usuario_id)
             }
         ]
 
@@ -44,6 +44,14 @@ class AgenteUseCase:
             conteudo_usuario, _ = self._preparar_conteudo_usuario(mensagem)
 
         historico.append({"role": "user", "content": conteudo_usuario})
+
+        base_conhecimento = self.base_conhecimento_usuario_use_case.consultar_base_conhecimento_usuario(cliente.usuario_id)
+        base_conhecimento_system = {
+            "role": "system",
+            "content": f"BASE_DE_CONHECIMENTO:\n{base_conhecimento}"
+        }
+
+        historico.append(base_conhecimento_system)
 
         resposta = self.agente_data_provider.enviar_mensagem(historico)
 

@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
-@dataclass
-class PromptUsuario:
+@dataclass()
+class BaseConhecimentoUsuario:
     id = str
     id_usuario = str
     titulo = str
-    prompt = str
-    tipo = int
+    conteudo = str

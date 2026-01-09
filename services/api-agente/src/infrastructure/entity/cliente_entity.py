@@ -10,3 +10,4 @@ class ClienteEntity(Base):
     telefone = Column(String(255), nullable=True)
     atributos_qualificacao = Column(JSON, nullable=True)
     inativo = Column(Boolean, nullable=False)
+    usuario_id = Column(BINARY(16), nullable=False)

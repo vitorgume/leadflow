@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from src.entrypoint.controller.dto.mensagem_dto import MensagemDto
 from src.entrypoint.controller.dto.mensagem_json_dto import MensagemJsonDto
+from src.entrypoint.mapper.mensagem_json_mapper import MensagemJsonMapper
 from src.entrypoint.mapper.mensagem_mapper import MensagemMapper
 from src.application.usecase.mensagem_use_case import MensagemUseCase
 from src.application.usecase.json_use_case import JsonUseCase
@@ -18,6 +19,7 @@ router = APIRouter()
 mensagem_conversa_mapper = MensagemConversaMapper()
 conversa_mapper = ConversaMapper(mensagem_conversa_mapper)
 mensagem_mapper = MensagemMapper()
+mensagem_json_mapper = MensagemJsonMapper()
 conversa_data_provider = ConversaDataProvider(conversa_mapper)
 agente_data_provider = AgenteDataProvider()
 conversa_use_case = ConversaUseCase(conversa_data_provider)
@@ -44,4 +46,5 @@ def estrutura_json_usuario(
     msg: MensagemJsonDto,
     use_case: JsonUseCase = Depends(get_json_use_case)
 ):
-    return use_case.transformar(msg.mensagem)
+    dom = mensagem_json_mapper.para_domain(msg)
+    return use_case.transformar(dom)

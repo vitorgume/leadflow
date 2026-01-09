@@ -7,8 +7,8 @@ class PromptUsuarioUseCase:
     def __init__(self, prompt_usuario_dataprovider: PromptUsuarioDataprovider):
         self.prompt_usuario_dataprovider = prompt_usuario_dataprovider
 
-    def consultar_prompt_usuario(self, id_usuario: str, tipo_prompt: int):
-        prompt = self.prompt_usuario_dataprovider.consultar_prompt_usuario(id_usuario, tipo_prompt)
+    def consultar_prompt_usuario(self, id_usuario: str):
+        prompt = self.prompt_usuario_dataprovider.consultar_prompt_usuario(id_usuario)
 
         if prompt is None:
             raise  PromptUsuarioNaoEncontradoException()
