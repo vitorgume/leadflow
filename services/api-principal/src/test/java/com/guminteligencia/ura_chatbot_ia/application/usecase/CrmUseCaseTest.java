@@ -1,8 +1,9 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.LeadNaoEncontradoException;
-import com.guminteligencia.ura_chatbot_ia.application.gateways.CrmGateway;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.CardDto;
+import com.guminteligencia.ura_chatbot_ia.application.gateways.IntegracaoKommoGateway;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
 import com.guminteligencia.ura_chatbot_ia.domain.*;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.*;
 class CrmUseCaseTest {
 
     @Mock
-    private CrmGateway gateway;
+    private IntegracaoKommoGateway gateway;
 
     @InjectMocks
     private CrmUseCase useCase;
@@ -68,12 +69,12 @@ class CrmUseCaseTest {
         when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
 
         // patch OK
-        doNothing().when(gateway).atualizarCard(any(CardDto.class), eq(idLead));
+        doNothing().when(gateway).atualizarCard(any(PayloadKommo.class), eq(idLead));
 
         // act
         useCase.atualizarCrm(vendedor, cliente, conversaAgente);
 
-        ArgumentCaptor<CardDto> captor = ArgumentCaptor.forClass(CardDto.class);
+        ArgumentCaptor<PayloadKommo> captor = ArgumentCaptor.forClass(PayloadKommo.class);
         verify(gateway).atualizarCard(captor.capture(), eq(idLead));
         assertNotNull(captor.getValue());
     }
@@ -94,7 +95,7 @@ class CrmUseCaseTest {
         when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
 
         doThrow(new DataProviderException("patch-fail", null))
-                .when(gateway).atualizarCard(any(CardDto.class), eq(idLead));
+                .when(gateway).atualizarCard(any(PayloadKommo.class), eq(idLead));
 
         DataProviderException ex = assertThrows(
                 DataProviderException.class,

@@ -1,4 +1,4 @@
-package com.guminteligencia.ura_chatbot_ia.application.usecase.dto;
+package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

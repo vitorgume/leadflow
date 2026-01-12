@@ -1,7 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
-import com.guminteligencia.ura_chatbot_ia.application.gateways.CrmGateway;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.CardDto;
+import com.guminteligencia.ura_chatbot_ia.application.gateways.IntegracaoKommoGateway;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ContactDto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ContactsResponse;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
@@ -16,12 +16,12 @@ import java.util.Optional;
 
 @Component
 @Slf4j
-public class CrmDataProvider implements CrmGateway {
+public class IntegracaoKommoDataProvider implements IntegracaoKommoGateway {
     private static final String KOMMO_DRIVE_BASE = "https://drive-c.kommo.com";
 
     private final WebClient webClient;
 
-    public CrmDataProvider(@Qualifier("kommoWebClient") WebClient webClient) {
+    public IntegracaoKommoDataProvider(@Qualifier("kommoWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 
@@ -29,7 +29,7 @@ public class CrmDataProvider implements CrmGateway {
     public static final String MENSAGEM_ERRO_ATUALIZAR_CARD = "Erro ao atualizar card.";
 
 
-    public Optional<Integer> consultaLeadPeloTelefone(String telefoneE164) {
+    public Optional<Integer> consultaLeadPeloTelefone(String telefoneE164, String acessToken) {
         String normalized = normalizeE164(telefoneE164);
 
         Integer leadId;
@@ -41,6 +41,7 @@ public class CrmDataProvider implements CrmGateway {
                             .queryParam("with", "leads")
                             .queryParam("limit", 50)
                             .build())
+                    .headers(h -> h.setBearerAuth(acessToken))
                     .retrieve()
                     .bodyToMono(ContactsResponse.class)
                     .block();
@@ -66,12 +67,13 @@ public class CrmDataProvider implements CrmGateway {
     }
 
     @Override
-    public void atualizarCard(CardDto body, Integer idLead) {
+    public void atualizarCard(PayloadKommo body, Integer idLead, String acessToken) {
         try {
             webClient.patch()
                     .uri(uri -> uri.path("/leads/{id}").build(idLead))
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(body)
+                    .headers(h -> h.setBearerAuth(acessToken))
                     .retrieve()
                     .toBodilessEntity()
                     .block();

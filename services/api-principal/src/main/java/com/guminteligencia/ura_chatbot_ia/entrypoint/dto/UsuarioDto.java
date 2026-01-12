@@ -25,4 +25,7 @@ public class UsuarioDto {
 
     @JsonProperty("atributos_qualificacao")
     private Map<String, Object> atributosQualificacao;
+
+    @JsonProperty("configuracao_crm")
+    private ConfiguracaoCrmDto configuracaoCrm;
 }

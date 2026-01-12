@@ -14,6 +14,7 @@ public class UsuarioMapper {
                 .email(entity.getEmail())
                 .telefoneConcectado(entity.getTelefoneConectado())
                 .atributosQualificacao(entity.getAtributosQualificacao())
+                .configuracaoCrm(ConfiguracaoCrmMapper.paraDomain(entity.getConfiguracaoCrm()))
                 .build();
     }
 
@@ -26,6 +27,7 @@ public class UsuarioMapper {
                 .email(domain.getEmail())
                 .telefoneConectado(domain.getTelefoneConcectado())
                 .atributosQualificacao(domain.getAtributosQualificacao())
+                .configuracaoCrm(ConfiguracaoCrmMapper.paraEntity(domain.getConfiguracaoCrm()))
                 .build();
     }
 }

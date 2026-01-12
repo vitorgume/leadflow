@@ -1,4 +1,4 @@
-package com.guminteligencia.ura_chatbot_ia.application.usecase.dto;
+package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 @Getter

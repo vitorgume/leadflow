@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;

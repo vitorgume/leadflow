@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity;
 
+import com.guminteligencia.ura_chatbot_ia.domain.ConfiguracaoCrm;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,4 +29,8 @@ public class UsuarioEntity {
 
     @Column(name = "atributos_qualificacao")
     private Map<String, Object> atributosQualificacao;
+
+    @Column(name = "configuracao_crm")
+    @Embedded
+    private ConfiguracaoCrmEntity configuracaoCrm;
 }

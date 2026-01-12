@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
@@ -11,7 +12,6 @@ import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 

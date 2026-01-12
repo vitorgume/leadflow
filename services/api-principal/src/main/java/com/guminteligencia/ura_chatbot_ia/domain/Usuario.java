@@ -19,4 +19,5 @@ public class Usuario {
     private String email;
     private String telefoneConcectado;
     private Map<String, Object> atributosQualificacao;
+    private ConfiguracaoCrm configuracaoCrm;
 }

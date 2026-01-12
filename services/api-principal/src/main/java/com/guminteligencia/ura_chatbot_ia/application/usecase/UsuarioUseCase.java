@@ -18,6 +18,7 @@ public class UsuarioUseCase {
 
     private final UsuarioGateway gateway;
     private final CriptografiaUseCase criptografiaUseCase;
+    private final CriptografiaJCAUseCase criptografiaJCAUseCase;
 
     public Usuario cadastrar(Usuario novoUsuario) {
         log.info("Cadastrando novo usuário. Usuário: {}", novoUsuario);
@@ -29,6 +30,7 @@ public class UsuarioUseCase {
         }
 
         novoUsuario.setSenha(criptografiaUseCase.criptografar(novoUsuario.getSenha()));
+        novoUsuario.getConfiguracaoCrm().setAcessToken(criptografiaJCAUseCase.criptografar(novoUsuario.getConfiguracaoCrm().getAcessToken()));
 
         Usuario usuarioSalvo = gateway.salvar(novoUsuario);
 

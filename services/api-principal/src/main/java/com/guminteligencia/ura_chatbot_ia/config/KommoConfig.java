@@ -22,8 +22,7 @@ public class KommoConfig {
     @Bean("kommoWebClient")
     public WebClient kommoWebClient(
             WebClient.Builder builder,
-            @Value("${app.crm.url}") String baseUrl,
-            @Value("${app.crm.access-token}") String accessToken
+            @Value("${app.crm.url}") String baseUrl
     ) {
         if (baseUrl == null || !baseUrl.startsWith("http")) {
             throw new IllegalArgumentException("app.crm.url inválido: " + baseUrl);
@@ -31,7 +30,6 @@ public class KommoConfig {
         return builder
                 .baseUrl(baseUrl)
                 .defaultHeaders(h -> {
-                    h.setBearerAuth(accessToken);
                     h.setAccept(List.of(MediaType.valueOf("application/hal+json")));
                 })
                 .filter(errorMappingFilter())

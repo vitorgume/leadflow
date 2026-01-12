@@ -1,7 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.CardDto;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ContactsResponse;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,13 +34,13 @@ class CrmDataProviderTest {
     @Mock private WebClient.RequestHeadersSpec<?> headersSpec;
     @Mock private WebClient.ResponseSpec responseSpec;
 
-    private CrmDataProvider provider; // não precisamos de spy; só temp files
+    private IntegracaoKommoDataProvider provider; // não precisamos de spy; só temp files
 
     private final ObjectMapper om = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        provider = new CrmDataProvider(webClient);
+        provider = new IntegracaoKommoDataProvider(webClient);
     }
 
     // ------------------------------
@@ -81,7 +81,7 @@ class CrmDataProviderTest {
 
     @Test
     void atualizarCard_deveEnviarPatchComSucesso() {
-        CardDto body = CardDto.builder().statusId(123).build();
+        PayloadKommo body = PayloadKommo.builder().statusId(123).build();
 
         when(webClient.patch()).thenReturn(bodyUriSpec);
         when(bodyUriSpec.uri(any(Function.class))).thenReturn(bodyUriSpec);
@@ -103,7 +103,7 @@ class CrmDataProviderTest {
 
     @Test
     void atualizarCard_deveLancarDataProviderExceptionQuandoFalhar() {
-        CardDto body = CardDto.builder().statusId(123).build();
+        PayloadKommo body = PayloadKommo.builder().statusId(123).build();
 
         when(webClient.patch()).thenReturn(bodyUriSpec);
         when(bodyUriSpec.uri(any(Function.class))).thenReturn(bodyUriSpec);
