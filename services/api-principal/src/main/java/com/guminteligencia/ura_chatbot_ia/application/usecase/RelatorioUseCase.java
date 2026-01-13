@@ -72,10 +72,8 @@ public class RelatorioUseCase {
                 row.createCell(1).setCellValue(dto.getTelefone());
                 row.createCell(2).setCellValue(dto.getCpf());
                 row.createCell(3).setCellValue(dto.getConsentimentoAtendimnento());
-                row.createCell(4).setCellValue(dto.getTipoConsulta().getDescricao());
                 row.createCell(5).setCellValue(dto.getDorDesejoPaciente());
                 row.createCell(6).setCellValue(dto.getLinkMidia());
-                row.createCell(7).setCellValue(dto.getPreferenciaHorario().getDescricao());
                 row.createCell(8).setCellValue(dto.getDataCriacao().toString());
                 row.createCell(9).setCellValue(dto.getNomeVendedor());
             }
