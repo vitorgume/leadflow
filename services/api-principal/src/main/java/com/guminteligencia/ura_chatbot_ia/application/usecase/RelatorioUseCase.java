@@ -40,7 +40,7 @@ public class RelatorioUseCase {
             relatorio = clienteUseCase.getRelatorio();
         }
 
-        OutroContato gerencia = outroContatoUseCase.consultarPorNome("");
+        OutroContato gerencia = outroContatoUseCase.consultarPorNome("Lucas");
 
         String arquivo = gerarArquivo(relatorio);
 

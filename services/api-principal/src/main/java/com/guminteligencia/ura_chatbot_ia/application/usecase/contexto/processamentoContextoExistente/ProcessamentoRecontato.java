@@ -1,13 +1,11 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processamentoContextoExistente;
 
 import com.guminteligencia.ura_chatbot_ia.application.usecase.ConversaAgenteUseCase;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.OutroContatoUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
-import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
 import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +20,6 @@ public class ProcessamentoRecontato implements ProcessamentoContextoExistenteTyp
 
     private final MensagemUseCase mensagemUseCase;
     private final MensagemBuilder mensagemBuilder;
-    private final OutroContatoUseCase outroContatoUseCase;
     private final ConversaAgenteUseCase conversaAgenteUseCase;
 
     @Override
