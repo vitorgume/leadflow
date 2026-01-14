@@ -1,14 +1,13 @@
 package com.gumeinteligencia.api_intermidiaria.application.usecase;
 
 import com.gumeinteligencia.api_intermidiaria.application.gateways.OutroContatoGateway;
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
+import com.gumeinteligencia.api_intermidiaria.domain.OutroContato;
+import com.gumeinteligencia.api_intermidiaria.domain.Setor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;

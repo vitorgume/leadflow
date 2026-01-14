@@ -1,6 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.mapper;
 
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
+import com.gumeinteligencia.api_intermidiaria.domain.OutroContato;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 
 public class OutroContatoMapper {

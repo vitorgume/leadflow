@@ -1,12 +1,14 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity;
 
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
+import com.gumeinteligencia.api_intermidiaria.domain.Setor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
 
 import java.util.UUID;
 
@@ -31,7 +33,7 @@ public class OutroContatoEntityLeadflow {
     public String getNome() {
         return nome;
     }
-
+    @DynamoDbSecondaryPartitionKey(indexNames = "TelefoneIndex")
     public String getTelefone() {
         return telefone;
     }

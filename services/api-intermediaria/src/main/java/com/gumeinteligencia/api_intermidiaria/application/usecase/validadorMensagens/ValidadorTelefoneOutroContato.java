@@ -2,7 +2,6 @@ package com.gumeinteligencia.api_intermidiaria.application.usecase.validadorMens
 
 import com.gumeinteligencia.api_intermidiaria.application.usecase.OutroContatoUseCase;
 import com.gumeinteligencia.api_intermidiaria.domain.Mensagem;
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
