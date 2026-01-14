@@ -13,6 +13,7 @@ import com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.TextoDto
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.ContextoMapper;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.CLienteRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ContextoRepository;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ConversaAgenteRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
@@ -80,6 +81,9 @@ class MensagemControllerTest {
 
     @MockitoBean
     private ValidadorMensagemUseCase validadorMensagemUseCase;
+
+    @MockitoBean
+    private ConversaAgenteRepository conversaAgenteRepository;
 
     @MockitoBean
     private CLienteRepository cLienteRepository;
