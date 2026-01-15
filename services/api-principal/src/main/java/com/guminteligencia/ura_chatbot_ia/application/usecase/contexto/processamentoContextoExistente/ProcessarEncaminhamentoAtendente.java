@@ -26,7 +26,7 @@ public class ProcessarEncaminhamentoAtendente implements ProcessamentoContextoEx
     @Override
     public void processar(String resposta, ConversaAgente conversaAgente, Cliente cliente) {
         Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
-//        mensagemUseCase.enviarContato(vendedor, cliente);
+        mensagemUseCase.enviarContato(vendedor, cliente);
         mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, null, null), cliente.getTelefone(), false);
         crmUseCase.atualizarCrm(vendedor, cliente, conversaAgente);
 

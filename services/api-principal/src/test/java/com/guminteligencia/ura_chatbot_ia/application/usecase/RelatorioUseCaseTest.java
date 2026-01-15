@@ -66,7 +66,7 @@ class RelatorioUseCaseTest {
             when(clienteUseCase.getRelatorioSegundaFeira()).thenReturn(List.of(dto));
 
             OutroContato gerente = mock(OutroContato.class);
-            when(outroContatoUseCase.consultarPorNome("")).thenReturn(gerente);
+            when(outroContatoUseCase.consultarPorNome("Lucas")).thenReturn(gerente);
             when(gerente.getTelefone()).thenReturn("+55000000001");
 
             useCase.enviarRelatorioDiarioVendedores();
