@@ -20,4 +20,6 @@ public class Usuario {
     private String telefoneConcectado;
     private Map<String, Object> atributosQualificacao;
     private ConfiguracaoCrm configuracaoCrm;
+    private String mensagemDirecionamentoVendedor;
+    private String mensagemRecontatoG1;
 }

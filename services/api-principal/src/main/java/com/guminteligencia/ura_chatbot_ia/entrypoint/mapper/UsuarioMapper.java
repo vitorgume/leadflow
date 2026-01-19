@@ -15,6 +15,8 @@ public class UsuarioMapper {
                 .telefoneConectado(domain.getTelefoneConcectado())
                 .atributosQualificacao(domain.getAtributosQualificacao())
                 .configuracaoCrm(ConfiguracaoCrmMapper.paraDto(domain.getConfiguracaoCrm()))
+                .mensagemDirecionamentoVendedor(domain.getMensagemDirecionamentoVendedor())
+                .mensagemRecontatoG1(domain.getMensagemRecontatoG1())
                 .build();
     }
 
@@ -28,6 +30,8 @@ public class UsuarioMapper {
                 .telefoneConcectado(dto.getTelefoneConectado())
                 .atributosQualificacao(dto.getAtributosQualificacao())
                 .configuracaoCrm(ConfiguracaoCrmMapper.paraDomain(dto.getConfiguracaoCrm()))
+                .mensagemDirecionamentoVendedor(dto.getMensagemDirecionamentoVendedor())
+                .mensagemRecontatoG1(dto.getMensagemRecontatoG1())
                 .build();
     }
 }

@@ -33,4 +33,6 @@ public class UsuarioEntity {
     @Column(name = "configuracao_crm")
     @Embedded
     private ConfiguracaoCrmEntity configuracaoCrm;
+    private String mensagemDirecionamentoVendedor;
+    private String mensagemRecontatoG1;
 }

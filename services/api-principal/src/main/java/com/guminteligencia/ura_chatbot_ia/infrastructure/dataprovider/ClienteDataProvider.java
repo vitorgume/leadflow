@@ -77,7 +77,8 @@ public class ClienteDataProvider implements ClienteGateway {
         List<RelatorioContatoDto> relatorios;
 
         try {
-            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorio());
+//            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorio());
+            relatorios = null;
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_GERAR_RELATORIO, ex);
             throw new DataProviderException(MENSAGEM_ERRO_GERAR_RELATORIO, ex.getCause());
@@ -91,7 +92,8 @@ public class ClienteDataProvider implements ClienteGateway {
         List<RelatorioContatoDto> relatorios;
 
         try {
-            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorioSegundaFeira());
+//            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorioSegundaFeira());
+            relatorios = null;
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_GERAR_RELATORIO_SEGUNDA_FEIRA, ex);
             throw new DataProviderException(MENSAGEM_ERRO_GERAR_RELATORIO_SEGUNDA_FEIRA, ex.getCause());

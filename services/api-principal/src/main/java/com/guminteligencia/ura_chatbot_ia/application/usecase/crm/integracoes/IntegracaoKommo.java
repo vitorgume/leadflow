@@ -33,7 +33,7 @@ public class IntegracaoKommo implements CrmIntegracaoType {
     @Override
     public void implementacao(Vendedor vendedor, Cliente cliente, ConversaAgente conversaAgente) {
 
-        if(profile.equals("prod")) {
+        if(!profile.equals("prod")) {
             log.info("Atualizando crm. Vendedor: {}, Cliente: {}, Conversa: {}", vendedor, cliente, conversaAgente);
 
             ConfiguracaoCrm configuracaoCrm = cliente.getUsuario().getConfiguracaoCrm();

@@ -28,4 +28,6 @@ public class UsuarioDto {
 
     @JsonProperty("configuracao_crm")
     private ConfiguracaoCrmDto configuracaoCrm;
+    private String mensagemDirecionamentoVendedor;
+    private String mensagemRecontatoG1;
 }
