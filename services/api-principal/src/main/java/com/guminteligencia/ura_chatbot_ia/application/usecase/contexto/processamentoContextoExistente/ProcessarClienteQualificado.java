@@ -8,6 +8,7 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensa
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.*;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;

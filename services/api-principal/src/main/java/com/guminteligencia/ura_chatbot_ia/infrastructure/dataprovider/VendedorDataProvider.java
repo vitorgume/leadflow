@@ -1,11 +1,11 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
 import com.guminteligencia.ura_chatbot_ia.application.gateways.VendedorGateway;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.VendedorMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.VendedorRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.VendedorEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.vendedor.VendedorEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

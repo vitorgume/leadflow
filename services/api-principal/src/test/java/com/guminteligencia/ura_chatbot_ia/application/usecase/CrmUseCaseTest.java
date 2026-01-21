@@ -5,6 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.application.gateways.IntegracaoKommoGa
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
 import com.guminteligencia.ura_chatbot_ia.domain.*;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

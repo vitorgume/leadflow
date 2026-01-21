@@ -7,7 +7,7 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorU
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;

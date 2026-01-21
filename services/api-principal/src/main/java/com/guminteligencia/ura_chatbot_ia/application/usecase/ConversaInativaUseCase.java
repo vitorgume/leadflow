@@ -7,7 +7,7 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;

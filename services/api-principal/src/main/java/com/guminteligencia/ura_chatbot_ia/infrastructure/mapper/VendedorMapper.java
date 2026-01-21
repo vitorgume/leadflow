@@ -1,7 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.VendedorEntity;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.vendedor.VendedorEntity;
 
 public class VendedorMapper {
     public static Vendedor paraDomain(VendedorEntity entity) {
@@ -10,7 +10,6 @@ public class VendedorMapper {
                 .nome(entity.getNome())
                 .inativo(entity.getInativo())
                 .telefone(entity.getTelefone())
-                .prioridade(entity.getPrioridade())
                 .idVendedorCrm(entity.getIdVendedorCrm())
                 .padrao(entity.getPadrao())
                 .build();
@@ -22,7 +21,6 @@ public class VendedorMapper {
                 .nome(domain.getNome())
                 .inativo(domain.getInativo())
                 .telefone(domain.getTelefone())
-                .prioridade(domain.getPrioridade())
                 .idVendedorCrm(domain.getIdVendedorCrm())
                 .padrao(domain.getPadrao())
                 .build();

@@ -3,7 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.MensagemGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

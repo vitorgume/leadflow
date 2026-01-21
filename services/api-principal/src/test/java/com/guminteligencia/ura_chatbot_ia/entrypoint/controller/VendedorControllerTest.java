@@ -1,17 +1,14 @@
 package com.guminteligencia.ura_chatbot_ia.entrypoint.controller;
 
 import com.guminteligencia.ura_chatbot_ia.application.gateways.MensageriaGateway;
-import com.guminteligencia.ura_chatbot_ia.domain.Prioridade;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.VendedorRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.VendedorEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.vendedor.VendedorEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import reactor.util.retry.RetryBackoffSpec;

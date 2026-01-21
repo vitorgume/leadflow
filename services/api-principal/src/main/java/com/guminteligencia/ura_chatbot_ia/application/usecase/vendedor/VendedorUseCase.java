@@ -4,12 +4,19 @@ import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorComMesm
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEscolhidoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.VendedorGateway;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.ConfiguracaoEscolhaVendedorUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.condicoes.CondicaoComposite;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.condicoes.CondicaoType;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Condicao;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.ConectorLogico;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.ConfiguracaoEscolhaVendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -19,10 +26,11 @@ import java.util.Random;
 @Slf4j
 public class VendedorUseCase {
 
-    private final EscolhaVendedorComposite escolhaVendedorComposite;
     private final VendedorGateway gateway;
     private final Random random = new Random();
     private static String ultimoVendedor = null;
+    private final ConfiguracaoEscolhaVendedorUseCase configuracaoEscolhaVendedorUseCase;
+    private final CondicaoComposite condicaoComposite;
 
     public Vendedor cadastrar(Vendedor novoVendedor) {
         log.info("Cadastrando novo vendedor. Novo vendedor: {}", novoVendedor);
@@ -42,19 +50,96 @@ public class VendedorUseCase {
 
 
     public Vendedor escolherVendedor(Cliente cliente) {
-        List<Vendedor> candidatos = gateway.listarAtivos();
-        return escolhaVendedorComposite.escolher(cliente, candidatos).orElseThrow(VendedorNaoEscolhidoException::new);
+        List<ConfiguracaoEscolhaVendedor> configuracoes = configuracaoEscolhaVendedorUseCase.listarPorUsuario(cliente.getUsuario().getId());
+
+        for (ConfiguracaoEscolhaVendedor configuracao : configuracoes) {
+            if (avaliarCondicoes(cliente, configuracao.getCondicoes())) {
+
+                if(configuracao.getVendedores().size() == 1) {
+                    log.info("Vendedor {} escolhido para o cliente {} com base na configuração {}",
+                            configuracao.getVendedores().getFirst().getNome(), cliente.getNome(), configuracao.getId());
+
+                    return configuracao.getVendedores().getFirst();
+                } else {
+                    Vendedor vendedor = this.roletaVendedores(configuracao.getVendedores());
+                    log.info("Vendedor {} escolhido para o cliente {} com base na configuração {}",
+                            vendedor.getNome(), cliente.getNome(), configuracao.getId());
+
+                    return vendedor;
+                }
+
+            }
+        }
+
+        log.warn("Nenhum vendedor foi escolhido para o cliente {}. Nenhuma configuração correspondeu.", cliente.getNome());
+        throw new VendedorNaoEscolhidoException();
+    }
+
+    private boolean avaliarCondicoes(Cliente cliente, List<Condicao> condicoes) {
+        if (condicoes == null || condicoes.isEmpty()) {
+            return false;
+        }
+
+        // 1. Avaliar todas as condições individualmente
+        List<Boolean> resultados = new ArrayList<>();
+        for (Condicao condicao : condicoes) {
+            CondicaoType condicaoType = condicaoComposite.escolher(condicao.getOperadorLogico());
+            resultados.add(condicaoType.executar(cliente, condicao));
+        }
+
+        // 2. Processar conectores AND (têm precedência)
+        List<Boolean> resultadosPosAnd = new ArrayList<>();
+        List<ConectorLogico> conectoresPosOr = new ArrayList<>();
+
+        if (!resultados.isEmpty()) {
+            boolean acumuladorAnd = resultados.get(0);
+
+            for (int i = 0; i < condicoes.size() - 1; i++) {
+                ConectorLogico conector = condicoes.get(i).getConectorLogico();
+                boolean proximoResultado = resultados.get(i + 1);
+
+                if (conector == ConectorLogico.AND) {
+                    acumuladorAnd = acumuladorAnd && proximoResultado;
+                } else { // OR
+                    resultadosPosAnd.add(acumuladorAnd);
+                    conectoresPosOr.add(ConectorLogico.OR);
+                    acumuladorAnd = proximoResultado;
+                }
+            }
+            resultadosPosAnd.add(acumuladorAnd);
+        } else {
+            return false; // Nenhuma condição para avaliar
+        }
+
+        // 3. Processar conectores OR
+        boolean resultadoFinal = false;
+        if (!resultadosPosAnd.isEmpty()) {
+            resultadoFinal = resultadosPosAnd.get(0);
+            for (int i = 1; i < resultadosPosAnd.size(); i++) {
+                // Neste ponto, todos os conectores restantes em conectoresPosOr são OR
+                resultadoFinal = resultadoFinal || resultadosPosAnd.get(i);
+            }
+        }
+
+        return resultadoFinal;
+    }
+
+    public Vendedor roletaVendedores(List<Vendedor> vendedores) {
+        if (vendedores.size() <= 1) return vendedores.get(0);
+
+        Vendedor vendedor;
+
+        do {
+            vendedor = vendedores.get(random.nextInt(vendedores.size()));
+        } while (vendedor.getInativo() || vendedor.getNome().equals(ultimoVendedor));
+
+        ultimoVendedor = vendedor.getNome();
+        return vendedor;
     }
 
 
-    public String roletaVendedores(String excecao) {
-        List<Vendedor> vendedores;
-
-        if (excecao == null) {
-            vendedores = gateway.listar();
-        } else {
-            vendedores = gateway.listarComExcecao(excecao);
-        }
+    public String roletaVendedoresContatosInativos() {
+        List<Vendedor> vendedores = gateway.listar();
 
         if (vendedores.size() <= 1) return vendedores.get(0).getNome();
 

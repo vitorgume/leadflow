@@ -1,4 +1,4 @@
-package com.guminteligencia.ura_chatbot_ia.entrypoint.dto;
+package com.guminteligencia.ura_chatbot_ia.entrypoint.dto.vendedor;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.guminteligencia.ura_chatbot_ia.domain.Prioridade;
@@ -14,7 +14,6 @@ public class VendedorDto {
     private String nome;
     private String telefone;
     private Boolean inativo;
-    private Prioridade prioridade;
 
     @JsonProperty("id_vendedor_crm")
     private Integer idVendedorCrm;

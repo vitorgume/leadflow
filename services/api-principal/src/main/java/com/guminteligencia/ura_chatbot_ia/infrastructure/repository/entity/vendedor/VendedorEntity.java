@@ -1,6 +1,5 @@
-package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity;
+package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.vendedor;
 
-import com.guminteligencia.ura_chatbot_ia.domain.Prioridade;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,9 +23,6 @@ public class VendedorEntity {
 
     @Column(name = "id_vendedor_crm")
     private Integer idVendedorCrm;
-
-    @Embedded
-    private Prioridade prioridade;
 
     private Boolean padrao;
 }
