@@ -16,4 +16,11 @@ public class Condicao {
     private OperadorLogico operadorLogico;
     private String valor;
     private ConectorLogico conectorLogico;
+
+    public void setDados(Condicao condicao) {
+        this.campo = condicao.getCampo();
+        this.operadorLogico = condicao.getOperadorLogico();
+        this.valor = condicao.getValor();
+        this.conectorLogico = condicao.getConectorLogico();
+    }
 }

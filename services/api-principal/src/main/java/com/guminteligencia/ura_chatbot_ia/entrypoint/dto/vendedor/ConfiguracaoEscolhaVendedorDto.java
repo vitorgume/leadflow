@@ -1,8 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.entrypoint.dto.vendedor;
 
-import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
-import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Condicao;
-import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.UsuarioDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +15,7 @@ import java.util.UUID;
 @Builder
 public class ConfiguracaoEscolhaVendedorDto {
     private UUID id;
-    private Usuario usuario;
-    private Vendedor vendedor;
-    List<Condicao> condicoes;
+    private UsuarioDto usuario;
+    private List<VendedorDto> vendedores;
+    List<CondicaoDto> condicoes;
 }

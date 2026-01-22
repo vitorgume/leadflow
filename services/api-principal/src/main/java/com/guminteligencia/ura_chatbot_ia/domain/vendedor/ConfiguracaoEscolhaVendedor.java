@@ -16,4 +16,10 @@ public class ConfiguracaoEscolhaVendedor {
     private Usuario usuario;
     private List<Vendedor> vendedores;
     List<Condicao> condicoes;
+
+    public void setDados(ConfiguracaoEscolhaVendedor configuracaoEscolhaVendedor) {
+        this.usuario = configuracaoEscolhaVendedor.getUsuario();
+        this.vendedores = configuracaoEscolhaVendedor.getVendedores();
+        this.condicoes = configuracaoEscolhaVendedor.getCondicoes();
+    }
 }

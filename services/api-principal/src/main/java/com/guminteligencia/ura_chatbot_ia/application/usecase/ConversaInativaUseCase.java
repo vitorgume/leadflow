@@ -83,7 +83,7 @@ public class ConversaInativaUseCase {
                 } else {
                     conversa.setStatus(StatusConversa.INATIVO_G2);
                     conversa.setFinalizada(true);
-                    Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
+                    Vendedor vendedor = vendedorUseCase.roletaVendedoresContatosInativos();
                     conversa.setVendedor(vendedor);
                     crmUseCase.atualizarCrm(vendedor, conversa.getCliente(), conversa);
                 }

@@ -162,7 +162,7 @@ public class VendedorUseCase {
     }
 
 
-    public synchronized String roletaVendedoresContatosInativos() {
+    public synchronized Vendedor roletaVendedoresContatosInativos() {
         List<Vendedor> vendedores = gateway.listar();
 
         // 1. Filtra vendedores inativos
@@ -179,7 +179,7 @@ public class VendedorUseCase {
         if (vendedoresAtivos.size() == 1) {
             Vendedor unicoVendedor = vendedoresAtivos.get(0);
             ultimoVendedor = unicoVendedor.getNome();
-            return unicoVendedor.getNome();
+            return unicoVendedor;
         }
 
         // 4. Tenta encontrar vendedores que não sejam o último escolhido
@@ -195,7 +195,7 @@ public class VendedorUseCase {
         // 6. Sorteia um vendedor da lista de candidatos
         Vendedor vendedorEscolhido = possiveisVendedores.get(random.nextInt(possiveisVendedores.size()));
         ultimoVendedor = vendedorEscolhido.getNome();
-        return vendedorEscolhido.getNome();
+        return vendedorEscolhido;
     }
 
     public Vendedor consultarVendedor(String nome) {
@@ -241,7 +241,7 @@ public class VendedorUseCase {
         log.info("Vendedor deletado com sucesso.");
     }
 
-    private Vendedor consultarPorId(Long idVendedor) {
+    public Vendedor consultarPorId(Long idVendedor) {
         log.info("Consultando vendedor pelo id. Id vendedor: {}", idVendedor);
         Optional<Vendedor> vendedor = gateway.consultarPorId(idVendedor);
 
