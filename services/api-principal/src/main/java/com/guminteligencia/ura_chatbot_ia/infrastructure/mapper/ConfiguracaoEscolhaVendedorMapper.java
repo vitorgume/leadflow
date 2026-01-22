@@ -9,7 +9,7 @@ public class ConfiguracaoEscolhaVendedorMapper {
         return ConfiguracaoEscolhaVendedor.builder()
                 .id(entity.getId())
                 .usuario(UsuarioMapper.paraDomain(entity.getUsuario()))
-                .vendedor(VendedorMapper.paraDomain(entity.getVendedor()))
+                .vendedores(entity.getVendedores().stream().map(VendedorMapper::paraDomain).toList())
                 .condicoes(entity.getCondicoes().stream().map(CondicaoMapper::paraDomain).toList())
                 .build();
     }
@@ -18,7 +18,7 @@ public class ConfiguracaoEscolhaVendedorMapper {
         return ConfiguracaoEscolhaVendedorEntity.builder()
                 .id(domain.getId())
                 .usuario(UsuarioMapper.paraEntity(domain.getUsuario()))
-                .vendedor(VendedorMapper.paraEntity(domain.getVendedor()))
+                .vendedores(domain.getVendedores().stream().map(VendedorMapper::paraEntity).toList())
                 .condicoes(domain.getCondicoes().stream().map(CondicaoMapper::paraEntity).toList())
                 .build();
     }

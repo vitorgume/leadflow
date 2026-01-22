@@ -18,6 +18,7 @@ public class CondicaoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id_condicao")
     private UUID id;
 
     private String campo;

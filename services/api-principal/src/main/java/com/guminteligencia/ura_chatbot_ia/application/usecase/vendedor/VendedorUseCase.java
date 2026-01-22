@@ -58,9 +58,9 @@ public class VendedorUseCase {
 
                 if(configuracao.getVendedores().size() == 1) {
                     log.info("Vendedor {} escolhido para o cliente {} com base na configuração {}",
-                            configuracao.getVendedores().getFirst().getNome(), cliente.getNome(), configuracao.getId());
+                            configuracao.getVendedores().get(0).getNome(), cliente.getNome(), configuracao.getId());
 
-                    return configuracao.getVendedores().getFirst();
+                    return configuracao.getVendedores().get(0);
                 } else if (configuracao.getVendedores().size() > 1) {
                     Vendedor vendedor = this.roletaVendedores(configuracao.getVendedores());
                     log.info("Vendedor {} escolhido para o cliente {} com base na configuração {}",

@@ -18,13 +18,19 @@ public class ConfiguracaoEscolhaVendedorEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id_configuracao_escolha_vendedor")
     private UUID id;
 
     @ManyToOne
     private UsuarioEntity usuario;
 
-    @ManyToOne
-    private VendedorEntity vendedor;
+    @ManyToMany
+    @JoinTable(
+            name = "configuracao_vendedores",
+            joinColumns = @JoinColumn(name = "id_configuracao_escolha_vendedor"),
+            inverseJoinColumns = @JoinColumn(name = "id_vendedor")
+    )
+    private List<VendedorEntity> vendedores;
 
     @OneToMany
     List<CondicaoEntity> condicoes;
