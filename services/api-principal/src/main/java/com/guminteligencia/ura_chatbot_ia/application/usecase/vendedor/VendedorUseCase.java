@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor;
 
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.NenhumVendedorReferenciadoException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorComMesmoTelefoneException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEscolhidoException;
@@ -60,12 +61,14 @@ public class VendedorUseCase {
                             configuracao.getVendedores().getFirst().getNome(), cliente.getNome(), configuracao.getId());
 
                     return configuracao.getVendedores().getFirst();
-                } else {
+                } else if (configuracao.getVendedores().size() > 1) {
                     Vendedor vendedor = this.roletaVendedores(configuracao.getVendedores());
                     log.info("Vendedor {} escolhido para o cliente {} com base na configuração {}",
                             vendedor.getNome(), cliente.getNome(), configuracao.getId());
 
                     return vendedor;
+                } else {
+                    throw new NenhumVendedorReferenciadoException();
                 }
 
             }
@@ -124,33 +127,75 @@ public class VendedorUseCase {
         return resultadoFinal;
     }
 
-    public Vendedor roletaVendedores(List<Vendedor> vendedores) {
-        if (vendedores.size() <= 1) return vendedores.get(0);
+    public synchronized Vendedor roletaVendedores(List<Vendedor> vendedores) {
+        // 1. Filtra vendedores inativos
+        List<Vendedor> vendedoresAtivos = vendedores.stream()
+                .filter(v -> !v.getInativo())
+                .toList();
 
-        Vendedor vendedor;
+        // 2. Se não houver vendedores ativos, lança uma exceção
+        if (vendedoresAtivos.isEmpty()) {
+            throw new NenhumVendedorReferenciadoException();
+        }
 
-        do {
-            vendedor = vendedores.get(random.nextInt(vendedores.size()));
-        } while (vendedor.getInativo() || vendedor.getNome().equals(ultimoVendedor));
+        // 3. Se houver apenas um vendedor ativo, retorna ele
+        if (vendedoresAtivos.size() == 1) {
+            Vendedor unicoVendedor = vendedoresAtivos.get(0);
+            ultimoVendedor = unicoVendedor.getNome();
+            return unicoVendedor;
+        }
 
-        ultimoVendedor = vendedor.getNome();
-        return vendedor;
+        // 4. Tenta encontrar vendedores que não sejam o último escolhido
+        List<Vendedor> possiveisVendedores = vendedoresAtivos.stream()
+                .filter(v -> !v.getNome().equals(ultimoVendedor))
+                .toList();
+
+        // 5. Se todos os vendedores ativos foram o último, volta a considerar todos os ativos
+        if (possiveisVendedores.isEmpty()) {
+            possiveisVendedores = vendedoresAtivos;
+        }
+
+        // 6. Sorteia um vendedor da lista de candidatos
+        Vendedor vendedorEscolhido = possiveisVendedores.get(random.nextInt(possiveisVendedores.size()));
+        ultimoVendedor = vendedorEscolhido.getNome();
+        return vendedorEscolhido;
     }
 
 
-    public String roletaVendedoresContatosInativos() {
+    public synchronized String roletaVendedoresContatosInativos() {
         List<Vendedor> vendedores = gateway.listar();
 
-        if (vendedores.size() <= 1) return vendedores.get(0).getNome();
+        // 1. Filtra vendedores inativos
+        List<Vendedor> vendedoresAtivos = vendedores.stream()
+                .filter(v -> !v.getInativo())
+                .toList();
 
-        Vendedor vendedor;
-        do {
-            vendedor = vendedores.get(random.nextInt(vendedores.size()));
-        } while (vendedor.getInativo() || vendedor.getNome().equals(ultimoVendedor));
+        // 2. Se não houver vendedores ativos, lança uma exceção
+        if (vendedoresAtivos.isEmpty()) {
+            throw new NenhumVendedorReferenciadoException();
+        }
 
-        ultimoVendedor = vendedor.getNome();
-        return vendedor.getNome();
+        // 3. Se houver apenas um vendedor ativo, retorna ele
+        if (vendedoresAtivos.size() == 1) {
+            Vendedor unicoVendedor = vendedoresAtivos.get(0);
+            ultimoVendedor = unicoVendedor.getNome();
+            return unicoVendedor.getNome();
+        }
 
+        // 4. Tenta encontrar vendedores que não sejam o último escolhido
+        List<Vendedor> possiveisVendedores = vendedoresAtivos.stream()
+                .filter(v -> !v.getNome().equals(ultimoVendedor))
+                .toList();
+
+        // 5. Se todos os vendedores ativos foram o último, volta a considerar todos os ativos
+        if (possiveisVendedores.isEmpty()) {
+            possiveisVendedores = vendedoresAtivos;
+        }
+
+        // 6. Sorteia um vendedor da lista de candidatos
+        Vendedor vendedorEscolhido = possiveisVendedores.get(random.nextInt(possiveisVendedores.size()));
+        ultimoVendedor = vendedorEscolhido.getNome();
+        return vendedorEscolhido.getNome();
     }
 
     public Vendedor consultarVendedor(String nome) {
