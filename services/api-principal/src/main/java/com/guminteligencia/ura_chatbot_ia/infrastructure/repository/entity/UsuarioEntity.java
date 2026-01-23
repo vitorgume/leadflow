@@ -33,6 +33,19 @@ public class UsuarioEntity {
     @Column(name = "configuracao_crm")
     @Embedded
     private ConfiguracaoCrmEntity configuracaoCrm;
+
+    @Column(name = "mensagem_direcionamento_vendedor")
     private String mensagemDirecionamentoVendedor;
+
+    @Column(name = "mensagem_recontato_g1")
     private String mensagemRecontatoG1;
+
+    @Column(name = "whatsapp_token")
+    private String whatsappToken;
+
+    @Column(name = "whatsapp_id_instance")
+    private String whatsappIdInstance;
+
+    @Column(name = "agente_api_key")
+    private String agenteApiKey;
 }

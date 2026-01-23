@@ -22,4 +22,7 @@ public class Usuario {
     private ConfiguracaoCrm configuracaoCrm;
     private String mensagemDirecionamentoVendedor;
     private String mensagemRecontatoG1;
+    private String whatsappToken;
+    private String whatsappIdInstance;
+    private String agenteApiKey;
 }

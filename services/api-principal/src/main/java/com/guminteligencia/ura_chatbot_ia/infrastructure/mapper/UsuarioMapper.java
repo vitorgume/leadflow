@@ -17,6 +17,9 @@ public class UsuarioMapper {
                 .configuracaoCrm(ConfiguracaoCrmMapper.paraDomain(entity.getConfiguracaoCrm()))
                 .mensagemDirecionamentoVendedor(entity.getMensagemDirecionamentoVendedor())
                 .mensagemRecontatoG1(entity.getMensagemRecontatoG1())
+                .whatsappToken(entity.getWhatsappToken())
+                .whatsappIdInstance(entity.getWhatsappIdInstance())
+                .agenteApiKey(entity.getAgenteApiKey())
                 .build();
     }
 
@@ -32,6 +35,9 @@ public class UsuarioMapper {
                 .configuracaoCrm(ConfiguracaoCrmMapper.paraEntity(domain.getConfiguracaoCrm()))
                 .mensagemDirecionamentoVendedor(domain.getMensagemDirecionamentoVendedor())
                 .mensagemRecontatoG1(domain.getMensagemRecontatoG1())
+                .whatsappToken(domain.getWhatsappToken())
+                .whatsappIdInstance(domain.getWhatsappIdInstance())
+                .agenteApiKey(domain.getAgenteApiKey())
                 .build();
     }
 }

@@ -32,7 +32,8 @@ public class ConfiguracaoEscolhaVendedorEntity {
     )
     private List<VendedorEntity> vendedores;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_configuracao_escolha_vendedor")
     List<CondicaoEntity> condicoes;
 
     private Integer prioridade;

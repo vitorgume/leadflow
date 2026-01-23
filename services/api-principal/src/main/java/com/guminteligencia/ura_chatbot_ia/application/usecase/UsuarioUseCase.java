@@ -31,6 +31,9 @@ public class UsuarioUseCase {
 
         novoUsuario.setSenha(criptografiaUseCase.criptografar(novoUsuario.getSenha()));
         novoUsuario.getConfiguracaoCrm().setAcessToken(criptografiaJCAUseCase.criptografar(novoUsuario.getConfiguracaoCrm().getAcessToken()));
+        novoUsuario.setWhatsappToken(criptografiaJCAUseCase.criptografar(novoUsuario.getWhatsappToken()));
+        novoUsuario.setWhatsappIdInstance(criptografiaJCAUseCase.criptografar(novoUsuario.getWhatsappIdInstance()));
+        novoUsuario.setAgenteApiKey(criptografiaJCAUseCase.criptografar(novoUsuario.getAgenteApiKey()));
 
         Usuario usuarioSalvo = gateway.salvar(novoUsuario);
 

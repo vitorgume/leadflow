@@ -90,7 +90,7 @@ class JsonUseCase:
         ]
 
         # Envia para a IA
-        resposta = self.agente_data_provider.enviar_mensagem_trasformacao_json(historico)
+        resposta = self.agente_data_provider.enviar_mensagem_trasformacao_json(historico, usuario.agente_api_key)
 
         logger.info("Transformação dos dados executada com sucesso.")
 

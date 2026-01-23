@@ -9,12 +9,9 @@ from urllib.parse import urlparse
 
 from openai import OpenAI
 
-from src.config.settings import OPENAI_API_KEY
 from src.infrastructure.exceptions.data_provider_exception import DataProviderException
 
 logger = logging.getLogger(__name__)
-
-client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 class AgenteDataProvider:
@@ -22,8 +19,9 @@ class AgenteDataProvider:
     modelo_chat = "gpt-4.1"
     modelo_json = "gpt-4"
 
-    def enviar_mensagem(self, historico) -> str:
+    def enviar_mensagem(self, historico, api_key: str) -> str:
         try:
+            client = OpenAI(api_key=api_key)
             response = client.chat.completions.create(
                 model=self.modelo_chat,
                 messages=historico,
@@ -43,8 +41,9 @@ class AgenteDataProvider:
             logger.exception("Erro ao enviar mensagem a IA: %s", e)
             raise DataProviderException(self.mensagem_erro_enviar_mensagem_ia)
 
-    def enviar_mensagem_trasformacao_json(self, historico):
+    def enviar_mensagem_trasformacao_json(self, historico, api_key: str):
         try:
+            client = OpenAI(api_key=api_key)
             response = client.chat.completions.create(
                 model=self.modelo_json,
                 messages=historico,
@@ -59,9 +58,10 @@ class AgenteDataProvider:
             logger.exception("Erro ao enviar mensagem a IA: %s", e)
             raise DataProviderException(self.mensagem_erro_enviar_mensagem_ia)
 
-    def transcrever_audio(self, audio_url: str) -> str:
+    def transcrever_audio(self, audio_url: str, api_key: str) -> str:
         caminho_tmp = None
         try:
+            client = OpenAI(api_key=api_key)
             caminho_tmp = self._baixar_arquivo_temporario(audio_url, prefixo="audio")
             with open(caminho_tmp, "rb") as audio_file:
                 transcription = client.audio.transcriptions.create(

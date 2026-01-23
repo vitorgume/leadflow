@@ -16,3 +16,4 @@ class UsuarioEntity(Base):
     email = Column(String(255), nullable=False)
     telefone_conectado = Column(String(20), nullable=False)
     atributos_qualificacao = Column(JSON, nullable=False)
+    agente_api_key = Column(String(255), nullable=False)

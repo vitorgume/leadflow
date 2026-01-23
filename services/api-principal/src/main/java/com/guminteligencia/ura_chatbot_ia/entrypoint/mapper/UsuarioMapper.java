@@ -32,6 +32,9 @@ public class UsuarioMapper {
                 .configuracaoCrm(ConfiguracaoCrmMapper.paraDomain(dto.getConfiguracaoCrm()))
                 .mensagemDirecionamentoVendedor(dto.getMensagemDirecionamentoVendedor())
                 .mensagemRecontatoG1(dto.getMensagemRecontatoG1())
+                .whatsappToken(dto.getWhatsappToken())
+                .whatsappIdInstance(dto.getWhatsappIdInstance())
+                .agenteApiKey(dto.getAgenteApiKey())
                 .build();
     }
 }

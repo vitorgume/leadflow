@@ -28,6 +28,19 @@ public class UsuarioDto {
 
     @JsonProperty("configuracao_crm")
     private ConfiguracaoCrmDto configuracaoCrm;
+
+    @JsonProperty("mensagem_direcionamento_vendedor")
     private String mensagemDirecionamentoVendedor;
+
+    @JsonProperty("mensagem_recontato_g1")
     private String mensagemRecontatoG1;
+
+    @JsonProperty("whatsapp_token")
+    private String whatsappToken;
+
+    @JsonProperty("whatsapp_id_instance")
+    private String whatsappIdInstance;
+
+    @JsonProperty("agente_api_key")
+    private String agenteApiKey;
 }

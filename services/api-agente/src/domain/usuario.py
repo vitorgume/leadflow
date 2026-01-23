@@ -12,3 +12,4 @@ class Usuario:
     email = str
     telefone_conectado = str
     atributos_qualificacao = Dict
+    agente_api_key = str
