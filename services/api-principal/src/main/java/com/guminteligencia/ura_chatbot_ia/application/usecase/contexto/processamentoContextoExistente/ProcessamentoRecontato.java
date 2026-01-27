@@ -21,7 +21,6 @@ public class ProcessamentoRecontato implements ProcessamentoContextoExistenteTyp
 
     private final MensagemUseCase mensagemUseCase;
     private final MensagemBuilder mensagemBuilder;
-    private final OutroContatoUseCase outroContatoUseCase;
     private final ConversaAgenteUseCase conversaAgenteUseCase;
 
     @Override

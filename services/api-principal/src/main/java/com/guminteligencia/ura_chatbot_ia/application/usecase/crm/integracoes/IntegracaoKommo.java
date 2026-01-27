@@ -26,7 +26,7 @@ import java.util.Optional;
 public class IntegracaoKommo implements CrmIntegracaoType {
 
     @Value("${spring.profiles.active}")
-    private final String profile;
+    private String profile;
 
     private final IntegracaoKommoGateway gateway;
     private final CriptografiaJCAUseCase criptografiaJCAUseCase;

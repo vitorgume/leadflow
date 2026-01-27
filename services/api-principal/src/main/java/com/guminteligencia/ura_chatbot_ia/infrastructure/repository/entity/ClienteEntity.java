@@ -3,6 +3,8 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity;
 import com.guminteligencia.ura_chatbot_ia.domain.*;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
 import java.util.UUID;
@@ -25,6 +27,7 @@ public class ClienteEntity {
     private String telefone;
 
     @Column(name = "atributos_qualificacao")
+    @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> atributosQualificacao;
 
     @ManyToOne

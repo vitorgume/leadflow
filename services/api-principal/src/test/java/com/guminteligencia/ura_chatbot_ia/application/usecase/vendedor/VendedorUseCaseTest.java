@@ -4,7 +4,6 @@ import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorComMesm
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEscolhidoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.VendedorGateway;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.ConfiguracaoEscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.condicoes.CondicaoComposite;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.condicoes.CondicaoType;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;

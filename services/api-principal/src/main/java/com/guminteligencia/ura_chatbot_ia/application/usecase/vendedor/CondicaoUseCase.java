@@ -1,4 +1,4 @@
-package com.guminteligencia.ura_chatbot_ia.application.usecase;
+package com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor;
 
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.CondicaoNaoEncontradaException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.CondicaoGateway;

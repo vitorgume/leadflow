@@ -3,6 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processa
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
@@ -19,11 +20,11 @@ public class ProcessarEncaminhamentoAtendente implements ProcessamentoContextoEx
 
     private final MensagemUseCase mensagemUseCase;
     private final MensagemBuilder mensagemBuilder;
-    private final VendedorUseCase vendedorUseCase;
+    private final EscolhaVendedorUseCase escolhaVendedorUseCase;
 
     @Override
     public void processar(String resposta, ConversaAgente conversaAgente, Cliente cliente) {
-        Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
+        Vendedor vendedor = escolhaVendedorUseCase.escolherVendedor(cliente);
         mensagemUseCase.enviarContato(vendedor, cliente);
         mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, null, null), cliente.getTelefone(), false);
         conversaAgente.setVendedor(vendedor);

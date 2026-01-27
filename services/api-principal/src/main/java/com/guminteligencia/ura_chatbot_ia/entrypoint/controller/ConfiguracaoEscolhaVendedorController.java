@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.entrypoint.controller;
 
-import com.guminteligencia.ura_chatbot_ia.application.usecase.ConfiguracaoEscolhaVendedorUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.ConfiguracaoEscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.ResponseDto;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.vendedor.ConfiguracaoEscolhaVendedorDto;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.mapper.ConfiguracaoEscolhaVendedorMapper;
@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController

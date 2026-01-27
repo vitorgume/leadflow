@@ -1,6 +1,4 @@
-from tokenize import String
-
-from sqlalchemy import Column, BINARY, JSON
+from sqlalchemy import Column, BINARY, JSON, String
 
 from src.config.database import Base
 

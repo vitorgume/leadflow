@@ -1,15 +1,14 @@
-package com.guminteligencia.ura_chatbot_ia.application.usecase;
+package com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor;
 
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguracaoEscolhaVendedorNaoEncontrada;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.ConfiguracaoEscolhaVendedorGateway;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.UsuarioUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Condicao;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.ConfiguracaoEscolhaVendedor;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.xmlbeans.impl.common.NameUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,7 @@ public class ConfiguracaoEscolhaVendedorUseCase {
         log.info("Cadastrnado configuracao do vendedor. Configuracao: {}", configuracaoEscolhaVendedor);
 
         Usuario usuario = usuarioUseCase.consultarPorId(configuracaoEscolhaVendedor.getUsuario().getId());
+
         List<Vendedor> vendedores = configuracaoEscolhaVendedor.getVendedores()
                 .stream()
                 .map(vendedor -> vendedorUseCase.consultarPorId(vendedor.getId()))

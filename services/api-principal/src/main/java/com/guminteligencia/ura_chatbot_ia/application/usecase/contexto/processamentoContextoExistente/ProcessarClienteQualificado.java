@@ -6,6 +6,7 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.*;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProcessarClienteQualificado implements ProcessamentoContextoExistenteType {
 
-    private final VendedorUseCase vendedorUseCase;
+    private final EscolhaVendedorUseCase escolhaVendedorUseCase;
     private final ClienteUseCase clienteUseCase;
     private final MensagemUseCase mensagemUseCase;
     private final MensagemBuilder mensagemBuilder;
@@ -38,7 +39,8 @@ public class ProcessarClienteQualificado implements ProcessamentoContextoExisten
                 .build();
 
         Cliente clienteSalvo = clienteUseCase.alterar(clienteQualificado, conversaAgente.getCliente().getId());
-        Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
+
+        Vendedor vendedor = escolhaVendedorUseCase.escolherVendedor(cliente);
         conversaAgente.setStatus(StatusConversa.ATIVO);
 
         mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.MENSAGEM_DIRECIONAMENTO_VENDEDOR, vendedor.getNome(), clienteSalvo), clienteSalvo.getTelefone(), false);
