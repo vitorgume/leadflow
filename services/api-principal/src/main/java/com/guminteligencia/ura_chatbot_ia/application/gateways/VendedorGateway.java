@@ -4,11 +4,12 @@ import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface VendedorGateway {
     Optional<Vendedor> consultarVendedor(String nome);
 
-    List<Vendedor> listar();
+    List<Vendedor> listarPorUsuario(UUID idUsuario);
 
     List<Vendedor> listarComExcecao(String excecao);
 

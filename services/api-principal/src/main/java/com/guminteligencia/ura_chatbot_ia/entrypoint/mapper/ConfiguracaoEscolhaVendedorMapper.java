@@ -1,6 +1,8 @@
 package com.guminteligencia.ura_chatbot_ia.entrypoint.mapper;
 
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.ConfiguracaoEscolhaVendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.vendedor.ConfiguracaoEscolhaVendedorDto;
 
 public class ConfiguracaoEscolhaVendedorMapper {
@@ -8,8 +10,8 @@ public class ConfiguracaoEscolhaVendedorMapper {
     public static ConfiguracaoEscolhaVendedor paraDomain(ConfiguracaoEscolhaVendedorDto dto) {
         return ConfiguracaoEscolhaVendedor.builder()
                 .id(dto.getId())
-                .usuario(UsuarioMapper.paraDomain(dto.getUsuario()))
-                .vendedores(dto.getVendedores().stream().map(VendedorMapper::paraDomain).toList())
+                .usuario(Usuario.builder().id(dto.getUsuario().getId()).build())
+                .vendedores(dto.getVendedores().stream().map(vendedorDto -> Vendedor.builder().id(vendedorDto.getId()).build()).toList())
                 .condicoes(dto.getCondicoes().stream().map(CondicaoMapper::paraDomain).toList())
                 .build();
     }

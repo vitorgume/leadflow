@@ -2,6 +2,7 @@ package com.guminteligencia.ura_chatbot_ia.entrypoint.dto.vendedor;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.guminteligencia.ura_chatbot_ia.domain.Prioridade;
+import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.UsuarioDto;
 import lombok.*;
 
 @AllArgsConstructor
@@ -19,4 +20,5 @@ public class VendedorDto {
     private Integer idVendedorCrm;
 
     private Boolean padrao;
+    private UsuarioDto usuario;
 }

@@ -21,6 +21,7 @@ public class MensagemDirecionamentoVendedor implements MensagemType {
         String mensagem = cliente.getUsuario().getMensagemDirecionamentoVendedor();
 
         mensagem = mensagem.replaceAll("\\{nome_cliente\\}", cliente.getNome());
+        mensagem = mensagem.replaceAll("\\{nome_vendedor\\}", nomeVendedor);
 
         for (Map.Entry<String, Object> dado : cliente.getAtributosQualificacao().entrySet()) {
             mensagem = mensagem.replaceAll("\\{" + dado.getKey() + "\\}", dado.getValue().toString());

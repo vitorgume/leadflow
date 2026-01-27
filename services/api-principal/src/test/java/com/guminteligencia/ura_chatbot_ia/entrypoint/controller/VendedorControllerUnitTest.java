@@ -69,7 +69,7 @@ class VendedorControllerUnitTest {
 
     @Test
     void listarDeveRetornarOk() throws Exception {
-        when(vendedorUseCase.listar()).thenReturn(List.of(
+        when(vendedorUseCase.listarPorUsuario()).thenReturn(List.of(
                 Vendedor.builder().id(1L).nome("A").telefone("1").build(),
                 Vendedor.builder().id(2L).nome("B").telefone("2").build()
         ));

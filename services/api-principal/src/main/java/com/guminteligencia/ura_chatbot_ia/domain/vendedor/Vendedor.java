@@ -1,6 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.domain.vendedor;
 
 import com.guminteligencia.ura_chatbot_ia.domain.Prioridade;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import lombok.*;
 
 @AllArgsConstructor
@@ -15,6 +16,7 @@ public class Vendedor {
     private Boolean inativo;
     private Integer idVendedorCrm;
     private Boolean padrao;
+    private Usuario usuario;
 
     public void setDados(Vendedor novosDados) {
         this.nome = novosDados.getNome();

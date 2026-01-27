@@ -37,10 +37,7 @@ public class ConfiguracaoEscolhaVendedorUseCase {
                 .map(vendedor -> vendedorUseCase.consultarPorId(vendedor.getId()))
                 .toList();
 
-        List<Condicao> condicoes = configuracaoEscolhaVendedor.getCondicoes()
-                .stream()
-                .map(condicaoUseCase::cadastrar)
-                .toList();
+        List<Condicao> condicoes = configuracaoEscolhaVendedor.getCondicoes();
 
         configuracaoEscolhaVendedor.setUsuario(usuario);
         configuracaoEscolhaVendedor.setVendedores(vendedores);

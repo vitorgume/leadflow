@@ -85,7 +85,7 @@ class VendedorDataProviderTest {
     }
 
     @Test
-    void deveListarComSucesso() {
+    void deveListarPorUsuarioComSucesso() {
         List<VendedorEntity> raw = List.of(entityIn);
         List<Vendedor> domList = List.of(domainOut);
 
@@ -93,7 +93,7 @@ class VendedorDataProviderTest {
         try (MockedStatic<VendedorMapper> ms = mockStatic(VendedorMapper.class)) {
             ms.when(() -> VendedorMapper.paraDomain(entityIn)).thenReturn(domainOut);
 
-            List<Vendedor> result = provider.listar();
+            List<Vendedor> result = provider.listarPorUsuario();
             assertEquals(domList, result);
 
             verify(repository).findAll();
@@ -102,17 +102,17 @@ class VendedorDataProviderTest {
     }
 
     @Test
-    void deveLancarExceptionAoListar() {
+    void deveLancarExceptionAoListarPorUsuario() {
         when(repository.findAll()).thenThrow(new RuntimeException("fail-list"));
         DataProviderException ex = assertThrows(
                 DataProviderException.class,
-                () -> provider.listar()
+                () -> provider.listarPorUsuario()
         );
         assertEquals(ERR_LIST, ex.getMessage());
     }
 
     @Test
-    void deveListarComExcecaoComSucesso() {
+    void deveListarPorUsuarioComExcecaoComSucesso() {
         List<VendedorEntity> raw = List.of(entityIn);
         List<Vendedor> domList = List.of(domainOut);
 
@@ -129,7 +129,7 @@ class VendedorDataProviderTest {
     }
 
     @Test
-    void deveLancarExceptionAoListarComExcecao() {
+    void deveLancarExceptionAoListarPorUsuarioComExcecao() {
         when(repository.listarComExcecao(any()))
                 .thenThrow(new RuntimeException("fail-exc"));
         DataProviderException ex = assertThrows(
@@ -254,7 +254,7 @@ class VendedorDataProviderTest {
     }
 
     @Test
-    void deveListarAtivosComSucesso() {
+    void deveListarPorUsuarioAtivosComSucesso() {
         List<VendedorEntity> raw = List.of(entityIn);
         List<Vendedor> domList = List.of(domainOut);
 

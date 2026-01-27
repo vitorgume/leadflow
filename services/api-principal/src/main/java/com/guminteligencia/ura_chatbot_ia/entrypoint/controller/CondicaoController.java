@@ -1,4 +1,4 @@
-package com.guminteligencia.ura_chatbot_ia.entrypoint;
+package com.guminteligencia.ura_chatbot_ia.entrypoint.controller;
 
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.CondicaoUseCase;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.ResponseDto;

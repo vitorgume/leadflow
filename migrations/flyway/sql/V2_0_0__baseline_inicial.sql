@@ -12,9 +12,9 @@ CREATE TABLE usuarios (
     atributos_qualificacao JSON,
     mensagem_direcionamento_vendedor VARCHAR(255),
     mensagem_recontato_g1 VARCHAR(255),
-    whatsapp_token VARCHAR(255),
-    whatsapp_id_instance VARCHAR(255),
-    agente_api_key VARCHAR(255),
+    whatsapp_token TEXT,
+    whatsapp_id_instance TEXT,
+    agente_api_key TEXT,
     -- Campos da entidade embutida ConfiguracaoCrmEntity
     crm_type VARCHAR(255),
     mapeamento_campos JSON,
@@ -27,12 +27,21 @@ CREATE TABLE usuarios (
 
 -- Tabela de vendedores que serão associados aos clientes.
 CREATE TABLE vendedores (
-    id_vendedor BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_vendedor BIGINT NOT NULL AUTO_INCREMENT,
     nome VARCHAR(255),
     telefone VARCHAR(255),
-    inativo BOOLEAN,
+    inativo BIT(1), -- Hibernate mapeia Boolean como BIT(1) no MySQL
     id_vendedor_crm INT,
-    padrao BOOLEAN
+    padrao BIT(1),
+    
+    -- Nova coluna de relacionamento
+    usuario_id BINARY(16), 
+
+    PRIMARY KEY (id_vendedor),
+
+    -- Criação da chave estrangeira (Link com a tabela usuarios)
+    CONSTRAINT fk_vendedores_usuarios 
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
 -- Tabela para outros contatos diversos.

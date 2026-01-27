@@ -3,6 +3,8 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorComMesmoTelefoneException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.VendedorGateway;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.UsuarioUseCase;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ import java.util.Optional;
 public class VendedorUseCase {
 
     private final VendedorGateway gateway;
+    private final UsuarioUseCase usuarioUseCase;
 
     public Vendedor cadastrar(Vendedor novoVendedor) {
         log.info("Cadastrando novo vendedor. Novo vendedor: {}", novoVendedor);
@@ -26,6 +30,9 @@ public class VendedorUseCase {
         if(vendedor.isPresent() && vendedor.get().getTelefone().equals(novoVendedor.getTelefone())) {
             throw new VendedorComMesmoTelefoneException();
         }
+
+        Usuario usuario = usuarioUseCase.consultarPorId(novoVendedor.getUsuario().getId());
+        novoVendedor.setUsuario(usuario);
 
         novoVendedor = gateway.salvar(novoVendedor);
 
@@ -58,10 +65,10 @@ public class VendedorUseCase {
         return vendedor;
     }
 
-    public List<Vendedor> listar() {
+    public List<Vendedor> listarPorUsuario(UUID idUsuario) {
         log.info("Listando vendedores.");
 
-        List<Vendedor> vendedores = gateway.listar();
+        List<Vendedor> vendedores = gateway.listarPorUsuario(idUsuario);
 
         log.info("Vendedores listados com sucesso. Vendedores: {}", vendedores);
 

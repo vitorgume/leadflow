@@ -11,6 +11,8 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -27,6 +29,12 @@ public class CriptografiaJCADataProvider implements CriptografiaJCAGateway {
     private static final String MENSAGEM_ERRO_CRIPTOGRAFAR = "Erro ao criptografar o valor";
     private static final String MENSAGEM_ERRO_DESCRIPTORAFAR = "Erro ao descriptografar o valor";
 
+    private SecretKeySpec createKeySpec(String secret) throws NoSuchAlgorithmException {
+        MessageDigest sha = MessageDigest.getInstance("SHA-256");
+        byte[] keyBytes = sha.digest(secret.getBytes(StandardCharsets.UTF_8));
+        return new SecretKeySpec(keyBytes, "AES");
+    }
+
     @Override
     public String criptografar(String valor) {
         if (valor == null) return null;
@@ -35,7 +43,7 @@ public class CriptografiaJCADataProvider implements CriptografiaJCAGateway {
             new SecureRandom().nextBytes(iv); // IV sempre aleatório!
 
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
+            SecretKeySpec keySpec = createKeySpec(key);
             GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(TAG_LENGTH_BITS, iv);
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, gcmParameterSpec);
 
@@ -48,8 +56,8 @@ public class CriptografiaJCADataProvider implements CriptografiaJCAGateway {
 
             return Base64.getEncoder().encodeToString(byteBuffer.array());
         } catch (Exception e) {
-            log.error(MENSAGEM_ERRO_CRIPTOGRAFAR, e.getCause());
-            throw new DataProviderException(MENSAGEM_ERRO_CRIPTOGRAFAR, e);
+            log.error(MENSAGEM_ERRO_CRIPTOGRAFAR, e);
+            throw new DataProviderException(MENSAGEM_ERRO_CRIPTOGRAFAR, e.getCause());
         }
     }
 
@@ -67,15 +75,15 @@ public class CriptografiaJCADataProvider implements CriptografiaJCAGateway {
             byteBuffer.get(cipherText);
 
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
+            SecretKeySpec keySpec = createKeySpec(key);
             GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(TAG_LENGTH_BITS, iv);
             cipher.init(Cipher.DECRYPT_MODE, keySpec, gcmParameterSpec);
 
             byte[] plainText = cipher.doFinal(cipherText);
             return new String(plainText, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.error(MENSAGEM_ERRO_DESCRIPTORAFAR, e.getCause());
-            throw new DataProviderException(MENSAGEM_ERRO_DESCRIPTORAFAR, e);
+            log.error(MENSAGEM_ERRO_DESCRIPTORAFAR, e);
+            throw new DataProviderException(MENSAGEM_ERRO_DESCRIPTORAFAR, e.getCause());
         }
     }
 }

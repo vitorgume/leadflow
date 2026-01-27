@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class EscolhaVendedorUseCase {
     private final VendedorUseCase vendedorUseCase;
 
     public Vendedor escolherVendedor(Cliente cliente) {
-        List<Vendedor> vendedores = vendedorUseCase.listar();
+        List<Vendedor> vendedores = vendedorUseCase.listarPorUsuario(cliente.getUsuario().getId());
 
         if(vendedores.size() == 1) {
             return vendedores.get(0);
@@ -146,8 +147,8 @@ public class EscolhaVendedorUseCase {
     }
 
 
-    public synchronized Vendedor roletaVendedoresContatosInativos() {
-        List<Vendedor> vendedores = vendedorUseCase.listar();
+    public synchronized Vendedor roletaVendedoresContatosInativos(UUID idUsuario) {
+        List<Vendedor> vendedores = vendedorUseCase.listarPorUsuario(idUsuario);
 
         // 1. Filtra vendedores inativos
         List<Vendedor> vendedoresAtivos = vendedores.stream()

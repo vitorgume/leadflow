@@ -34,6 +34,8 @@ class ConversaDataProvider:
         try:
             uuid_bytes = uuid.UUID(id).bytes
             entity = session.query(ConversaEntity).filter(ConversaEntity.id_conversa == uuid_bytes).first()
+            if entity is None:
+                return None
             return self.conversa_mapper.paraDomain(entity)
         except SQLAlchemyError as e:
             logger.exception("Erro ao consultar conversa no banco de dados %s", e)

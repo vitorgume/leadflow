@@ -1,8 +1,9 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity;
 
-import com.guminteligencia.ura_chatbot_ia.domain.ConfiguracaoCrm;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class UsuarioEntity {
     private String telefoneConectado;
 
     @Column(name = "atributos_qualificacao")
+    @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> atributosQualificacao;
 
     @Column(name = "configuracao_crm")
@@ -46,6 +48,6 @@ public class UsuarioEntity {
     @Column(name = "whatsapp_id_instance")
     private String whatsappIdInstance;
 
-    @Column(name = "agente_api_key")
+    @Column(name = "agente_api_key", columnDefinition = "TEXT")
     private String agenteApiKey;
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -44,11 +45,11 @@ public class VendedorDataProvider implements VendedorGateway {
     }
 
     @Override
-    public List<Vendedor> listar() {
+    public List<Vendedor> listarPorUsuario(UUID idUsuario) {
         List<VendedorEntity> vendedorEntities;
 
         try {
-            vendedorEntities = repository.findAll();
+            vendedorEntities = repository.findByUsuario_Id(idUsuario);
         } catch (Exception ex) {
             log.error(MENSAGEM_LISTAR_VENDEDORES, ex);
             throw new DataProviderException(MENSAGEM_LISTAR_VENDEDORES, ex.getCause());

@@ -12,6 +12,7 @@ public class VendedorMapper {
                 .telefone(entity.getTelefone())
                 .idVendedorCrm(entity.getIdVendedorCrm())
                 .padrao(entity.getPadrao())
+                .usuario(UsuarioMapper.paraDomain(entity.getUsuario()))
                 .build();
     }
 
@@ -23,6 +24,7 @@ public class VendedorMapper {
                 .telefone(domain.getTelefone())
                 .idVendedorCrm(domain.getIdVendedorCrm())
                 .padrao(domain.getPadrao())
+                .usuario(UsuarioMapper.paraEntity(domain.getUsuario()))
                 .build();
     }
 }

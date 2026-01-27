@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface VendedorRepository extends JpaRepository<VendedorEntity, Long> {
@@ -20,4 +21,6 @@ public interface VendedorRepository extends JpaRepository<VendedorEntity, Long> 
     List<VendedorEntity> findByInativoIsFalse();
 
     Optional<VendedorEntity> findByPadraoIsTrue();
+
+    List<VendedorEntity> findByUsuario_Id(UUID id);
 }

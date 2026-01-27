@@ -230,10 +230,10 @@ class VendedorUseCaseTest {
     }
 
     @Test
-    void listarDeveDelegarParaGateway() {
+    void listarPorUsuarioDeveDelegarParaGateway() {
         List<Vendedor> lista = List.of(Vendedor.builder().nome("A").build());
-        when(gateway.listar()).thenReturn(lista);
-        List<Vendedor> res = useCase.listar();
+        when(gateway.listarPorUsuario()).thenReturn(lista);
+        List<Vendedor> res = useCase.listarPorUsuario();
         assertSame(lista, res);
     }
 

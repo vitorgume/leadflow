@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.entrypoint.mapper;
 
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.vendedor.VendedorDto;
 
@@ -13,6 +14,7 @@ public class VendedorMapper {
                 .inativo(dto.getInativo())
                 .idVendedorCrm(dto.getIdVendedorCrm())
                 .padrao(dto.getPadrao())
+                .usuario(Usuario.builder().id(dto.getUsuario().getId()).build())
                 .build();
     }
 
