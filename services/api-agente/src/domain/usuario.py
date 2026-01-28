@@ -5,11 +5,11 @@ from typing import Dict
 
 @dataclass()
 class Usuario:
-    id = str
-    nome = str
-    telefone = str
-    senha = str
-    email = str
-    telefone_conectado = str
-    atributos_qualificacao = Dict
-    agente_api_key = str
+    id: str
+    nome: str
+    telefone: str
+    senha: str
+    email: str
+    telefone_conectado: str
+    atributos_qualificacao: Dict
+    agente_api_key: str

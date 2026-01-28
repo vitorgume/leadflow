@@ -31,7 +31,7 @@ public class ProcessarClienteQualificado implements ProcessamentoContextoExisten
     @Override
     public void processar(String resposta, ConversaAgente conversaAgente, Cliente cliente) {
         log.info("Processando cliente qualificado. Resposta: {}, ConversaAgente: {}, Cliente: {}", resposta, conversaAgente, cliente);
-        Qualificacao qualificacao = agenteUseCase.enviarJsonTrasformacao(resposta);
+        Qualificacao qualificacao = agenteUseCase.enviarJsonTrasformacao(resposta, cliente.getUsuario().getId());
 
         Cliente clienteQualificado = Cliente.builder()
                 .nome(qualificacao.getNome())

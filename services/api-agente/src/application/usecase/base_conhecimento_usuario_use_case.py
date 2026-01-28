@@ -9,9 +9,5 @@ class BaseConhecimentoUsuarioUseCase:
         self.base_conhecimento_usuario_dataprovider = base_conhecimento_usuario_dataprovider
 
     def consultar_base_conhecimento_usuario(self, id_usuario: str):
-        base_conhecimento = self.base_conhecimento_usuario_dataprovider.consultar_base_conhecimento_usuario(id_usuario)
+        return self.base_conhecimento_usuario_dataprovider.consultar_base_conhecimento_usuario(id_usuario)
 
-        if base_conhecimento is None:
-            raise BaseConhecimentoUsuarioNaoEncontradoException()
-
-        return base_conhecimento

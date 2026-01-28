@@ -14,6 +14,7 @@ class ClienteDataProvider:
         self.cliente_mappper = cliente_mapper
 
     def consultar_por_id(self, id: str):
+        print("Id do cliente: " + id)
         session = SessionLocal()
         try:
             uuid_bytes = uuid.UUID(id).bytes
@@ -22,7 +23,7 @@ class ClienteDataProvider:
         except Exception as e:
             session.rollback()
             logger.exception("Erro ao consultar cliente por id. %s", e)
-            raise DataProviderException("Erro ao consultar cliente por id. %s")
+            raise DataProviderException("Erro ao consultar cliente por id.")
         finally:
             session.close()
 

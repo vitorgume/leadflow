@@ -42,6 +42,8 @@ class AgenteDataProvider:
             raise DataProviderException(self.mensagem_erro_enviar_mensagem_ia)
 
     def enviar_mensagem_trasformacao_json(self, historico, api_key: str):
+        print("Body:", historico)
+
         try:
             client = OpenAI(api_key=api_key)
             response = client.chat.completions.create(

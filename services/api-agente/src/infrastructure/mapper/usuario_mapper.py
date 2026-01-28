@@ -13,12 +13,12 @@ class UsuarioMapper:
 
     def para_domain(self, usuario_entity: UsuarioEntity) -> Usuario:
         return Usuario(
-            id=str(uuid.UUID(usuario_entity.id)),
+            id=str(uuid.UUID(bytes=usuario_entity.id)),
             nome=usuario_entity.nome,
             telefone=usuario_entity.telefone,
             senha=usuario_entity.senha,
             email=usuario_entity.email,
-            telefone_concectado=usuario_entity.telefone_conectado,
+            telefone_conectado=usuario_entity.telefone_conectado,
             atributos_qualificacao=usuario_entity.atributos_qualificacao,
             agente_api_key=self.crypto_util.decrypt(usuario_entity.agente_api_key)
         )

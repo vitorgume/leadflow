@@ -1,4 +1,5 @@
 import base64
+import hashlib
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.exceptions import InvalidTag
 
@@ -17,8 +18,10 @@ class CryptoUtil:
     def __init__(self, secret_key: str):
         if not secret_key:
             raise ValueError("A chave secreta não pode ser vazia.")
-        # Assumindo que a chave secreta já está nos bytes corretos ou string que pode ser codificada.
-        self.key = secret_key.encode('utf-8') if isinstance(secret_key, str) else secret_key
+        # Replica a implementação Java: usa o hash SHA-256 da chave para garantir que ela tenha 32 bytes.
+        sha256 = hashlib.sha256()
+        sha256.update(secret_key.encode('utf-8'))
+        self.key = sha256.digest()
 
 
     def decrypt(self, encrypted_data_b64: str) -> str:

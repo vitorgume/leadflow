@@ -30,10 +30,11 @@ class AgenteUseCase:
         cliente = self.cliente_use_case.consutlar_por_id(conversa.cliente_id)
         usuario = self.usuario_use_case.consultar_por_id(cliente.usuario_id)
 
+        prompt_usuario = self.prompt_usuario_usecase.consultar_prompt_usuario(cliente.usuario_id)
         historico = [
             {
                 "role": "system",
-                "content": self.prompt_usuario_usecase.consultar_prompt_usuario(cliente.usuario_id)
+                "content": prompt_usuario.prompt if prompt_usuario else ""
             }
         ]
 
@@ -50,12 +51,14 @@ class AgenteUseCase:
         historico.append({"role": "user", "content": conteudo_usuario})
 
         base_conhecimento = self.base_conhecimento_usuario_use_case.consultar_base_conhecimento_usuario(cliente.usuario_id)
-        base_conhecimento_system = {
-            "role": "system",
-            "content": f"BASE_DE_CONHECIMENTO:\n{base_conhecimento}"
-        }
 
-        historico.append(base_conhecimento_system)
+        if base_conhecimento and base_conhecimento.conteudo:
+            base_conhecimento_system = {
+                "role": "system",
+                "content": f"BASE_DE_CONHECIMENTO:\n{base_conhecimento.conteudo}"
+            }
+
+            historico.append(base_conhecimento_system)
 
         resposta = self.agente_data_provider.enviar_mensagem(historico, usuario.agente_api_key)
 
