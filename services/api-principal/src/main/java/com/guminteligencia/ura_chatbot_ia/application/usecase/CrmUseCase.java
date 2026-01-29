@@ -57,7 +57,7 @@ public class CrmUseCase {
                     ? Map.of("id", 100738)
                     : Map.of("id", 100736);
 
-            Integer statusId = conversaAgente.getStatus().getCodigo().equals(1) ? 96488527 : 96488979;
+            Integer statusId = conversaAgente.getStatus().getCodigo().equals(1) ? 96488527 : 95834523;
 
             Map<String, Object> embedded = Map.of("tags", List.of(tagItem));
 
