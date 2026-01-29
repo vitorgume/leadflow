@@ -61,7 +61,7 @@ class JsonUseCase:
             },
             {
                 "role": "user",
-                "content": msg
+                "content": msg.mensagem
             }
         ]
 

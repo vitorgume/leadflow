@@ -6,5 +6,6 @@ public enum OperadorLogico {
     IS_GREATER_THAN,
     IS_LESS_THAN,
     IS_GREATER_THAN_OR_EQUAL_TO,
-    IS_LESS_THAN_OR_EQUAL_TO
+    IS_LESS_THAN_OR_EQUAL_TO,
+    CONTAINS
 }

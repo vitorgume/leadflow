@@ -19,12 +19,6 @@ public class MensagemDadosContatoAtendente implements MensagemType {
 
         mensagem.append("Dados do contato acima:\n");
 
-        if(cliente.getNome() != null) {
-            mensagem.append("Nome: ").append(cliente.getNome()).append("\n");
-        } else {
-            mensagem.append("Nome: ").append("Nome não informado").append("\n");
-        }
-
         for (Map.Entry<String, Object> dado : cliente.getAtributosQualificacao().entrySet()) {
             String nomeCampo = dado.getKey();
             Object valorCampo = dado.getValue();

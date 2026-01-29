@@ -33,6 +33,7 @@ public class VendedorUseCase {
 
         Usuario usuario = usuarioUseCase.consultarPorId(novoVendedor.getUsuario().getId());
         novoVendedor.setUsuario(usuario);
+        novoVendedor.setInativo(false);
 
         novoVendedor = gateway.salvar(novoVendedor);
 

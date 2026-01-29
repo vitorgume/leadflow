@@ -12,6 +12,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class EscolhaVendedorUseCase {
     private final CondicaoComposite condicaoComposite;
     private final VendedorUseCase vendedorUseCase;
 
+    @Transactional(readOnly = true)
     public Vendedor escolherVendedor(Cliente cliente) {
         List<Vendedor> vendedores = vendedorUseCase.listarPorUsuario(cliente.getUsuario().getId());
 

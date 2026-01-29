@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CrmIntegracaoFactory {
 
-    private List<CrmIntegracaoType> integracoes;
+    private final List<CrmIntegracaoType> integracoes;
 
     public CrmIntegracaoType create(CrmType crmType) {
         return integracoes.stream()
