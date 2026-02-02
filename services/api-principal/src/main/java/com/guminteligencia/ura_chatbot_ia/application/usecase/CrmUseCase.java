@@ -34,64 +34,59 @@ public class CrmUseCase {
     }
 
     public void atualizarCrm(Vendedor vendedor, Cliente cliente, ConversaAgente conversaAgente) {
-        if(profile.equals("prod")) {
-            log.info("Atualizando crm. Vendedor: {}, Cliente: {}, Conversa: {}", vendedor, cliente, conversaAgente);
+        log.info("Atualizando crm. Vendedor: {}, Cliente: {}, Conversa: {}", vendedor, cliente, conversaAgente);
 
-            Integer idLead = this.consultaLeadPeloTelefone(cliente.getTelefone());
+        Integer idLead = this.consultaLeadPeloTelefone(cliente.getTelefone());
 
-            log.info("Construindo body para atualizar card.");
+        log.info("Construindo body para atualizar card.");
 
-            List<CustomFieldDto> customFieldDtos = new ArrayList<>();
+        List<CustomFieldDto> customFieldDtos = new ArrayList<>();
 
-            addTextIfPresent(customFieldDtos, 2760738, cliente.getCpf());
+        addTextIfPresent(customFieldDtos, 2760738, cliente.getCpf());
 
-            customFieldDtos.add(selectField(2760990, cliente.getConsentimentoAtendimnento() ? 2191554 : 2191556));
+        customFieldDtos.add(selectField(2760990, cliente.getConsentimentoAtendimnento() ? 2191554 : 2191556));
 
-            customFieldDtos.add(selectField(2761160, cliente.getTipoConsulta() == null ? TipoConsulta.NAO_INFORMADO.getCodigoCrm() : cliente.getTipoConsulta().getCodigoCrm()));
+        customFieldDtos.add(selectField(2761160, cliente.getTipoConsulta() == null ? TipoConsulta.NAO_INFORMADO.getCodigoCrm() : cliente.getTipoConsulta().getCodigoCrm()));
 
-            addTextIfPresent(customFieldDtos,2761314, cliente.getDorDesejoPaciente());
+        addTextIfPresent(customFieldDtos, 2761314, cliente.getDorDesejoPaciente());
 
-            customFieldDtos.add(selectField(2761418, cliente.getPreferenciaHorario() == null ? PreferenciaHorario.NAO_INFORMADO.getCodigoCrm() : cliente.getPreferenciaHorario().getCodigoCrm()));
+        customFieldDtos.add(selectField(2761418, cliente.getPreferenciaHorario() == null ? PreferenciaHorario.NAO_INFORMADO.getCodigoCrm() : cliente.getPreferenciaHorario().getCodigoCrm()));
 
-            Map<String, Integer> tagItem = conversaAgente.getStatus().getCodigo().equals(2) || conversaAgente.getStatus().getCodigo().equals(0)
-                    ? Map.of("id", 100738)
-                    : Map.of("id", 100736);
+        Map<String, Integer> tagItem = conversaAgente.getStatus().getCodigo().equals(2) || conversaAgente.getStatus().getCodigo().equals(0)
+                ? Map.of("id", 100738)
+                : Map.of("id", 100736);
 
-            Integer statusId = conversaAgente.getStatus().getCodigo().equals(1) ? 96488527 : 95834523;
+        Integer statusId = conversaAgente.getStatus().getCodigo().equals(1) ? 96488527 : 95834523;
 
-            Map<String, Object> embedded = Map.of("tags", List.of(tagItem));
+        Map<String, Object> embedded = Map.of("tags", List.of(tagItem));
 
-            CardDto cardDto = CardDto.builder()
-                    .responsibleUserId(vendedor.getIdVendedorCrm())
-                    .statusId(statusId)
-                    .customFieldsValues(customFieldDtos)
-                    .embedded(embedded)
-                    .build();
+        CardDto cardDto = CardDto.builder()
+                .responsibleUserId(vendedor.getIdVendedorCrm())
+                .statusId(statusId)
+                .customFieldsValues(customFieldDtos)
+                .embedded(embedded)
+                .build();
 
-            log.info("Body para atualizar card criado com sucesso. Body: {}", cardDto);
+        log.info("Body para atualizar card criado com sucesso. Body: {}", cardDto);
 
-            try {
-                var json = new ObjectMapper()
-                        .writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(cardDto);
-                log.info("Kommo PATCH body=\n{}", json);
-            } catch (Exception ignore) {
-            }
-
-            gateway.atualizarCard(cardDto, idLead);
-
-            log.info("Atualização do crm concluída com sucesso. Card: {}, Id do lead: {}", cardDto, idLead);
-        } else {
-            log.info("Card atualizado com sucesso !");
+        try {
+            var json = new ObjectMapper()
+                    .writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(cardDto);
+            log.info("Kommo PATCH body=\n{}", json);
+        } catch (Exception ignore) {
         }
 
+        gateway.atualizarCard(cardDto, idLead);
+
+        log.info("Atualização do crm concluída com sucesso. Card: {}, Id do lead: {}", cardDto, idLead);
     }
 
     public Integer consultaLeadPeloTelefone(String telefone) {
         log.info("Consultando lead pelo telefone. Telefone: {}", telefone);
         Optional<Integer> lead = gateway.consultaLeadPeloTelefone(telefone);
 
-        if(lead.isEmpty()) {
+        if (lead.isEmpty()) {
             throw new LeadNaoEncontradoException();
         }
 
