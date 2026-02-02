@@ -55,7 +55,7 @@ public class EscolhaVendedorUseCase {
 
                     return vendedor;
                 } else {
-                    throw new NenhumVendedorReferenciadoException();
+                    return this.roletaVendedores(vendedores);
                 }
 
             }

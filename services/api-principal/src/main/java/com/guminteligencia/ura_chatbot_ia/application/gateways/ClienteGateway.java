@@ -1,7 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.application.gateways;
 
-import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ObjetoRelatorioDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,9 +14,9 @@ public interface ClienteGateway {
 
     Optional<Cliente> consultarPorId(UUID idCliente);
 
-    List<RelatorioContatoDto> getRelatorioContato();
+    List<ObjetoRelatorioDto> getRelatorioContato(UUID idUsuario);
 
-    List<RelatorioContatoDto> getRelatorioContatoSegundaFeira();
+    List<ObjetoRelatorioDto> getRelatorioContatoSegundaFeira(UUID idUsuario);
 
     Optional<Cliente> consultarPorTelefoneEUsuario(String telefone, UUID idUsuario);
 }

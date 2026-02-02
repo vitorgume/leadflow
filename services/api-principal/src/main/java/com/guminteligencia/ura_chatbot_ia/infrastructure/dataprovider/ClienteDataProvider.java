@@ -3,6 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.ClienteGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ObjetoRelatorioDto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.ClienteMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.RelatorioMapper;
@@ -73,12 +74,11 @@ public class ClienteDataProvider implements ClienteGateway {
     }
 
     @Override
-    public List<RelatorioContatoDto> getRelatorioContato() {
-        List<RelatorioContatoDto> relatorios;
+    public List<ObjetoRelatorioDto> getRelatorioContato(UUID idUsuario) {
+        List<ObjetoRelatorioDto> relatorios;
 
         try {
-//            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorio());
-            relatorios = null;
+            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorio(idUsuario));
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_GERAR_RELATORIO, ex);
             throw new DataProviderException(MENSAGEM_ERRO_GERAR_RELATORIO, ex.getCause());
@@ -88,12 +88,11 @@ public class ClienteDataProvider implements ClienteGateway {
     }
 
     @Override
-    public List<RelatorioContatoDto> getRelatorioContatoSegundaFeira() {
-        List<RelatorioContatoDto> relatorios;
+    public List<ObjetoRelatorioDto> getRelatorioContatoSegundaFeira(UUID idUsuario) {
+        List<ObjetoRelatorioDto> relatorios;
 
         try {
-//            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorioSegundaFeira());
-            relatorios = null;
+            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorioSegundaFeira(idUsuario));
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_GERAR_RELATORIO_SEGUNDA_FEIRA, ex);
             throw new DataProviderException(MENSAGEM_ERRO_GERAR_RELATORIO_SEGUNDA_FEIRA, ex.getCause());

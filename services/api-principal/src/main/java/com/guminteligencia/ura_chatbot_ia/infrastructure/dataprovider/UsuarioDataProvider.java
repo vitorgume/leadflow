@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ public class UsuarioDataProvider implements UsuarioGateway {
     private final String MENSAGEM_ERRO_CONSULTAR_POR_EMAIL = "Erro ao consultar usuário pelo email.";
     private final String MENSAGEM_ERRO_DELETAR = "Erro ao deletar usuário.";
     private final String MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE_CONECTADO = "Erro ao consultar usuário pelo telefone conectado.";
+    private final String MENSAGEM_ERRO_LISTAR = "Erro ao listar todos os usuários.";
 
     @Override
     public Optional<Usuario> consultarPorId(UUID id) {
@@ -80,6 +82,20 @@ public class UsuarioDataProvider implements UsuarioGateway {
         }
 
         return usuarioEntity.map(UsuarioMapper::paraDomain);
+    }
+
+    @Override
+    public List<Usuario> listar() {
+        List<UsuarioEntity> usuarioEntities;
+
+        try {
+            usuarioEntities = repository.findAll();
+        } catch (Exception ex) {
+            log.error(MENSAGEM_ERRO_LISTAR, ex);
+            throw new DataProviderException(MENSAGEM_ERRO_LISTAR, ex.getCause());
+        }
+
+        return usuarioEntities.stream().map(UsuarioMapper::paraDomain).toList();
     }
 
     @Override

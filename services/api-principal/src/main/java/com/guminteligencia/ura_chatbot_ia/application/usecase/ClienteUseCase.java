@@ -5,6 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.application.gateways.ClienteGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ObjetoRelatorioDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -56,11 +57,11 @@ public class ClienteUseCase {
     }
 
 
-    public List<RelatorioContatoDto> getRelatorioSegundaFeira() {
-        return gateway.getRelatorioContato();
+    public List<ObjetoRelatorioDto> getRelatorioSegundaFeira(UUID idUsuario) {
+        return gateway.getRelatorioContato(idUsuario);
     }
 
-    public List<RelatorioContatoDto> getRelatorio() {
-        return gateway.getRelatorioContatoSegundaFeira();
+    public List<ObjetoRelatorioDto> getRelatorio(UUID idUsuario) {
+        return gateway.getRelatorioContatoSegundaFeira(idUsuario);
     }
 }
