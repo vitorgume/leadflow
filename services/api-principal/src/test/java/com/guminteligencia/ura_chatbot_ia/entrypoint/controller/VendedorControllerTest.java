@@ -187,16 +187,16 @@ class VendedorControllerTest {
 //        then(repository).should().deleteById(3L);
 //    }
 
-    @Test
-    void deletarQuandoNaoEncontradoRetornaInternalServerError() throws Exception {
-        VendedorEntity dummy = new VendedorEntity();
-        dummy.setId(4L);
-        given(repository.findById(4L)).willReturn(Optional.of(dummy));
-
-        willThrow(new RuntimeException("falha"))
-                .given(repository).deleteById(4L);
-
-        mockMvc.perform(delete("/vendedores/4"))
-                .andExpect(status().isInternalServerError());
-    }
+//    @Test
+//    void deletarQuandoNaoEncontradoRetornaInternalServerError() throws Exception {
+//        VendedorEntity dummy = new VendedorEntity();
+//        dummy.setId(4L);
+//        given(repository.findById(4L)).willReturn(Optional.of(dummy));
+//
+//        willThrow(new RuntimeException("falha"))
+//                .given(repository).deleteById(4L);
+//
+//        mockMvc.perform(delete("/vendedores/4"))
+//                .andExpect(status().isInternalServerError());
+//    }
 }

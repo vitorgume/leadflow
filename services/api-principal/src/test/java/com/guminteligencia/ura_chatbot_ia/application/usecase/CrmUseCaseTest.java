@@ -40,7 +40,7 @@ class CrmUseCaseTest {
     void setUp() {
         useCase = new CrmUseCase(
                 gateway,
-                "dev"
+                "prod"
         );
 
         conversaAgente = ConversaAgente.builder()

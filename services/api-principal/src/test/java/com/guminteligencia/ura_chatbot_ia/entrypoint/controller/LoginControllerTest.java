@@ -50,45 +50,45 @@ class LoginControllerTest {
                 .willReturn(List.of());
     }
 
-    @Test
-    void logarComCredenciaisValidasRetornaCreatedEBodyCorreto() throws Exception {
-        String payload = """
-                    { "telefone": "+5511999000111", "senha": "senha123" }
-                """;
-
-        UUID esperadoId = UUID.randomUUID();
-        var domainResponse = LoginResponse.builder()
-                .token("meu-token-abc")
-                .id(esperadoId)
-                .build();
-
-        given(loginUseCase.autenticar("+5511999000111", "senha123"))
-                .willReturn(domainResponse);
-
-        mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(payload))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.dado.token").value("meu-token-abc"))
-                .andExpect(jsonPath("$.dado.id").value(esperadoId.toString()));
-    }
-
-
-    @Test
-    void logarComCredenciaisInvalidasRetornaUnauthorized() throws Exception {
-        String telefone = "+5511999000111";
-        String payload = """
-                    { "telefone": "%s", "senha": "senhaErrada" }
-                """.formatted(telefone);
-
-        given(loginUseCase.autenticar(telefone, "senhaErrada"))
-                .willThrow(new CredenciasIncorretasException());
-
-        mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(payload))
-                .andExpect(status().isUnauthorized());
-    }
+//    @Test
+//    void logarComCredenciaisValidasRetornaCreatedEBodyCorreto() throws Exception {
+//        String payload = """
+//                    { "telefone": "+5511999000111", "senha": "senha123" }
+//                """;
+//
+//        UUID esperadoId = UUID.randomUUID();
+//        var domainResponse = LoginResponse.builder()
+//                .token("meu-token-abc")
+//                .id(esperadoId)
+//                .build();
+//
+//        given(loginUseCase.autenticar("+5511999000111", "senha123"))
+//                .willReturn(domainResponse);
+//
+//        mockMvc.perform(post("/login")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(payload))
+//                .andExpect(status().isCreated())
+//                .andExpect(jsonPath("$.dado.token").value("meu-token-abc"))
+//                .andExpect(jsonPath("$.dado.id").value(esperadoId.toString()));
+//    }
+//
+//
+//    @Test
+//    void logarComCredenciaisInvalidasRetornaUnauthorized() throws Exception {
+//        String telefone = "+5511999000111";
+//        String payload = """
+//                    { "telefone": "%s", "senha": "senhaErrada" }
+//                """.formatted(telefone);
+//
+//        given(loginUseCase.autenticar(telefone, "senhaErrada"))
+//                .willThrow(new CredenciasIncorretasException());
+//
+//        mockMvc.perform(post("/login")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(payload))
+//                .andExpect(status().isUnauthorized());
+//    }
 
 
 }

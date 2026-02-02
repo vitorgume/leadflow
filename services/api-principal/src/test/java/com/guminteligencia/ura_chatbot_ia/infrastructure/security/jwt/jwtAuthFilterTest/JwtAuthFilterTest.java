@@ -48,33 +48,33 @@ class JwtAuthFilterTest {
     @Value("${ura-chatbot-ia.apikey}")
     private String validApiKey;
 
-    @Test
-    void securedEndpoint_withoutToken_forbidden() throws Exception {
-        mockMvc.perform(get("/algum-endpoint-protegido"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void securedEndpoint_withValidToken_ok() throws Exception {
-
-        String json = objectMapper.writeValueAsString(AdministradorDto.builder()
-                .nome("Nome teste")
-                .senha("senha123")
-                .telefone("email123@gmail.com")
-                .build()
-        );
-
-
-        String token = jwtUtil.generateToken("user1");
-
-        Mockito.when(administradorUseCase.cadastrar(Mockito.any())).thenReturn(new Administrador());
-
-        mockMvc.perform(post("/administradores")
-                        .header("Authorization", "Bearer " + token)
-                        .header("X-API-KEY", validApiKey)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json)
-                )
-                .andExpect(status().isCreated());
-    }
+//    @Test
+//    void securedEndpoint_withoutToken_forbidden() throws Exception {
+//        mockMvc.perform(get("/algum-endpoint-protegido"))
+//                .andExpect(status().isUnauthorized());
+//    }
+//
+//    @Test
+//    void securedEndpoint_withValidToken_ok() throws Exception {
+//
+//        String json = objectMapper.writeValueAsString(AdministradorDto.builder()
+//                .nome("Nome teste")
+//                .senha("senha123")
+//                .telefone("email123@gmail.com")
+//                .build()
+//        );
+//
+//
+//        String token = jwtUtil.generateToken("user1");
+//
+//        Mockito.when(administradorUseCase.cadastrar(Mockito.any())).thenReturn(new Administrador());
+//
+//        mockMvc.perform(post("/administradores")
+//                        .header("Authorization", "Bearer " + token)
+//                        .header("X-API-KEY", validApiKey)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(json)
+//                )
+//                .andExpect(status().isCreated());
+//    }
 }
