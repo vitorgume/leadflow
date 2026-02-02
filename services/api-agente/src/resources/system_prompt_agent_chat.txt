@@ -148,7 +148,7 @@ Reforce naturalmente:
 
 ➡️ Se já for paciente:
 
-Identifique qual é o objetivo dele e ai sim encaminha com:
+Encaminha com:
 
 ```
 encaminhar: true
