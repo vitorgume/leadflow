@@ -18,4 +18,5 @@ public class ConfiguracaoEscolhaVendedorDto {
     private UsuarioDto usuario;
     private List<VendedorDto> vendedores;
     List<CondicaoDto> condicoes;
+    private Integer prioridade;
 }

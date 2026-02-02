@@ -16,10 +16,12 @@ public class ConfiguracaoEscolhaVendedor {
     private Usuario usuario;
     private List<Vendedor> vendedores;
     List<Condicao> condicoes;
+    private Integer prioridade;
 
     public void setDados(ConfiguracaoEscolhaVendedor configuracaoEscolhaVendedor) {
         this.usuario = configuracaoEscolhaVendedor.getUsuario();
         this.vendedores = configuracaoEscolhaVendedor.getVendedores();
         this.condicoes = configuracaoEscolhaVendedor.getCondicoes();
+        this.prioridade = configuracaoEscolhaVendedor.getPrioridade();
     }
 }

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -39,6 +40,7 @@ public class EscolhaVendedorUseCase {
         }
 
         List<ConfiguracaoEscolhaVendedor> configuracoes = configuracaoEscolhaVendedorUseCase.listarPorUsuario(cliente.getUsuario().getId());
+        configuracoes.sort(Comparator.comparing(ConfiguracaoEscolhaVendedor::getPrioridade, Comparator.nullsLast(Integer::compareTo)));
 
         for (ConfiguracaoEscolhaVendedor configuracao : configuracoes) {
             if (avaliarCondicoes(cliente, configuracao.getCondicoes())) {

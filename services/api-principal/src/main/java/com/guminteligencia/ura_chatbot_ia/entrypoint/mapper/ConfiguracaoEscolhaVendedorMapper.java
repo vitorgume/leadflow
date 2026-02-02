@@ -13,6 +13,7 @@ public class ConfiguracaoEscolhaVendedorMapper {
                 .usuario(Usuario.builder().id(dto.getUsuario().getId()).build())
                 .vendedores(dto.getVendedores().stream().map(vendedorDto -> Vendedor.builder().id(vendedorDto.getId()).build()).toList())
                 .condicoes(dto.getCondicoes().stream().map(CondicaoMapper::paraDomain).toList())
+                .prioridade(dto.getPrioridade())
                 .build();
     }
 
@@ -22,6 +23,7 @@ public class ConfiguracaoEscolhaVendedorMapper {
                 .usuario(UsuarioMapper.paraDto(domain.getUsuario()))
                 .vendedores(domain.getVendedores().stream().map(VendedorMapper::paraDto).toList())
                 .condicoes(domain.getCondicoes().stream().map(CondicaoMapper::paraDto).toList())
+                .prioridade(domain.getPrioridade())
                 .build();
     }
 }
