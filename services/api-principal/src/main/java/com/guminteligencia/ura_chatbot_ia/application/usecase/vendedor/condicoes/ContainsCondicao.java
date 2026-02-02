@@ -13,9 +13,9 @@ public class ContainsCondicao implements CondicaoType {
     public boolean executar(Cliente cliente, Condicao condicao) {
         Map<String, Object> campos = cliente.getAtributosQualificacao();
 
-        Object valor = campos.get(condicao.getCampo());
+        Object valorCliente = campos.get(condicao.getCampo());
 
-        return valor.toString().contains(valor.toString());
+        return valorCliente.toString().contains(condicao.getValor());
     }
 
     @Override

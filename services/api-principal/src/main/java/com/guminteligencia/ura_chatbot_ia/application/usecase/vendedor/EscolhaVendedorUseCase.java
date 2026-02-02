@@ -39,7 +39,7 @@ public class EscolhaVendedorUseCase {
             return vendedores.get(0);
         }
 
-        List<ConfiguracaoEscolhaVendedor> configuracoes = configuracaoEscolhaVendedorUseCase.listarPorUsuario(cliente.getUsuario().getId());
+        List<ConfiguracaoEscolhaVendedor> configuracoes = new ArrayList<>(configuracaoEscolhaVendedorUseCase.listarPorUsuario(cliente.getUsuario().getId()));
         configuracoes.sort(Comparator.comparing(ConfiguracaoEscolhaVendedor::getPrioridade, Comparator.nullsLast(Integer::compareTo)));
 
         for (ConfiguracaoEscolhaVendedor configuracao : configuracoes) {
