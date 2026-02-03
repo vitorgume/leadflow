@@ -3,7 +3,7 @@ import uuid
 from src.infrastructure.entity.conversa_entity import ConversaEntity
 from src.infrastructure.mapper.conversa_mapper import ConversaMapper
 from src.domain.conversa import Conversa
-from src.config.database import SessionLocal, Base
+from src.config.database import SessionLocal
 from src.infrastructure.exceptions.data_provider_exception import DataProviderException
 from sqlalchemy.exc import SQLAlchemyError
 import logging

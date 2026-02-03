@@ -11,10 +11,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -41,6 +43,7 @@ class VendedorDataProviderTest {
     private VendedorEntity entityOut;
     private Vendedor domainIn;
     private Vendedor domainOut;
+    private final UUID ID_USUARIO = UUID.randomUUID();
 
     @BeforeEach
     void setup() {
@@ -89,24 +92,24 @@ class VendedorDataProviderTest {
         List<VendedorEntity> raw = List.of(entityIn);
         List<Vendedor> domList = List.of(domainOut);
 
-        when(repository.findAll()).thenReturn(raw);
+        when(repository.findByUsuario_Id(Mockito.any())).thenReturn(raw);
         try (MockedStatic<VendedorMapper> ms = mockStatic(VendedorMapper.class)) {
             ms.when(() -> VendedorMapper.paraDomain(entityIn)).thenReturn(domainOut);
 
-            List<Vendedor> result = provider.listarPorUsuario();
+            List<Vendedor> result = provider.listarPorUsuario(ID_USUARIO);
             assertEquals(domList, result);
 
-            verify(repository).findAll();
+            verify(repository).findByUsuario_Id(Mockito.any());
             ms.verify(() -> VendedorMapper.paraDomain(entityIn));
         }
     }
 
     @Test
     void deveLancarExceptionAoListarPorUsuario() {
-        when(repository.findAll()).thenThrow(new RuntimeException("fail-list"));
+        when(repository.findByUsuario_Id(Mockito.any())).thenThrow(new RuntimeException("fail-list"));
         DataProviderException ex = assertThrows(
                 DataProviderException.class,
-                () -> provider.listarPorUsuario()
+                () -> provider.listarPorUsuario(Mockito.any())
         );
         assertEquals(ERR_LIST, ex.getMessage());
     }

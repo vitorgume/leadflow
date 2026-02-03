@@ -24,7 +24,6 @@ public class RelatorioMapper {
                         .telefone(proj.getTelefone())
                         .atributos_qualificacao(parseJsonToMap(proj.getAtributosQualificacao()))
                         .nome_vendedor(proj.getNomeVendedor())
-                        // .toString() se o DTO esperar String, ou mude o DTO para LocalDateTime também
                         .data_criacao(proj.getDataCriacao())
                         .build()
         ).toList();

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship
-from src.config.database import Base
+from src.config.base_class import Base
 from sqlalchemy.dialects.mysql import BINARY
 
 class MensagemConversaEntity(Base):

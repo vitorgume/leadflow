@@ -12,5 +12,5 @@ class BaseConhecimentoUsuarioMapper:
                 id=str(uuid.UUID(bytes=base_conhecimento_usuario_entity.id)),
                 id_usuario = str(uuid.UUID(bytes=base_conhecimento_usuario_entity.id_usuario)),
                 titulo=base_conhecimento_usuario_entity.titulo,
-                conteudo=base_conhecimento_usuario_entity.prompt
+                conteudo=base_conhecimento_usuario_entity.conteudo
             )

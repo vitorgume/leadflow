@@ -109,7 +109,7 @@ class AgenteUseCase:
         conteudo_historico = texto_base
         if imagens_data_uri:
             complemento = f"[{len(imagens_data_uri)} imagem(ns) anexada(s)]"
-            conteudo_historico = f"{texto_base}\n\n{complemento}" if texto_base else complemento
+            conteudo_historico = f"{texto_base}\n\n{complemento}" if texto_base else f"\n\n{complemento}"
 
         # --- CONTEÚDO PARA O MODELO --------------------------------
         if imagens_data_uri:

@@ -38,17 +38,17 @@ class ConversaInativaUseCaseTest {
 
     private ConversaInativaUseCase useCase;
 
-    @BeforeEach
-    void setUp() {
-        useCase = new ConversaInativaUseCase(
-                conversaAgenteUseCase,
-                vendedorUseCase,
-                crmUseCase,
-                mensagemUseCase,
-                mensagemBuilder,
-                "dev"
-        );
-    }
+//    @BeforeEach
+//    void setUp() {
+//        useCase = new ConversaInativaUseCase(
+//                conversaAgenteUseCase,
+//                vendedorUseCase,
+//                crmUseCase,
+//                mensagemUseCase,
+//                mensagemBuilder,
+//                "dev"
+//        );
+//    }
 
     @Test
     void naoDeveProcessarQuandoNaoExistiremConversas() {

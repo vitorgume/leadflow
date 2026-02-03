@@ -14,7 +14,7 @@ def client():
 
     # Stubs
     fake_msg_uc  = SimpleNamespace(processar_mensagem=lambda md: {"reply": f"Echo: {md.message}"})
-    fake_json_uc = SimpleNamespace(transformar=lambda s: {"json": s.upper()})
+    fake_json_uc = SimpleNamespace(transformar=lambda s: {"json": s.mensagem.upper()})
 
     # Override
     app.dependency_overrides[get_mensagem_use_case] = lambda: fake_msg_uc
@@ -47,7 +47,7 @@ def test_chat_endpoint_missing_field(client):
     assert response.status_code == 422
 
 def test_chat_json_endpoint_success(client):
-    payload = {"mensagem": "testando json"}
+    payload = {"id_usuario": "user-123", "mensagem": "testando json"}
     response = client.post("/chat/json", json=payload)
     assert response.status_code == 200
     assert response.json() == {"json": "TESTANDO JSON"}

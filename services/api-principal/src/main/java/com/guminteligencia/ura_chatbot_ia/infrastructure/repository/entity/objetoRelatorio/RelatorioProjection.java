@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public interface RelatorioProjection {
     String getNome();
     String getTelefone();
-    String getAtributosQualificacao(); // O Driver do MySQL costuma entregar JSON como String, então aqui ok
-    LocalDateTime getDataCriacao();    // <--- AQUI A MÁGICA: O Spring converte o Timestamp do banco pra cá
+    String getAtributosQualificacao();
+    LocalDateTime getDataCriacao();
     String getNomeVendedor();
 }

@@ -2,8 +2,9 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.ClienteNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.ClienteGateway;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ObjetoRelatorioDto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,13 +26,17 @@ class ClienteUseCaseTest {
 
     @Mock
     private ClienteGateway gateway;
+    @Mock
+    private UsuarioUseCase usuarioUseCase;
 
     @InjectMocks
     private ClienteUseCase useCase;
 
     private final String telefone = "+5511999000111";
+    private final String telefoneUsuario = "5511999999999";
     private UUID idCliente;
     private Cliente clienteSalvo;
+    private Usuario usuario;
 
     @BeforeEach
     void setup() {
@@ -40,30 +45,38 @@ class ClienteUseCaseTest {
                 .id(idCliente)
                 .telefone(telefone)
                 .build();
+
+        usuario = Usuario.builder()
+                .id(UUID.randomUUID())
+                .telefone(telefoneUsuario)
+                .build();
     }
 
     @Test
     void deveDelegarConsultarPorTelefone() {
-        when(gateway.consultarPorTelefone(telefone))
+        when(usuarioUseCase.consultarPorTelefoneConectado(telefoneUsuario)).thenReturn(usuario);
+        when(gateway.consultarPorTelefoneEUsuario(telefone, usuario.getId()))
                 .thenReturn(Optional.of(clienteSalvo));
 
-        Optional<Cliente> resultado = useCase.consultarPorTelefone(telefone);
+        Optional<Cliente> resultado = useCase.consultarPorTelefoneEUsuario(telefone, telefoneUsuario);
 
         assertTrue(resultado.isPresent());
         assertSame(clienteSalvo, resultado.get());
-        verify(gateway).consultarPorTelefone(telefone);
+        verify(gateway).consultarPorTelefoneEUsuario(telefone, usuario.getId());
     }
 
     @Test
     void deveCadastrarClienteComTelefone() {
+        when(usuarioUseCase.consultarPorTelefoneConectado(telefoneUsuario)).thenReturn(usuario);
         when(gateway.salvar(any(Cliente.class))).thenReturn(clienteSalvo);
 
-        Cliente resultado = useCase.cadastrar(telefone);
+        Cliente resultado = useCase.cadastrar(telefone, telefoneUsuario);
 
         assertSame(clienteSalvo, resultado);
         ArgumentCaptor<Cliente> cap = ArgumentCaptor.forClass(Cliente.class);
         verify(gateway).salvar(cap.capture());
         assertEquals(telefone, cap.getValue().getTelefone());
+        assertEquals(usuario, cap.getValue().getUsuario());
     }
 
     @Test
@@ -103,24 +116,24 @@ class ClienteUseCaseTest {
 
     @Test
     void deveRetornarRelatorioSegundaFeiraDelegandoAoGateway() {
-        List<RelatorioContatoDto> rel = List.of(mock(RelatorioContatoDto.class));
-        when(gateway.getRelatorioContato()).thenReturn(rel);
+        List<ObjetoRelatorioDto> rel = List.of(mock(ObjetoRelatorioDto.class));
+        when(gateway.getRelatorioContato(usuario.getId())).thenReturn(rel);
 
-        List<RelatorioContatoDto> resultado = useCase.getRelatorioSegundaFeira();
+        List<ObjetoRelatorioDto> resultado = useCase.getRelatorioSegundaFeira(usuario.getId());
 
         assertSame(rel, resultado);
-        verify(gateway).getRelatorioContato();
+        verify(gateway).getRelatorioContato(usuario.getId());
     }
 
     @Test
     void deveRetornarRelatorioDelegandoAoGateway() {
-        List<RelatorioContatoDto> rel = List.of(mock(RelatorioContatoDto.class));
-        when(gateway.getRelatorioContatoSegundaFeira()).thenReturn(rel);
+        List<ObjetoRelatorioDto> rel = List.of(mock(ObjetoRelatorioDto.class));
+        when(gateway.getRelatorioContatoSegundaFeira(usuario.getId())).thenReturn(rel);
 
-        List<RelatorioContatoDto> resultado = useCase.getRelatorio();
+        List<ObjetoRelatorioDto> resultado = useCase.getRelatorio(usuario.getId());
 
         assertSame(rel, resultado);
-        verify(gateway).getRelatorioContatoSegundaFeira();
+        verify(gateway).getRelatorioContatoSegundaFeira(usuario.getId());
     }
 
 }

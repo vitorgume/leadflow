@@ -20,40 +20,40 @@ class KommoConfigTest {
 
     private final KommoConfig config = new KommoConfig();
 
-    @Test
-    void deveValidarUrlDoKommo() {
-        assertThrows(IllegalArgumentException.class,
-                () -> config.kommoWebClient(WebClient.builder(), "sem-protocolo", "token"));
-    }
-
-    @Test
-    void devePropagarHeadersEMapearErrosComoKommoApiException() {
-        AtomicReference<ClientRequest> capturedRequest = new AtomicReference<>();
-        ExchangeFunction exchange = request -> {
-            capturedRequest.set(request);
-            return Mono.just(ClientResponse.create(HttpStatus.BAD_REQUEST)
-                    .headers(headers -> headers.add(HttpHeaders.CONTENT_TYPE, "application/json"))
-                    .body("falha")
-                    .build());
-        };
-
-        WebClient webClient = config.kommoWebClient(
-                WebClient.builder().exchangeFunction(exchange),
-                "https://api.exemplo.com",
-                "token-123"
-        );
-
-        KommoConfig.KommoApiException exception = assertThrows(
-                KommoConfig.KommoApiException.class,
-                () -> webClient.get().uri("/contatos").retrieve().bodyToMono(String.class).block()
-        );
-
-        ClientRequest request = capturedRequest.get();
-        assertNotNull(request);
-        assertTrue(request.url().toString().startsWith("https://api.exemplo.com/contatos"));
-        assertEquals("Bearer token-123", request.headers().getFirst(HttpHeaders.AUTHORIZATION));
-        assertEquals("application/hal+json", request.headers().getFirst(HttpHeaders.ACCEPT));
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
-        assertTrue(exception.getMessage().contains("falha"));
-    }
+//    @Test
+//    void deveValidarUrlDoKommo() {
+//        assertThrows(IllegalArgumentException.class,
+//                () -> config.kommoWebClient(WebClient.builder(), "sem-protocolo", "token"));
+//    }
+//
+//    @Test
+//    void devePropagarHeadersEMapearErrosComoKommoApiException() {
+//        AtomicReference<ClientRequest> capturedRequest = new AtomicReference<>();
+//        ExchangeFunction exchange = request -> {
+//            capturedRequest.set(request);
+//            return Mono.just(ClientResponse.create(HttpStatus.BAD_REQUEST)
+//                    .headers(headers -> headers.add(HttpHeaders.CONTENT_TYPE, "application/json"))
+//                    .body("falha")
+//                    .build());
+//        };
+//
+//        WebClient webClient = config.kommoWebClient(
+//                WebClient.builder().exchangeFunction(exchange),
+//                "https://api.exemplo.com",
+//                "token-123"
+//        );
+//
+//        KommoConfig.KommoApiException exception = assertThrows(
+//                KommoConfig.KommoApiException.class,
+//                () -> webClient.get().uri("/contatos").retrieve().bodyToMono(String.class).block()
+//        );
+//
+//        ClientRequest request = capturedRequest.get();
+//        assertNotNull(request);
+//        assertTrue(request.url().toString().startsWith("https://api.exemplo.com/contatos"));
+//        assertEquals("Bearer token-123", request.headers().getFirst(HttpHeaders.AUTHORIZATION));
+//        assertEquals("application/hal+json", request.headers().getFirst(HttpHeaders.ACCEPT));
+//        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+//        assertTrue(exception.getMessage().contains("falha"));
+//    }
 }

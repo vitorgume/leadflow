@@ -2,23 +2,24 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ObjetoRelatorioDto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.ClienteMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.RelatorioMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.ClienteRepository;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ClienteEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.objetoRelatorio.RelatorioProjection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -45,6 +46,8 @@ class ClienteDataProviderTest {
     private UUID id;
     private String telefone;
 
+    private List<ObjetoRelatorioDto> dtoList;
+
     @BeforeEach
     void setup() {
         entityIn = mock(ClienteEntity.class);
@@ -53,6 +56,22 @@ class ClienteDataProviderTest {
         domainOut = mock(Cliente.class);
         id = UUID.randomUUID();
         telefone = "+5511999999999";
+        dtoList = new ArrayList<>(List.of(
+                ObjetoRelatorioDto.builder()
+                        .nome("Nome teste")
+                        .telefone("telefone teste")
+                        .atributos_qualificacao(Map.of("teste", "teste1", "teste2", "teste2"))
+                        .data_criacao(LocalDateTime.now())
+                        .nome_vendedor("VendedorTeste")
+                        .build(),
+                ObjetoRelatorioDto.builder()
+                        .nome("Nome teste 2")
+                        .telefone("telefone teste 2")
+                        .atributos_qualificacao(Map.of("teste", "teste1", "teste2", "teste2"))
+                        .data_criacao(LocalDateTime.now())
+                        .nome_vendedor("VendedorTeste2")
+                        .build()
+        ));
     }
 
     @Test
@@ -172,30 +191,34 @@ class ClienteDataProviderTest {
 
     @Test
     void deveRetornarRelatoriosDeContatosComSucesso() {
-        List<Object[]> raw = Collections.singletonList(new Object[0]);
-        List<RelatorioContatoDto> dtoList = List.of(mock(RelatorioContatoDto.class));
+        RelatorioProjection projectionMock = mock(RelatorioProjection.class);
 
-        when(repository.gerarRelatorio()).thenReturn(raw);
+        List<RelatorioProjection> raw = List.of(projectionMock);
+
+        when(repository.gerarRelatorio(id)).thenReturn(raw);
+
         try (MockedStatic<RelatorioMapper> ms = mockStatic(RelatorioMapper.class)) {
-            ms.when(() -> RelatorioMapper.paraDto(raw))
-                    .thenReturn(dtoList);
 
-            List<RelatorioContatoDto> result = provider.getRelatorioContato();
+            ms.when(() -> RelatorioMapper.paraDto(raw)).thenReturn(dtoList);
+
+            List<ObjetoRelatorioDto> result = provider.getRelatorioContato(id);
+
+            assertNotNull(result);
             assertSame(dtoList, result);
 
-            verify(repository).gerarRelatorio();
+            verify(repository).gerarRelatorio(id);
             ms.verify(() -> RelatorioMapper.paraDto(raw));
         }
     }
 
     @Test
     void deveLancarExceptionAoRetornarRelatorioDeContatos() {
-        when(repository.gerarRelatorio())
+        when(repository.gerarRelatorio(Mockito.any()))
                 .thenThrow(new RuntimeException("fail-rel"));
 
         DataProviderException ex = assertThrows(
                 DataProviderException.class,
-                () -> provider.getRelatorioContato()
+                () -> provider.getRelatorioContato(Mockito.any())
         );
         assertEquals(ERR_REL, ex.getMessage());
     }
@@ -203,30 +226,34 @@ class ClienteDataProviderTest {
 
     @Test
     void deveRetornaRelatorioDeContatosDeSegundaFeira() {
-        List<Object[]> raw = Collections.singletonList(new Object[0]);
-        List<RelatorioContatoDto> dtoList = List.of(mock(RelatorioContatoDto.class));
+        RelatorioProjection projectionMock = mock(RelatorioProjection.class);
 
-        when(repository.gerarRelatorioSegundaFeira()).thenReturn(raw);
+        List<RelatorioProjection> raw = List.of(projectionMock);
+
+        when(repository.gerarRelatorioSegundaFeira(id)).thenReturn(raw);
+
         try (MockedStatic<RelatorioMapper> ms = mockStatic(RelatorioMapper.class)) {
-            ms.when(() -> RelatorioMapper.paraDto(raw))
-                    .thenReturn(dtoList);
 
-            List<RelatorioContatoDto> result = provider.getRelatorioContatoSegundaFeira();
+            ms.when(() -> RelatorioMapper.paraDto(raw)).thenReturn(dtoList);
+
+            List<ObjetoRelatorioDto> result = provider.getRelatorioContatoSegundaFeira(id);
+
+            assertNotNull(result);
             assertSame(dtoList, result);
 
-            verify(repository).gerarRelatorioSegundaFeira();
+            verify(repository).gerarRelatorioSegundaFeira(id);
             ms.verify(() -> RelatorioMapper.paraDto(raw));
         }
     }
 
     @Test
     void deveLancarExceptionAoRetornarRelatorioDeContatosDeSegundaFeira() {
-        when(repository.gerarRelatorioSegundaFeira())
+        when(repository.gerarRelatorioSegundaFeira(Mockito.any()))
                 .thenThrow(new RuntimeException("fail-rel2"));
 
         DataProviderException ex = assertThrows(
                 DataProviderException.class,
-                () -> provider.getRelatorioContatoSegundaFeira()
+                () -> provider.getRelatorioContatoSegundaFeira(Mockito.any())
         );
         assertEquals(ERR_REL2, ex.getMessage());
     }

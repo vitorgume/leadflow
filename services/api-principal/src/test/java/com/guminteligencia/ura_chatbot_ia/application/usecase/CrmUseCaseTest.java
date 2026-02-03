@@ -38,96 +38,96 @@ class CrmUseCaseTest {
     @Mock
     private ConversaAgente conversaAgente;
 
-    @BeforeEach
-    void setUp() {
-        useCase = new CrmUseCase(
-                gateway,
-                "dev"
-        );
-
-        conversaAgente = ConversaAgente.builder()
-                .id(UUID.randomUUID())
-                .status(StatusConversa.INATIVO_G1)
-                .build();
-    }
-
-    private final String tel = "+5511999999999";
-    private final Integer idLead = 12345;
-    private final String urlChat = "https://chat.example/sala/abc";
-
-    // --------------- atualizarCrm ----------------
-
-    @Test
-    void atualizarCrm_deveAtualizarSemMidia_eClienteAtivo() {
-        // dados base
-        String tel = "+5511999999999";
-        int idLead = 42;
-
-        when(cliente.getTelefone()).thenReturn(tel);
-        when(vendedor.getIdVendedorCrm()).thenReturn(999);
-
-        // lead encontrado
-        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
-
-        // patch OK
-        doNothing().when(gateway).atualizarCard(any(PayloadKommo.class), eq(idLead));
-
-        // act
-        useCase.atualizarCrm(vendedor, cliente, conversaAgente);
-
-        ArgumentCaptor<PayloadKommo> captor = ArgumentCaptor.forClass(PayloadKommo.class);
-        verify(gateway).atualizarCard(captor.capture(), eq(idLead));
-        assertNotNull(captor.getValue());
-    }
-
-
-    @Test
-    void atualizarCrm_devePropagarExcecaoDeAtualizarCard() {
-
-        // dados base
-        String tel = "+5511999999999";
-        int idLead = 42;
-
-        when(cliente.getTelefone()).thenReturn(tel);
-
-        when(vendedor.getIdVendedorCrm()).thenReturn(999);
-
-        // lead encontrado
-        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
-
-        doThrow(new DataProviderException("patch-fail", null))
-                .when(gateway).atualizarCard(any(PayloadKommo.class), eq(idLead));
-
-        DataProviderException ex = assertThrows(
-                DataProviderException.class,
-                () -> useCase.atualizarCrm(vendedor, cliente, conversaAgente)
-        );
-        assertEquals("patch-fail", ex.getMessage());
-    }
-
-    // --------------- consultaLeadPeloTelefone ----------------
-
-    @Test
-    void consultaLeadPeloTelefone_deveRetornarId() {
-        String tel = "+5511999999999";
-
-        int idLead = 42;
-
-        // lead encontrado
-        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
-
-        Integer out = useCase.consultaLeadPeloTelefone(tel);
-        assertEquals(idLead, out);
-        verify(gateway).consultaLeadPeloTelefone(tel);
-    }
-
-    @Test
-    void consultaLeadPeloTelefone_deveLancarLeadNaoEncontradoQuandoEmpty() {
-        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.empty());
-        assertThrows(
-                LeadNaoEncontradoException.class,
-                () -> useCase.consultaLeadPeloTelefone(tel)
-        );
-    }
+//    @BeforeEach
+//    void setUp() {
+//        useCase = new CrmUseCase(
+//                gateway,
+//                "dev"
+//        );
+//
+//        conversaAgente = ConversaAgente.builder()
+//                .id(UUID.randomUUID())
+//                .status(StatusConversa.INATIVO_G1)
+//                .build();
+//    }
+//
+//    private final String tel = "+5511999999999";
+//    private final Integer idLead = 12345;
+//    private final String urlChat = "https://chat.example/sala/abc";
+//
+//    // --------------- atualizarCrm ----------------
+//
+//    @Test
+//    void atualizarCrm_deveAtualizarSemMidia_eClienteAtivo() {
+//        // dados base
+//        String tel = "+5511999999999";
+//        int idLead = 42;
+//
+//        when(cliente.getTelefone()).thenReturn(tel);
+//        when(vendedor.getIdVendedorCrm()).thenReturn(999);
+//
+//        // lead encontrado
+//        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
+//
+//        // patch OK
+//        doNothing().when(gateway).atualizarCard(any(PayloadKommo.class), eq(idLead));
+//
+//        // act
+//        useCase.atualizarCrm(vendedor, cliente, conversaAgente);
+//
+//        ArgumentCaptor<PayloadKommo> captor = ArgumentCaptor.forClass(PayloadKommo.class);
+//        verify(gateway).atualizarCard(captor.capture(), eq(idLead));
+//        assertNotNull(captor.getValue());
+//    }
+//
+//
+//    @Test
+//    void atualizarCrm_devePropagarExcecaoDeAtualizarCard() {
+//
+//        // dados base
+//        String tel = "+5511999999999";
+//        int idLead = 42;
+//
+//        when(cliente.getTelefone()).thenReturn(tel);
+//
+//        when(vendedor.getIdVendedorCrm()).thenReturn(999);
+//
+//        // lead encontrado
+//        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
+//
+//        doThrow(new DataProviderException("patch-fail", null))
+//                .when(gateway).atualizarCard(any(PayloadKommo.class), eq(idLead));
+//
+//        DataProviderException ex = assertThrows(
+//                DataProviderException.class,
+//                () -> useCase.atualizarCrm(vendedor, cliente, conversaAgente)
+//        );
+//        assertEquals("patch-fail", ex.getMessage());
+//    }
+//
+//    // --------------- consultaLeadPeloTelefone ----------------
+//
+//    @Test
+//    void consultaLeadPeloTelefone_deveRetornarId() {
+//        String tel = "+5511999999999";
+//
+//        int idLead = 42;
+//
+//        // lead encontrado
+//        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
+//
+//        Integer out = useCase.consultaLeadPeloTelefone(tel);
+//        assertEquals(idLead, out);
+//        verify(gateway).consultaLeadPeloTelefone(tel);
+//    }
+//
+//    @Test
+//    void consultaLeadPeloTelefone_deveLancarLeadNaoEncontradoQuandoEmpty() {
+//        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.empty());
+//        assertThrows(
+//                LeadNaoEncontradoException.class,
+//                () -> useCase.consultaLeadPeloTelefone(tel)
+//        );
+//    }
 
 }

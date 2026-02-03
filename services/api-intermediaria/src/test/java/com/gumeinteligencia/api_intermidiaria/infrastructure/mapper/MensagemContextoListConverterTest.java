@@ -1,5 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.mapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gumeinteligencia.api_intermidiaria.domain.MensagemContexto;
@@ -11,11 +12,8 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class MensagemContextoListConverterTest {
 
@@ -138,5 +136,21 @@ class MensagemContextoListConverterTest {
     @Test
     void typeDeveRetornarListaDeMensagemContexto() {
         assertEquals(EnhancedType.listOf(MensagemContexto.class), converter.type());
+    }
+
+    @Test
+    void transformFromDeveLancarRuntimeExceptionQuandoJsonProcessingExceptionOcorre() throws Exception {
+        ObjectMapper mockMapper = mock(ObjectMapper.class);
+        when(mockMapper.writeValueAsString(any())).thenThrow(new JsonProcessingException("Test exception") {});
+
+        MensagemContextoListConverter failingConverter = new MensagemContextoListConverter(mockMapper);
+        List<MensagemContexto> mensagens = List.of(MensagemContexto.builder().mensagem("test").build());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            failingConverter.transformFrom(mensagens);
+        });
+
+        assertEquals("Erro convertendo lista de MensagemContexto para JSON", exception.getMessage());
+        assertTrue(exception.getCause() instanceof JsonProcessingException);
     }
 }

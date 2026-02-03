@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -46,21 +47,25 @@ class ValidadorTempoEsperaTest {
 
     final String tel = "+5511999000111";
 
+    private final String TELEFONE_USUARIO = "+5511999000112";
+
     @BeforeEach
     void setup() {
+
         when(ctx.getTelefone()).thenReturn(tel);
+        when(ctx.getTelefoneUsuario()).thenReturn(TELEFONE_USUARIO);
     }
 
     @Test
     void deveRetornarFalseSeClienteNaoEncontrado() {
-        when(clienteUseCase.consultarPorTelefone(tel)).thenReturn(Optional.empty());
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel, TELEFONE_USUARIO)).thenReturn(Optional.empty());
         assertTrue(validadorTempoEspera.permitirProcessar(ctx));
         verifyNoInteractions(conversaAgenteUseCase, mensageriaUseCase);
     }
 
     @Test
     void deveRetornaFalseConversaNaoFinalizada() {
-        when(clienteUseCase.consultarPorTelefone(tel)).thenReturn(Optional.of(cliente));
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel, TELEFONE_USUARIO)).thenReturn(Optional.of(cliente));
         when(conversaAgenteUseCase.consultarPorCliente(cliente.getId()))
                 .thenReturn(conv);
         when(conv.getFinalizada()).thenReturn(false);
@@ -71,7 +76,7 @@ class ValidadorTempoEsperaTest {
 
     @Test
     void deveRetornarFalseEDeletarMensagemSeEstiverDentroDos30minutos() {
-        when(clienteUseCase.consultarPorTelefone(tel)).thenReturn(Optional.of(cliente));
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel, TELEFONE_USUARIO)).thenReturn(Optional.of(cliente));
         when(conversaAgenteUseCase.consultarPorCliente(cliente.getId()))
                 .thenReturn(conv);
 
@@ -88,7 +93,7 @@ class ValidadorTempoEsperaTest {
 
     @Test
     void deveRetornarTrueNaoDeletarSeMensagemDepois30minutos() {
-        when(clienteUseCase.consultarPorTelefone(tel)).thenReturn(Optional.of(cliente));
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel, TELEFONE_USUARIO)).thenReturn(Optional.of(cliente));
         when(conversaAgenteUseCase.consultarPorCliente(cliente.getId()))
                 .thenReturn(conv);
 

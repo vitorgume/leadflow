@@ -1,7 +1,7 @@
 
 from sqlalchemy import Column, String, BINARY, TEXT, INTEGER
 
-from src.config.database import Base
+from src.config.base_class import Base
 
 
 class PromptUsuarioEntity(Base):

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, BINARY, JSON, String
 
-from src.config.database import Base
+from src.config.base_class import Base
 
 
 class UsuarioEntity(Base):

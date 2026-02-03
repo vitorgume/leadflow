@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, BINARY, TEXT
 
-from src.config.database import Base
+from src.config.base_class import Base
 
 class BaseConhecimentoUsuarioEntity(Base):
     __tablename__ = "base_conhecimento_usuarios"

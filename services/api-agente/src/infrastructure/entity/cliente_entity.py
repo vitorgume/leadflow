@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Boolean, SmallInteger
 from sqlalchemy.dialects.mysql import BINARY, JSON
-from src.config.database import Base
+from src.config.base_class import Base
 
 class ClienteEntity(Base):
     __tablename__ = "clientes"

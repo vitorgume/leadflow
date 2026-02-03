@@ -26,6 +26,7 @@ public class ContextoDataProvider implements ContextoGateway {
 
     private final ContextoRepository repository;
     private final DynamoDbClient dynamoDbClient;
+    private final MensagemContextoListConverter mensagemContextoListConverter = new MensagemContextoListConverter();
     private final String MENSAGEM_ERRO_CONSULTAR_CONTEXTO_PELO_TELEFONE_E_ATIVO = "Erro ao consultar contexto pelo seu telefone e ativo.";
     private final String MENSAGEM_ERRO_SALVAR_CONTEXTO = "Erro ao salvar contexto.";
 
@@ -76,7 +77,7 @@ public class ContextoDataProvider implements ContextoGateway {
 
     private ContextoEntity converterParaContextoEntity(Map<String, AttributeValue> item) {
         List<MensagemContexto> mensagens = Optional.ofNullable(item.get("mensagens"))
-                .map(MensagemContextoListConverter::fromAttributeValue)
+                .map(mensagemContextoListConverter::fromAttributeValue)
                 .orElseGet(Collections::emptyList);
 
         StatusContexto status = Optional.ofNullable(item.get("status"))
