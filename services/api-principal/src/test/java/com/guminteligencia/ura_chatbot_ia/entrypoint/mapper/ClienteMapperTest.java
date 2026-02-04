@@ -6,6 +6,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.domain.ConfiguracaoCrm;
+import com.guminteligencia.ura_chatbot_ia.domain.CrmType;
+
 import java.util.UUID;
 
 class ClienteMapperTest {
@@ -19,6 +23,10 @@ class ClienteMapperTest {
                 .nome("Nome teste")
                 .telefone("5544998748377")
                 .inativo(false)
+                .usuario(Usuario.builder()
+                        .id(UUID.randomUUID())
+                        .configuracaoCrm(ConfiguracaoCrm.builder().crmType(CrmType.KOMMO).build())
+                        .build()) // Added dummy Usuario with ConfiguracaoCrm
                 .build();
     }
 

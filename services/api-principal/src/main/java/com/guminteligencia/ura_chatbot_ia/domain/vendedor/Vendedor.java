@@ -9,6 +9,7 @@ import lombok.*;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
 public class Vendedor {
     private Long id;
     private String nome;

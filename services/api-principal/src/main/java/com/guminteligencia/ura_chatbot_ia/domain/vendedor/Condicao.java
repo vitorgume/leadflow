@@ -10,6 +10,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
 public class Condicao {
     private UUID id;
     private String campo;

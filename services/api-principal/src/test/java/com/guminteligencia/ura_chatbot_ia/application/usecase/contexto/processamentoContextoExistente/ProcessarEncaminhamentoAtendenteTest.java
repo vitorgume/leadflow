@@ -3,18 +3,18 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processa
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,7 +29,7 @@ class ProcessarEncaminhamentoAtendenteTest {
     @Mock
     private MensagemBuilder mensagemBuilder;
     @Mock
-    private VendedorUseCase vendedorUseCase;
+    private EscolhaVendedorUseCase escolhaVendedorUseCase;
 
     @InjectMocks
     private ProcessarEncaminhamentoAtendente processador;
@@ -37,17 +37,18 @@ class ProcessarEncaminhamentoAtendenteTest {
     @Test
     void deveEncaminharParaAtendenteEAjustarConversa() {
         Vendedor vendedor = Vendedor.builder().id(10L).telefone("+5500").build();
+        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5511").usuario(Usuario.builder().id(UUID.randomUUID()).build()).build();
         ConversaAgente conversa = ConversaAgente.builder()
-                .cliente(Cliente.builder().id(UUID.randomUUID()).telefone("+5511").build())
+                .cliente(cliente)
                 .finalizada(false)
                 .status(StatusConversa.ANDAMENTO)
                 .build();
 
-        when(vendedorUseCase.consultarVendedorPadrao()).thenReturn(vendedor);
+        when(escolhaVendedorUseCase.escolherVendedor(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, null, null))
                 .thenReturn("msg");
 
-        processador.processar("encaminhar:true", conversa, conversa.getCliente());
+        processador.processar("encaminhar:true", conversa, cliente);
 
         verify(mensagemUseCase).enviarContato(vendedor, conversa.getCliente());
         verify(mensagemUseCase).enviarMensagem("msg", conversa.getCliente().getTelefone(), false);

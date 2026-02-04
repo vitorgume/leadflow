@@ -11,6 +11,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
 public class ConfiguracaoEscolhaVendedor {
     private UUID id;
     private Usuario usuario;

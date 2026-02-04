@@ -53,84 +53,86 @@ class ProcessamentoMensagemUseCaseTest {
     private UUID id1, id2;
     private final String tel1 = "+5511999000111";
 
-//    @BeforeEach
-//    void setup() {
-//        ctx1 = mock(Contexto.class);
-//        ctx2 = mock(Contexto.class);
-//        msg1 = mock(Message.class);
-//        msg2 = mock(Message.class);
-//        id1 = UUID.randomUUID();
-//        id2 = UUID.randomUUID();
-//        aviso1 = AvisoContexto.builder().idContexto(id1).mensagemFila(msg1).build();
-//        aviso2 = AvisoContexto.builder().idContexto(id2).mensagemFila(msg2).build();
-//    }
+    @BeforeEach
+    void setup() {
+        ctx1 = mock(Contexto.class);
+        ctx2 = mock(Contexto.class);
+        msg1 = mock(Message.class);
+        msg2 = mock(Message.class);
+        id1 = UUID.randomUUID();
+        id2 = UUID.randomUUID();
+        aviso1 = AvisoContexto.builder().idContexto(id1).mensagemFila(msg1).build();
+        aviso2 = AvisoContexto.builder().idContexto(id2).mensagemFila(msg2).build();
+        lenient().when(ctx1.getTelefoneUsuario()).thenReturn("telefoneUsuario1");
+        lenient().when(ctx2.getTelefoneUsuario()).thenReturn("telefoneUsuario2");
+    }
 //
-//    @Test
-//    void deveNaoFazerNadaQuandoNenhumContextoNaFila() {
-//        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of());
-//
-//        useCase.consumirFila();
-//
-//        verify(mensageriaUseCase).listarAvisos();
-//        verifyNoMoreInteractions(
-//                mensageriaUseCase,
-//                contextoUseCase,
-//                clienteUseCase,
-//                contextoValidadorComposite,
-//                processamentoContextoExistente,
-//                processamentoContextoNovoUseCase
-//        );
-//    }
-//
-//    @Test
-//    void deveProcessarFluxoExistenteComSucesso() {
-//        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of(aviso1, aviso2));
-//        when(contextoUseCase.consultarPeloId(id1)).thenReturn(ctx1);
-//        when(contextoUseCase.consultarPeloId(id2)).thenReturn(ctx2);
-//        when(contextoValidadorComposite.permitirProcessar(ctx1)).thenReturn(true);
-//        when(contextoValidadorComposite.permitirProcessar(ctx2)).thenReturn(false);
-//        when(ctx1.getId()).thenReturn(id1);
-//        when(ctx2.getId()).thenReturn(id2);
-//        when(ctx1.getMensagemFila()).thenReturn(msg1);
-//        when(ctx2.getMensagemFila()).thenReturn(msg2);
-//        when(ctx1.getTelefone()).thenReturn(tel1);
-//
-//        Cliente cliente = mock(Cliente.class);
-//        when(clienteUseCase.consultarPorTelefone(tel1))
-//                .thenReturn(Optional.of(cliente));
-//
-//        useCase.consumirFila();
-//
-//        verify(mensageriaUseCase).listarAvisos();
-//        verify(contextoUseCase).consultarPeloId(id1);
-//        verify(contextoUseCase).consultarPeloId(id2);
-//        verify(contextoUseCase).deletar(id1);
-//        verify(contextoUseCase).deletar(id2);
-//        verify(mensageriaUseCase).deletarMensagem(msg1);
-//        verify(mensageriaUseCase).deletarMensagem(msg2);
-//        verify(contextoValidadorComposite, atLeastOnce()).permitirProcessar(ctx1);
-//        verify(contextoValidadorComposite, atLeastOnce()).permitirProcessar(ctx2);
-//    }
-//
-//    @Test
-//    void deveProcessarNovoFluxoComSucessoQuandoClienteNaoEncontrado() {
-//        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of(aviso1));
-//        when(contextoUseCase.consultarPeloId(id1)).thenReturn(ctx1);
-//        when(contextoValidadorComposite.permitirProcessar(ctx1)).thenReturn(true);
-//        when(ctx1.getId()).thenReturn(id1);
-//        when(ctx1.getMensagemFila()).thenReturn(msg1);
-//        when(ctx1.getTelefone()).thenReturn(tel1);
-//
-//        when(clienteUseCase.consultarPorTelefone(tel1))
-//                .thenReturn(Optional.empty());
-//
-//        useCase.consumirFila();
-//
-//        verify(mensageriaUseCase).listarAvisos();
-//        verify(contextoUseCase).consultarPeloId(id1);
-//        verify(contextoUseCase).deletar(id1);
-//        verify(processamentoContextoNovoUseCase).processarContextoNovo(ctx1);
-//        verify(processamentoContextoExistente, never()).processarContextoExistente(any(), any());
-//        verify(mensageriaUseCase).deletarMensagem(msg1);
-//    }
+    @Test
+    void deveNaoFazerNadaQuandoNenhumContextoNaFila() {
+        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of());
+
+        useCase.consumirFila();
+
+        verify(mensageriaUseCase).listarAvisos();
+        verifyNoMoreInteractions(
+                mensageriaUseCase,
+                contextoUseCase,
+                clienteUseCase,
+                contextoValidadorComposite,
+                processamentoContextoExistente,
+                processamentoContextoNovoUseCase
+        );
+    }
+
+    @Test
+    void deveProcessarFluxoExistenteComSucesso() {
+        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of(aviso1, aviso2));
+        when(contextoUseCase.consultarPeloId(id1)).thenReturn(ctx1);
+        when(contextoUseCase.consultarPeloId(id2)).thenReturn(ctx2);
+        when(contextoValidadorComposite.permitirProcessar(ctx1)).thenReturn(true);
+        when(contextoValidadorComposite.permitirProcessar(ctx2)).thenReturn(false);
+        when(ctx1.getId()).thenReturn(id1);
+        when(ctx2.getId()).thenReturn(id2);
+        when(ctx1.getMensagemFila()).thenReturn(msg1);
+        when(ctx2.getMensagemFila()).thenReturn(msg2);
+        when(ctx1.getTelefone()).thenReturn(tel1);
+
+        Cliente cliente = mock(Cliente.class);
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel1, "telefoneUsuario1"))
+                .thenReturn(Optional.of(cliente));
+
+        useCase.consumirFila();
+
+        verify(mensageriaUseCase).listarAvisos();
+        verify(contextoUseCase).consultarPeloId(id1);
+        verify(contextoUseCase).consultarPeloId(id2);
+        verify(contextoUseCase).deletar(id1);
+        verify(contextoUseCase).deletar(id2);
+        verify(mensageriaUseCase).deletarMensagem(msg1);
+        verify(mensageriaUseCase).deletarMensagem(msg2);
+        verify(contextoValidadorComposite, atLeastOnce()).permitirProcessar(ctx1);
+        verify(contextoValidadorComposite, atLeastOnce()).permitirProcessar(ctx2);
+    }
+
+    @Test
+    void deveProcessarNovoFluxoComSucessoQuandoClienteNaoEncontrado() {
+        when(mensageriaUseCase.listarAvisos()).thenReturn(List.of(aviso1));
+        when(contextoUseCase.consultarPeloId(id1)).thenReturn(ctx1);
+        when(contextoValidadorComposite.permitirProcessar(ctx1)).thenReturn(true);
+        when(ctx1.getId()).thenReturn(id1);
+        when(ctx1.getMensagemFila()).thenReturn(msg1);
+        when(ctx1.getTelefone()).thenReturn(tel1);
+
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel1, "telefoneUsuario1"))
+                .thenReturn(Optional.empty());
+
+        useCase.consumirFila();
+
+        verify(mensageriaUseCase).listarAvisos();
+        verify(contextoUseCase).consultarPeloId(id1);
+        verify(contextoUseCase).deletar(id1);
+        verify(processamentoContextoNovoUseCase).processarContextoNovo(ctx1);
+        verify(processamentoContextoExistente, never()).processarContextoExistente(any(), any());
+        verify(mensageriaUseCase).deletarMensagem(msg1);
+    }
 }

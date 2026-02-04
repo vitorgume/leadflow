@@ -102,7 +102,7 @@ class AgenteUseCaseTest {
         String texto = "texto";
         Qualificacao qual = new Qualificacao();
         qual.setNome("Ana");
-        String json = new ObjectMapper().writeValueAsString(qual);
+        String json = "{\"nome\":\"Ana\",\"atributos_variaveis\":null}";
 
         when(gateway.enviarJsonTrasformacao(texto, idUsuario)).thenReturn(json);
 
@@ -121,7 +121,7 @@ class AgenteUseCaseTest {
         qual.setNome("Ana");
 
         // JSON "normal"
-        String innerJson = new ObjectMapper().writeValueAsString(qual);
+        String innerJson = "{\"nome\":\"Ana\",\"atributos_variaveis\":null}";
         // Agora embrulha como STRING JSON (nó textual): "\"{...}\""
         String wrappedAsTextNode = new ObjectMapper().writeValueAsString(innerJson);
 

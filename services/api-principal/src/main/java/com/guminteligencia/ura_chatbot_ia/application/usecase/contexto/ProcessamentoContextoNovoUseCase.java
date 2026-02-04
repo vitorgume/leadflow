@@ -3,6 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.contexto;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.AgenteUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.ClienteUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.ConversaAgenteUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processamentoContextoExistente.ProcessamentoContextoExistente;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
@@ -20,8 +21,7 @@ public class ProcessamentoContextoNovoUseCase {
 
     private final ClienteUseCase clienteUseCase;
     private final ConversaAgenteUseCase conversaAgenteUseCase;
-    private final MensagemUseCase mensagemUseCase;
-    private final AgenteUseCase agenteUseCase;
+    private final ProcessamentoContextoExistente processamentoContextoExistente;
 
     public void processarContextoNovo(Contexto contexto) {
         log.info("Processando novo contexto. Contexto: {}", contexto);
@@ -30,10 +30,8 @@ public class ProcessamentoContextoNovoUseCase {
                 .orElseGet(() -> clienteUseCase.cadastrar(contexto.getTelefone(), contexto.getTelefoneUsuario()));
 
         ConversaAgente novaConversa = conversaAgenteUseCase.criar(clienteSalvo);
-        String resposta = agenteUseCase.enviarMensagem(clienteSalvo, novaConversa, contexto.getMensagens());
-        mensagemUseCase.enviarMensagem(resposta, clienteSalvo.getTelefone(), true);
-        novaConversa.setDataUltimaMensagem(LocalDateTime.now());
         conversaAgenteUseCase.salvar(novaConversa);
+        processamentoContextoExistente.processarContextoExistente(clienteSalvo, contexto);
 
         log.info("Novo contexto processado com sucesso.");
     }

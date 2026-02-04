@@ -2,10 +2,15 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ClienteEntity;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConversaAgenteEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.UsuarioEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConfiguracaoCrmEntity;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.vendedor.VendedorEntity;
+import com.guminteligencia.ura_chatbot_ia.domain.ConfiguracaoCrm;
+import com.guminteligencia.ura_chatbot_ia.domain.CrmType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +27,8 @@ class ConversaAgenteMapperTest {
     void setUp() {
         conversaAgenteDomain = ConversaAgente.builder()
                 .id(UUID.randomUUID())
-                .cliente(Cliente.builder().id(UUID.randomUUID()).build())
-                .vendedor(Vendedor.builder().id(1L).build())
+                .cliente(Cliente.builder().id(UUID.randomUUID()).usuario(Usuario.builder().id(UUID.randomUUID()).configuracaoCrm(ConfiguracaoCrm.builder().crmType(CrmType.KOMMO).build()).build()).build())
+                .vendedor(Vendedor.builder().id(1L).usuario(Usuario.builder().id(UUID.randomUUID()).configuracaoCrm(ConfiguracaoCrm.builder().crmType(CrmType.KOMMO).build()).build()).build())
                 .dataCriacao(LocalDateTime.now())
                 .finalizada(false)
                 .dataUltimaMensagem(LocalDateTime.now().plusHours(1))
@@ -32,8 +37,8 @@ class ConversaAgenteMapperTest {
 
         conversaAgenteEntity = ConversaAgenteEntity.builder()
                 .id(UUID.randomUUID())
-                .cliente(ClienteEntity.builder().id(UUID.randomUUID()).build())
-                .vendedor(VendedorEntity.builder().id(1L).build())
+                .cliente(ClienteEntity.builder().id(UUID.randomUUID()).usuario(UsuarioEntity.builder().id(UUID.randomUUID()).configuracaoCrm(ConfiguracaoCrmEntity.builder().crmType(CrmType.KOMMO).build()).build()).build())
+                .vendedor(VendedorEntity.builder().id(1L).usuario(UsuarioEntity.builder().id(UUID.randomUUID()).configuracaoCrm(ConfiguracaoCrmEntity.builder().crmType(CrmType.KOMMO).build()).build()).build())
                 .dataCriacao(LocalDateTime.now().plusDays(1))
                 .finalizada(true)
                 .dataUltimaMensagem(LocalDateTime.now().plusDays(1).plusHours(1))

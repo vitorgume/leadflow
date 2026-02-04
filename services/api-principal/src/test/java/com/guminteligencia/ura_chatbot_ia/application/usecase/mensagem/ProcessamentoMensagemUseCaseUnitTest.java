@@ -41,55 +41,61 @@ class ProcessamentoMensagemUseCaseUnitTest {
 
     private Method processarMensagemMethod;
 
-//    @BeforeEach
-//    void setup() throws Exception {
-//        processarMensagemMethod = ProcessamentoMensagemUseCase.class
-//                .getDeclaredMethod("processarMensagem", Contexto.class);
-//        processarMensagemMethod.setAccessible(true);
-//    }
+    @BeforeEach
+    void setup() throws Exception {
+        processarMensagemMethod = ProcessamentoMensagemUseCase.class
+                .getDeclaredMethod("processarMensagem", Contexto.class);
+        processarMensagemMethod.setAccessible(true);
+    }
 //
-//    @Test
-//    void deveProcessarContextoNovoQuandoClienteNaoPossuiConversa() throws Exception {
-//        Contexto contexto = Contexto.builder().telefone("+5511").build();
-//        Cliente cliente = Cliente.builder().telefone("+5511").build();
-//
-//        when(clienteUseCase.consultarPorTelefone("+5511"))
-//                .thenReturn(Optional.of(cliente));
-//        when(conversaAgenteUseCase.consultarPorCliente(any()))
-//                .thenThrow(new ConversaAgenteNaoEncontradoException());
-//
-//        processarMensagemMethod.invoke(useCase, contexto);
-//
-//        verify(processamentoContextoNovoUseCase).processarContextoNovo(contexto);
-//        verify(processamentoContextoExistente, never()).processarContextoExistente(any(), any());
-//    }
-//
-//    @Test
-//    void deveProcessarContextoExistenteQuandoConversaEncontrada() throws Exception {
-//        Contexto contexto = Contexto.builder().telefone("+5522").build();
-//        Cliente cliente = Cliente.builder().telefone("+5522").build();
-//        ConversaAgente conversa = ConversaAgente.builder().id(UUID.randomUUID()).build();
-//
-//        when(clienteUseCase.consultarPorTelefone("+5522"))
-//                .thenReturn(Optional.of(cliente));
-//        when(conversaAgenteUseCase.consultarPorCliente(any()))
-//                .thenReturn(conversa);
-//
-//        processarMensagemMethod.invoke(useCase, contexto);
-//
-//        verify(processamentoContextoExistente).processarContextoExistente(cliente, contexto);
-//        verify(processamentoContextoNovoUseCase, never()).processarContextoNovo(any());
-//    }
-//
-//    @Test
-//    void deveProcessarContextoNovoQuandoClienteNaoEncontrado() throws Exception {
-//        Contexto contexto = Contexto.builder().telefone("+5533").build();
-//        when(clienteUseCase.consultarPorTelefone("+5533"))
-//                .thenReturn(Optional.empty());
-//
-//        processarMensagemMethod.invoke(useCase, contexto);
-//
-//        verify(processamentoContextoNovoUseCase).processarContextoNovo(contexto);
-//        verify(processamentoContextoExistente, never()).processarContextoExistente(any(), any());
-//    }
+    @Test
+    void deveProcessarContextoNovoQuandoClienteNaoPossuiConversa() throws Exception {
+        Contexto contexto = mock(Contexto.class);
+        when(contexto.getTelefone()).thenReturn("+5511");
+        when(contexto.getTelefoneUsuario()).thenReturn("telefoneUsuario1");
+        Cliente cliente = Cliente.builder().telefone("+5511").build();
+
+        when(clienteUseCase.consultarPorTelefoneEUsuario("+5511", "telefoneUsuario1"))
+                .thenReturn(Optional.of(cliente));
+        when(conversaAgenteUseCase.consultarPorCliente(any()))
+                .thenThrow(new ConversaAgenteNaoEncontradoException());
+
+        processarMensagemMethod.invoke(useCase, contexto);
+
+        verify(processamentoContextoNovoUseCase).processarContextoNovo(contexto);
+        verify(processamentoContextoExistente, never()).processarContextoExistente(any(), any());
+    }
+
+    @Test
+    void deveProcessarContextoExistenteQuandoConversaEncontrada() throws Exception {
+        Contexto contexto = mock(Contexto.class);
+        when(contexto.getTelefone()).thenReturn("+5522");
+        when(contexto.getTelefoneUsuario()).thenReturn("telefoneUsuario2");
+        Cliente cliente = Cliente.builder().telefone("+5522").build();
+        ConversaAgente conversa = ConversaAgente.builder().id(UUID.randomUUID()).build();
+
+        when(clienteUseCase.consultarPorTelefoneEUsuario("+5522", "telefoneUsuario2"))
+                .thenReturn(Optional.of(cliente));
+        when(conversaAgenteUseCase.consultarPorCliente(any()))
+                .thenReturn(conversa);
+
+        processarMensagemMethod.invoke(useCase, contexto);
+
+        verify(processamentoContextoExistente).processarContextoExistente(cliente, contexto);
+        verify(processamentoContextoNovoUseCase, never()).processarContextoNovo(any());
+    }
+
+    @Test
+    void deveProcessarContextoNovoQuandoClienteNaoEncontrado() throws Exception {
+        Contexto contexto = mock(Contexto.class);
+        when(contexto.getTelefone()).thenReturn("+5533");
+        when(contexto.getTelefoneUsuario()).thenReturn("telefoneUsuario3");
+        when(clienteUseCase.consultarPorTelefoneEUsuario("+5533", "telefoneUsuario3"))
+                .thenReturn(Optional.empty());
+
+        processarMensagemMethod.invoke(useCase, contexto);
+
+        verify(processamentoContextoNovoUseCase).processarContextoNovo(contexto);
+        verify(processamentoContextoExistente, never()).processarContextoExistente(any(), any());
+    }
 }

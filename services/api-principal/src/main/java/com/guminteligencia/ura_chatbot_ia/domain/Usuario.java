@@ -17,7 +17,7 @@ public class Usuario {
     private String telefone;
     private String senha;
     private String email;
-    private String telefoneConcectado;
+    private String telefoneConectado;
     private Map<String, Object> atributosQualificacao;
     private ConfiguracaoCrm configuracaoCrm;
     private String mensagemDirecionamentoVendedor;

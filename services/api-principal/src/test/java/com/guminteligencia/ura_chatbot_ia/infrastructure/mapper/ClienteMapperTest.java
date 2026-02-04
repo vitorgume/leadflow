@@ -29,7 +29,7 @@ class ClienteMapperTest {
                 .telefone("00000000000")
                 .senha("senhateste123")
                 .email("emailteste@123")
-                .telefoneConcectado("00000000000")
+                .telefoneConectado("00000000000")
                 .atributosQualificacao(Map.of("teste", new Object()))
                 .configuracaoCrm(
                         ConfiguracaoCrm.builder()

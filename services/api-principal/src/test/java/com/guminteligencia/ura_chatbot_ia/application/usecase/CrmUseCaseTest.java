@@ -4,8 +4,15 @@ import com.guminteligencia.ura_chatbot_ia.application.exceptions.LeadNaoEncontra
 import com.guminteligencia.ura_chatbot_ia.application.gateways.IntegracaoKommoGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
-import com.guminteligencia.ura_chatbot_ia.domain.*;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.CrmIntegracaoFactory;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.CrmIntegracaoType;
+import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.domain.ConfiguracaoCrm;
+import com.guminteligencia.ura_chatbot_ia.domain.CrmType;
+import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +31,7 @@ import static org.mockito.Mockito.*;
 class CrmUseCaseTest {
 
     @Mock
-    private IntegracaoKommoGateway gateway;
+    private CrmIntegracaoFactory crmIntegracaoFactory;
 
     @InjectMocks
     private CrmUseCase useCase;
@@ -37,97 +44,51 @@ class CrmUseCaseTest {
 
     @Mock
     private ConversaAgente conversaAgente;
+    @Mock
+    private CrmIntegracaoType crmIntegracaoType;
 
-//    @BeforeEach
-//    void setUp() {
-//        useCase = new CrmUseCase(
-//                gateway,
-//                "dev"
-//        );
+    @BeforeEach
+    void setUp() {
+        useCase = new CrmUseCase(
+                crmIntegracaoFactory
+        );
+
+        conversaAgente = ConversaAgente.builder()
+                .id(UUID.randomUUID())
+                .status(StatusConversa.INATIVO_G1)
+                .build();
+    }
 //
-//        conversaAgente = ConversaAgente.builder()
-//                .id(UUID.randomUUID())
-//                .status(StatusConversa.INATIVO_G1)
-//                .build();
-//    }
-//
-//    private final String tel = "+5511999999999";
-//    private final Integer idLead = 12345;
-//    private final String urlChat = "https://chat.example/sala/abc";
+
 //
 //    // --------------- atualizarCrm ----------------
 //
-//    @Test
-//    void atualizarCrm_deveAtualizarSemMidia_eClienteAtivo() {
-//        // dados base
-//        String tel = "+5511999999999";
-//        int idLead = 42;
-//
-//        when(cliente.getTelefone()).thenReturn(tel);
-//        when(vendedor.getIdVendedorCrm()).thenReturn(999);
-//
-//        // lead encontrado
-//        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
-//
-//        // patch OK
-//        doNothing().when(gateway).atualizarCard(any(PayloadKommo.class), eq(idLead));
-//
-//        // act
-//        useCase.atualizarCrm(vendedor, cliente, conversaAgente);
-//
-//        ArgumentCaptor<PayloadKommo> captor = ArgumentCaptor.forClass(PayloadKommo.class);
-//        verify(gateway).atualizarCard(captor.capture(), eq(idLead));
-//        assertNotNull(captor.getValue());
-//    }
-//
-//
-//    @Test
-//    void atualizarCrm_devePropagarExcecaoDeAtualizarCard() {
-//
-//        // dados base
-//        String tel = "+5511999999999";
-//        int idLead = 42;
-//
-//        when(cliente.getTelefone()).thenReturn(tel);
-//
-//        when(vendedor.getIdVendedorCrm()).thenReturn(999);
-//
-//        // lead encontrado
-//        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
-//
-//        doThrow(new DataProviderException("patch-fail", null))
-//                .when(gateway).atualizarCard(any(PayloadKommo.class), eq(idLead));
-//
-//        DataProviderException ex = assertThrows(
-//                DataProviderException.class,
-//                () -> useCase.atualizarCrm(vendedor, cliente, conversaAgente)
-//        );
-//        assertEquals("patch-fail", ex.getMessage());
-//    }
-//
-//    // --------------- consultaLeadPeloTelefone ----------------
-//
-//    @Test
-//    void consultaLeadPeloTelefone_deveRetornarId() {
-//        String tel = "+5511999999999";
-//
-//        int idLead = 42;
-//
-//        // lead encontrado
-//        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.of(idLead));
-//
-//        Integer out = useCase.consultaLeadPeloTelefone(tel);
-//        assertEquals(idLead, out);
-//        verify(gateway).consultaLeadPeloTelefone(tel);
-//    }
-//
-//    @Test
-//    void consultaLeadPeloTelefone_deveLancarLeadNaoEncontradoQuandoEmpty() {
-//        when(gateway.consultaLeadPeloTelefone(tel)).thenReturn(Optional.empty());
-//        assertThrows(
-//                LeadNaoEncontradoException.class,
-//                () -> useCase.consultaLeadPeloTelefone(tel)
-//        );
-//    }
+    @Test
+    void atualizarCrm_deveAtualizarSemMidia_eClienteAtivo() {
+        when(cliente.getUsuario()).thenReturn(Usuario.builder().configuracaoCrm(ConfiguracaoCrm.builder().crmType(CrmType.KOMMO).build()).build());
+        when(crmIntegracaoFactory.create(any(CrmType.class))).thenReturn(crmIntegracaoType);
+
+        // act
+        useCase.atualizarCrm(vendedor, cliente, conversaAgente);
+
+        verify(crmIntegracaoType).implementacao(vendedor, cliente, conversaAgente);
+    }
+
+
+    @Test
+    void atualizarCrm_devePropagarExcecaoDeAtualizarCard() {
+        when(cliente.getUsuario()).thenReturn(Usuario.builder().configuracaoCrm(ConfiguracaoCrm.builder().crmType(CrmType.KOMMO).build()).build());
+        when(crmIntegracaoFactory.create(any(CrmType.class))).thenReturn(crmIntegracaoType);
+        doThrow(new DataProviderException("patch-fail", null))
+                .when(crmIntegracaoType).implementacao(any(Vendedor.class), any(Cliente.class), any(ConversaAgente.class));
+
+        DataProviderException ex = assertThrows(
+                DataProviderException.class,
+                () -> useCase.atualizarCrm(vendedor, cliente, conversaAgente)
+        );
+        assertEquals("patch-fail", ex.getMessage());
+    }
+
+
 
 }

@@ -4,10 +4,12 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,19 +30,19 @@ import static org.mockito.Mockito.*;
 class ConversaInativaUseCaseExtraTest {
 
     @Mock private ConversaAgenteUseCase conversaAgenteUseCase;
-    @Mock private VendedorUseCase vendedorUseCase;
+    @Mock private EscolhaVendedorUseCase escolhaVendedorUseCase;
     @Mock private CrmUseCase crmUseCase;
     @Mock private MensagemUseCase mensagemUseCase;
     @Mock private MensagemBuilder mensagemBuilder;
 
     private ConversaInativaUseCase useCase;
 
-//    @BeforeEach
-//    void setUp() {
-//        useCase = new ConversaInativaUseCase(
-//                conversaAgenteUseCase, vendedorUseCase, crmUseCase, mensagemUseCase, mensagemBuilder, "dev"
-//        );
-//    }
+    @BeforeEach
+    void setUp() {
+        useCase = new ConversaInativaUseCase(
+                conversaAgenteUseCase, escolhaVendedorUseCase, crmUseCase, mensagemUseCase, mensagemBuilder, "dev"
+        );
+    }
 
     @Test
     void deveMarcarComoInativoG1EEnviarMensagemQuandoAindaEmAndamento() {
@@ -66,7 +68,7 @@ class ConversaInativaUseCaseExtraTest {
 
     @Test
     void deveMarcarComoInativoG2EChamarCrmQuandoFinalizada() {
-        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5522").build();
+        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5522").usuario(Usuario.builder().id(UUID.randomUUID()).build()).build();
         ConversaAgente conversa = ConversaAgente.builder()
                 .cliente(cliente)
                 .status(StatusConversa.ATIVO)
@@ -76,7 +78,7 @@ class ConversaInativaUseCaseExtraTest {
 
         Vendedor vendedorPadrao = Vendedor.builder().id(10L).build();
         when(conversaAgenteUseCase.listarNaoFinalizados()).thenReturn(List.of(conversa));
-        when(vendedorUseCase.consultarVendedorPadrao()).thenReturn(vendedorPadrao);
+        when(escolhaVendedorUseCase.roletaVendedoresContatosInativos(any(UUID.class))).thenReturn(vendedorPadrao);
 
         useCase.verificaAusenciaDeMensagem();
 

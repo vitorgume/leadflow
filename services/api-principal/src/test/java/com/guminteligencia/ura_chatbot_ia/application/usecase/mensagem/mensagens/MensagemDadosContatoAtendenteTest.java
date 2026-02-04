@@ -9,11 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,7 +18,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MensagemDadosContatoAtendenteTest {
@@ -40,7 +36,7 @@ class MensagemDadosContatoAtendenteTest {
             .telefone("00000000000")
             .senha("senhateste123")
             .email("emailteste@123")
-            .telefoneConcectado("00000000000")
+            .telefoneConectado("00000000000")
             .atributosQualificacao(Map.of("teste", new Object()))
             .configuracaoCrm(
                     ConfiguracaoCrm.builder()

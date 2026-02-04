@@ -7,15 +7,20 @@ import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.vendedor.VendedorDto;
 public class VendedorMapper {
 
     public static Vendedor paraDomain(VendedorDto dto) {
-        return Vendedor.builder()
+        Vendedor vendedor = Vendedor.builder()
                 .id(dto.getId())
                 .nome(dto.getNome())
                 .telefone(dto.getTelefone())
                 .inativo(dto.getInativo())
                 .idVendedorCrm(dto.getIdVendedorCrm())
                 .padrao(dto.getPadrao())
-                .usuario(Usuario.builder().id(dto.getUsuario().getId()).build())
                 .build();
+
+        if(dto.getUsuario() != null) {
+            vendedor.setUsuario(Usuario.builder().id(dto.getUsuario().getId()).build());
+        }
+
+        return vendedor;
     }
 
     public static VendedorDto paraDto(Vendedor domain) {

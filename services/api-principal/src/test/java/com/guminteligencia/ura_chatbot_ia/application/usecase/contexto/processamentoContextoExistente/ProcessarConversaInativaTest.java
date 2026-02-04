@@ -4,7 +4,7 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class ProcessarConversaInativaTest {
 
     @Mock
-    private VendedorUseCase vendedorUseCase;
+    private EscolhaVendedorUseCase escolhaVendedorUseCase;
     @Mock
     private CrmUseCase crmUseCase;
     @Mock
@@ -44,15 +44,15 @@ class ProcessarConversaInativaTest {
 
         when(cliente.getTelefone()).thenReturn("+5511999999999");
         when(vendedor.getNome()).thenReturn("Vendedor Teste");
-        when(vendedorUseCase.consultarVendedorPadrao()).thenReturn(vendedor);
+        when(escolhaVendedorUseCase.escolherVendedor(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, "Vendedor Teste", cliente))
                 .thenReturn("mensagem-g1-direcionamento");
 
         processador.processar("resp", conversa, cliente);
 
-        InOrder inOrder = inOrder(conversa, vendedorUseCase, mensagemBuilder, mensagemUseCase, crmUseCase);
+        InOrder inOrder = inOrder(conversa, escolhaVendedorUseCase, mensagemBuilder, mensagemUseCase, crmUseCase);
         inOrder.verify(conversa).setFinalizada(true);
-        inOrder.verify(vendedorUseCase).consultarVendedorPadrao();
+        inOrder.verify(escolhaVendedorUseCase).escolherVendedor(cliente);
         inOrder.verify(conversa).setVendedor(vendedor);
         inOrder.verify(mensagemBuilder).getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, "Vendedor Teste", cliente);
         inOrder.verify(mensagemUseCase).enviarMensagem("mensagem-g1-direcionamento", "+5511999999999", true);
@@ -68,7 +68,7 @@ class ProcessarConversaInativaTest {
 
         when(cliente.getTelefone()).thenReturn("+5544999999999");
         when(vendedor.getNome()).thenReturn("Joao");
-        when(vendedorUseCase.consultarVendedorPadrao()).thenReturn(vendedor);
+        when(escolhaVendedorUseCase.escolherVendedor(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, "Joao", cliente)).thenReturn("msg");
         doThrow(new RuntimeException("erro-envio"))
                 .when(mensagemUseCase).enviarMensagem("msg", "+5544999999999", true);
@@ -80,7 +80,6 @@ class ProcessarConversaInativaTest {
         }
 
         verify(conversa).setFinalizada(true);
-        verify(conversa).setVendedor(vendedor);
         verify(crmUseCase, never()).atualizarCrm(any(), any(), any());
     }
 
@@ -92,7 +91,7 @@ class ProcessarConversaInativaTest {
 
         when(cliente.getTelefone()).thenReturn("+5577999999999");
         when(vendedor.getNome()).thenReturn("Ana");
-        when(vendedorUseCase.consultarVendedorPadrao()).thenReturn(vendedor);
+        when(escolhaVendedorUseCase.escolherVendedor(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, "Ana", cliente))
                 .thenReturn("msg-ok");
         doThrow(new RuntimeException("erro-contato"))

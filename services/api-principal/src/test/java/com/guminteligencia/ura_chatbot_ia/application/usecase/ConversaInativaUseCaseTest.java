@@ -4,10 +4,12 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ class ConversaInativaUseCaseTest {
     @Mock
     private ConversaAgenteUseCase conversaAgenteUseCase;
     @Mock
-    private VendedorUseCase vendedorUseCase;
+    private EscolhaVendedorUseCase escolhaVendedorUseCase; // Changed from VendedorUseCase
     @Mock
     private MensagemUseCase mensagemUseCase;
     @Mock
@@ -38,17 +40,17 @@ class ConversaInativaUseCaseTest {
 
     private ConversaInativaUseCase useCase;
 
-//    @BeforeEach
-//    void setUp() {
-//        useCase = new ConversaInativaUseCase(
-//                conversaAgenteUseCase,
-//                vendedorUseCase,
-//                crmUseCase,
-//                mensagemUseCase,
-//                mensagemBuilder,
-//                "dev"
-//        );
-//    }
+    @BeforeEach
+    void setUp() {
+        useCase = new ConversaInativaUseCase(
+                conversaAgenteUseCase,
+                escolhaVendedorUseCase, // Changed from vendedorUseCase
+                crmUseCase,
+                mensagemUseCase,
+                mensagemBuilder,
+                "dev"
+        );
+    }
 
     @Test
     void naoDeveProcessarQuandoNaoExistiremConversas() {
@@ -57,7 +59,7 @@ class ConversaInativaUseCaseTest {
         useCase.verificaAusenciaDeMensagem();
 
         verify(conversaAgenteUseCase).listarNaoFinalizados();
-        verifyNoInteractions(vendedorUseCase, mensagemUseCase, mensagemBuilder, crmUseCase);
+        verifyNoInteractions(escolhaVendedorUseCase, mensagemUseCase, mensagemBuilder, crmUseCase);
     }
 
     @Test
@@ -87,7 +89,7 @@ class ConversaInativaUseCaseTest {
             verify(mensagemUseCase).enviarMensagem("msg-recontato-g1", cliente.getTelefone(), false);
             verify(conv).setDataUltimaMensagem(now);
             verify(conversaAgenteUseCase).salvar(conv);
-            verifyNoInteractions(vendedorUseCase, crmUseCase);
+            verifyNoInteractions(escolhaVendedorUseCase, crmUseCase);
         }
     }
 
@@ -105,18 +107,19 @@ class ConversaInativaUseCaseTest {
                     .id(UUID.randomUUID())
                     .nome("teste")
                     .telefone("+55999999999")
+                    .usuario(Usuario.builder().id(UUID.randomUUID()).build()) // Added User to Cliente
                     .build();
             when(conv.getCliente()).thenReturn(cliente);
             when(conversaAgenteUseCase.listarNaoFinalizados()).thenReturn(List.of(conv));
 
             Vendedor vendedor = Vendedor.builder().id(1L).nome("Nome teste").build();
-            when(vendedorUseCase.consultarVendedorPadrao()).thenReturn(vendedor);
+            when(escolhaVendedorUseCase.roletaVendedoresContatosInativos(any(UUID.class))).thenReturn(vendedor);
 
             useCase.verificaAusenciaDeMensagem();
 
             verify(conv).setStatus(StatusConversa.INATIVO_G2);
             verify(conv).setFinalizada(true);
-            verify(vendedorUseCase).consultarVendedorPadrao();
+            verify(escolhaVendedorUseCase).roletaVendedoresContatosInativos(any(UUID.class));
             verify(conv).setVendedor(vendedor);
             verify(crmUseCase).atualizarCrm(vendedor, cliente, conv);
             verify(conversaAgenteUseCase).salvar(conv);

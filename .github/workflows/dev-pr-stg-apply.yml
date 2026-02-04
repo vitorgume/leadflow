@@ -29,7 +29,7 @@ env:
 
   # --- Terraform backend (remoto já existente) ---
   TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}          
-  TF_STATE_KEY_INFRA: ${{ vars.TF_STATE_KEY_INFRA }}    
+  TF_STATE_KEY_INFRA: apprunner/pr-${{ github.event.pull_request.number }}/terraform.tfstate    
   TF_STATE_LOCK_TABLE: ${{ vars.TF_STATE_LOCK_TABLE }}  
 
   # --- NAME PREFIX por PR ---

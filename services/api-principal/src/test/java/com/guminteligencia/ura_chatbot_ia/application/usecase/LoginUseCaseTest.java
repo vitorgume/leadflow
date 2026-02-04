@@ -44,6 +44,7 @@ class LoginUseCaseTest {
                 .id(adminId)
                 .telefone(email)
                 .senha(senhaHash)
+                .email(email) // Set email here
                 .build();
     }
 
@@ -69,6 +70,7 @@ class LoginUseCaseTest {
                 .id(adminId)
                 .telefone("outro@example.com")
                 .senha(senhaHash)
+                .email("outro@example.com") // Set email here
                 .build();
         when(usuarioUseCase.consultarPorEmail(email)).thenReturn(outro);
 
