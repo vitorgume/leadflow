@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
@@ -80,13 +81,21 @@ class ValidadorTempoEsperaTest {
         when(conversaAgenteUseCase.consultarPorCliente(cliente.getId()))
                 .thenReturn(conv);
 
-        LocalDateTime fixed = LocalDateTime.of(2025,8,1,12,0);
-        try (MockedStatic<LocalDateTime> mt = mockStatic(LocalDateTime.class)) {
+        LocalDateTime fixed = LocalDateTime.of(2025, 8, 1, 12, 0);
+
+        // --- CORREÇÃO AQUI ---
+        // Adicione o Mockito.CALLS_REAL_METHODS
+        try (MockedStatic<LocalDateTime> mt = mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+
+            // Agora configuramos apenas o 'now' para retornar o valor fixo
             mt.when(LocalDateTime::now).thenReturn(fixed);
+
             when(conv.getFinalizada()).thenReturn(true);
             when(conv.getDataUltimaMensagem())
                     .thenReturn(fixed.minusMinutes(10));
 
+            // O log.info vai funcionar porque os outros métodos estáticos do LocalDateTime
+            // (usados pelo Logger) vão chamar a implementação real.
             assertFalse(validadorTempoEspera.permitirProcessar(ctx));
         }
     }

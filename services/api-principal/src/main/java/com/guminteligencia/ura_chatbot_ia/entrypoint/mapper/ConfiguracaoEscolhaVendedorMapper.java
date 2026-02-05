@@ -8,13 +8,21 @@ import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.vendedor.ConfiguracaoEs
 public class ConfiguracaoEscolhaVendedorMapper {
 
     public static ConfiguracaoEscolhaVendedor paraDomain(ConfiguracaoEscolhaVendedorDto dto) {
-        return ConfiguracaoEscolhaVendedor.builder()
+        ConfiguracaoEscolhaVendedor configuracaoEscolhaVendedor = ConfiguracaoEscolhaVendedor.builder()
                 .id(dto.getId())
                 .usuario(Usuario.builder().id(dto.getUsuario().getId()).build())
-                .vendedores(dto.getVendedores().stream().map(vendedorDto -> Vendedor.builder().id(vendedorDto.getId()).build()).toList())
-                .condicoes(dto.getCondicoes().stream().map(CondicaoMapper::paraDomain).toList())
                 .prioridade(dto.getPrioridade())
                 .build();
+
+        if(dto.getVendedores() != null) {
+            configuracaoEscolhaVendedor.setVendedores(dto.getVendedores().stream().map(vendedorDto -> Vendedor.builder().id(vendedorDto.getId()).build()).toList());
+        }
+
+        if(dto.getCondicoes() != null) {
+            configuracaoEscolhaVendedor.setCondicoes(dto.getCondicoes().stream().map(CondicaoMapper::paraDomain).toList());
+        }
+
+        return configuracaoEscolhaVendedor;
     }
 
     public static ConfiguracaoEscolhaVendedorDto paraDto(ConfiguracaoEscolhaVendedor domain) {

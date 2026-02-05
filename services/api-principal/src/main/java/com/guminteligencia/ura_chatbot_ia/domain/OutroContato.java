@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
 public class OutroContato {
     private Long id;
     private String nome;

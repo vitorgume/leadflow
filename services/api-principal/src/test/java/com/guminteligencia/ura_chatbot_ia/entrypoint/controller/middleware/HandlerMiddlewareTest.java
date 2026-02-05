@@ -93,6 +93,71 @@ class HandlerMiddlewareTest {
             throw new OutroContatoNaoEncontradoException();
         }
 
+        @GetMapping("/chatNotFound")
+        public void chatNotFound() {
+            throw new ChatNaoEncontradoException();
+        }
+
+        @GetMapping("/condicaoLogicaNaoIdentificado")
+        public void condicaoLogicaNaoIdentificado() {
+            throw new CondicaoLogicaNaoIdentificadoException();
+        }
+
+        @GetMapping("/condicaoNaoEncontrada")
+        public void condicaoNaoEncontrada() {
+            throw new CondicaoNaoEncontradaException();
+        }
+
+        @GetMapping("/configEscolhaVendedorNaoEncontrada")
+        public void configEscolhaVendedorNaoEncontrada() {
+            throw new ConfiguracaoEscolhaVendedorNaoEncontrada();
+        }
+
+        @GetMapping("/configCrmUsuarioNaoConfigurada")
+        public void configCrmUsuarioNaoConfigurada() {
+            throw new ConfiguraCrmUsuarioNaoConfiguradaException();
+        }
+
+        @GetMapping("/integracaoExistenteNaoIdentificada")
+        public void integracaoExistenteNaoIdentificada() {
+            throw new IntegracaoExistenteNaoIdentificada();
+        }
+
+        @GetMapping("/leadNaoEncontrado")
+        public void leadNaoEncontrado() {
+            throw new LeadNaoEncontradoException();
+        }
+
+        @GetMapping("/midiaClienteNaoEncontrada")
+        public void midiaClienteNaoEncontrada() {
+            throw new MidiaClienteNaoEncontradaException();
+        }
+
+        @GetMapping("/nenhumVendedorReferenciado")
+        public void nenhumVendedorReferenciado() {
+            throw new NenhumVendedorReferenciadoException();
+        }
+
+        @GetMapping("/outroContatoMesmoTelefone")
+        public void outroContatoMesmoTelefone() {
+            throw new OutroContatoComMesmoTelefoneJaCadastradoExcetion();
+        }
+
+        @GetMapping("/outroContatoTipoGerencia")
+        public void outroContatoTipoGerencia() {
+            throw new OutroContatoTipoGerenciaJaCadastradoException();
+        }
+
+        @GetMapping("/usuarioExistente")
+        public void usuarioExistente() {
+            throw new UsuarioExistenteException();
+        }
+
+        @GetMapping("/usuarioNaoEncontrado")
+        public void usuarioNaoEncontrado() {
+            throw new UsuarioNaoEncotradoException();
+        }
+
         @GetMapping("/nullMessage")
         public void nullMessage() {
             throw new RuntimeException();
@@ -113,6 +178,19 @@ class HandlerMiddlewareTest {
             "vendedorNotChosen,            500, Vendedor não escolhido de acordo com segmentação.",
             "dataProvider,                 500, DP error",
             "outroContatoNotFound,         404, Outro contato não encontrado.",
+            "chatNotFound,                 404, Chat não encontrado.",
+            "condicaoLogicaNaoIdentificado,500, Condição lógica não identificada.",
+            "condicaoNaoEncontrada,        404, Condicação não encontrado.",
+            "configEscolhaVendedorNaoEncontrada, 404, Configuracão escolha vendedor não encontrada.",
+            "configCrmUsuarioNaoConfigurada, 400, Configuração de crm do usuário não configurado.",
+            "integracaoExistenteNaoIdentificada, 500, Integração existente não identificada.",
+            "leadNaoEncontrado,            404, Lead não encontrado.",
+            "midiaClienteNaoEncontrada,    404, Midia do cliente não encontrada.",
+            "nenhumVendedorReferenciado,   400, Nenhum vendedor referênciado para a configuração de escolha dos vendedores.",
+            "outroContatoMesmoTelefone,    400, Outro contato com o mesmo telefone já cadastrado.",
+            "outroContatoTipoGerencia,     400, Outro contato do tipo gerencia já cadastrado.",
+            "usuarioExistente,             400, Usuário já cadastrado com esse mesmo telefone.",
+            "usuarioNaoEncontrado,         404, Usuário não encontrado",
             "nullMessage,                  500, Erro interno inesperado."
     })
     void testHandlerMiddleware(

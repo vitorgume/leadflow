@@ -7,10 +7,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
@@ -50,8 +47,11 @@ class ConversaAgenteUseCaseTest {
                 .id(UUID.randomUUID())
                 .cliente(cliente)
                 .build();
-        try (MockedStatic<LocalDateTime> mt = mockStatic(LocalDateTime.class)) {
+
+        // --- CORREÇÃO AQUI: Adicione Mockito.CALLS_REAL_METHODS ---
+        try (MockedStatic<LocalDateTime> mt = mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
             mt.when(LocalDateTime::now).thenReturn(fixedNow);
+
             when(gateway.salvar(any())).thenReturn(saved);
 
             ConversaAgente result = useCase.criar(cliente);

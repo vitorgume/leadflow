@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class AgenteDataProviderTest {
 
     @Mock
@@ -169,5 +171,61 @@ class AgenteDataProviderTest {
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> provider.enviarJsonTrasformacao(texto, ID_USUARIO));
+    }
+
+    @Test
+    @DisplayName("Deve acionar o Retry, passar pelo filtro de log e obter sucesso na segunda tentativa")
+    void deveAcionarRetryEObterSucessoAposFalha() {
+        // Arrange
+        String resultadoEsperado = "Sucesso após retry";
+
+        // Configuração do corpo da requisição (igual ao teste de sucesso)
+        Map<String, Object> bodyEsperado = Map.of(
+                "cliente_id", dto.getClienteId(),
+                "conversa_id", dto.getConversaId(),
+                "message", dto.getMensagem(),
+                "audios_url", dto.getAudiosUrl(),
+                "imagens_url", dto.getImagensUrl()
+        );
+
+        // --- O PULO DO GATO ---
+        // Criamos um Mono que falha na primeira subscrição e funciona na segunda.
+        // Isso força o operador .retryWhen() a agir e executar o .filter()
+        java.util.concurrent.atomic.AtomicInteger contadorTentativas = new java.util.concurrent.atomic.AtomicInteger(0);
+
+        Mono<String> monoSimulado = Mono.defer(() -> {
+            int tentativaAtual = contadorTentativas.incrementAndGet();
+            if (tentativaAtual == 1) {
+                // 1ª vez: Lança erro para ativar o Retry e o Log
+                return Mono.error(new RuntimeException("Erro temporário de conexão"));
+            }
+            // 2ª vez: Retorna sucesso
+            return Mono.just(resultadoEsperado);
+        });
+
+        // Configuração dos Mocks do WebClient
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(agenteUriApi + "/chat")).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.bodyValue(bodyEsperado)).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+        // Aqui retornamos o nosso Mono "inteligente"
+        when(responseSpec.bodyToMono(String.class)).thenReturn(monoSimulado);
+
+        // Act
+        // Nota: Esse teste vai demorar pelo menos 2 segundos por causa do Duration.ofSeconds(2) no código original
+        String result = provider.enviarMensagem(dto);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(resultadoEsperado, result);
+
+        // Verificamos se o contador incrementou 2 vezes (1 falha + 1 sucesso)
+        assertEquals(2, contadorTentativas.get());
+
+        // Verifica se o fluxo do WebClient foi montado corretamente
+        verify(webClient).post();
+        verify(requestBodySpec).bodyValue(bodyEsperado);
     }
 }

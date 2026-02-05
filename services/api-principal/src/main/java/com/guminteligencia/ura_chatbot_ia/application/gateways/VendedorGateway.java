@@ -22,6 +22,4 @@ public interface VendedorGateway {
     Optional<Vendedor> consultarPorId(Long idVendedor);
 
     List<Vendedor> listarAtivos();
-
-    Optional<Vendedor> consultarVendedorPadrao();
 }

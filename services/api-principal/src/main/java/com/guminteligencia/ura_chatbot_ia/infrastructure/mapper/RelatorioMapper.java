@@ -29,8 +29,6 @@ public class RelatorioMapper {
         ).toList();
     }
 
-    // ... método parseJsonToMap continua igual
-
     private static Map<String, String> parseJsonToMap(String json) {
         if (json == null || json.isBlank()) {
             return Collections.emptyMap();

@@ -1,9 +1,9 @@
-package com.guminteligencia.ura_chatbot_ia.entrypoint.controller;
+package com.guminteligencia.ura_chatbot_ia.entrypoint.controller.vendedor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
-import com.guminteligencia.ura_chatbot_ia.domain.Prioridade;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.entrypoint.controller.VendedorController;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.vendedor.VendedorDto;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.UsuarioDto;
 import org.junit.jupiter.api.BeforeEach;

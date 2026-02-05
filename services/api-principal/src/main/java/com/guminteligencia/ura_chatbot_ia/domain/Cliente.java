@@ -10,6 +10,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
 public class Cliente {
     private UUID id;
     private String nome;

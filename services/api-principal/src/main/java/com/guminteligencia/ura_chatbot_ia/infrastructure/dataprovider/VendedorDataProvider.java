@@ -137,18 +137,4 @@ public class VendedorDataProvider implements VendedorGateway {
 
         return vendedorEntities.stream().map(VendedorMapper::paraDomain).toList();
     }
-
-    @Override
-    public Optional<Vendedor> consultarVendedorPadrao() {
-        Optional<VendedorEntity> vendedorEntity;
-
-        try {
-            vendedorEntity = repository.findByPadraoIsTrue();
-        } catch (Exception ex) {
-            log.error(MENSAGEM_ERRO_CONSULTAR_VENDEDOR_PADRAO, ex);
-            throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_VENDEDOR_PADRAO, ex.getCause());
-        }
-
-        return vendedorEntity.map(VendedorMapper::paraDomain);
-    }
 }

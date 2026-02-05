@@ -95,14 +95,4 @@ public class VendedorUseCase {
 
         return vendedor.get();
     }
-
-    public Vendedor consultarVendedorPadrao() {
-        Optional<Vendedor> vendedor = gateway.consultarVendedorPadrao();
-
-        if(vendedor.isEmpty()) {
-            throw new VendedorNaoEncontradoException();
-        }
-
-        return vendedor.get();
-    }
 }

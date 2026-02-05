@@ -10,6 +10,7 @@ import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.ClienteRepos
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ClienteEntity;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.objetoRelatorio.RelatorioProjection;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -25,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ClienteDataProviderTest {
 
     @Mock
@@ -256,5 +259,98 @@ class ClienteDataProviderTest {
                 () -> provider.getRelatorioContatoSegundaFeira(Mockito.any())
         );
         assertEquals(ERR_REL2, ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve retornar cliente quando encontrado no repositório")
+    void deveRetornarClienteQuandoEncontrado() {
+        // Arrange
+        ClienteEntity entity = new ClienteEntity();
+        entity.setId(id);
+        entity.setNome("Cliente Teste");
+        entity.setTelefone(telefone);
+        // Não precisamos setar o UsuarioEntity, pois vamos mockar o Mapper
+
+        // Objeto de domínio que o Mapper vai "fingir" que retornou
+        Cliente clienteEsperado = new Cliente();
+        clienteEsperado.setNome("Cliente Teste");
+
+        when(repository.findByTelefoneAndUsuario_Id(telefone, id))
+                .thenReturn(Optional.of(entity));
+
+        // --- CORREÇÃO: Usar try-with-resources para Mockar o Static ---
+        try (MockedStatic<ClienteMapper> ms = mockStatic(ClienteMapper.class)) {
+
+            // Ensinamos o Mock: "Quando chamarem paraDomain com essa entity, retorne esse clienteEsperado"
+            ms.when(() -> ClienteMapper.paraDomain(entity))
+                    .thenReturn(clienteEsperado);
+
+            // Act
+            Optional<Cliente> resultado = provider.consultarPorTelefoneEUsuario(telefone, id);
+
+            // Assert
+            assertTrue(resultado.isPresent());
+            assertEquals(clienteEsperado.getNome(), resultado.get().getNome());
+
+            verify(repository).findByTelefoneAndUsuario_Id(telefone, id);
+
+            // Verifica se o mapper foi chamado
+            ms.verify(() -> ClienteMapper.paraDomain(entity));
+        }
+    }
+
+    @Test
+    @DisplayName("Deve retornar Optional vazio quando não encontrar no repositório")
+    void deveRetornarVazioQuandoNaoEncontrado() {
+        // Arrange
+        when(repository.findByTelefoneAndUsuario_Id(telefone, id))
+                .thenReturn(Optional.empty());
+
+        // Act
+        Optional<Cliente> resultado = provider.consultarPorTelefoneEUsuario(telefone, id);
+
+        // Assert
+        assertTrue(resultado.isEmpty());
+        verify(repository).findByTelefoneAndUsuario_Id(telefone, id);
+    }
+
+    @Test
+    @DisplayName("Deve lançar DataProviderException quando ocorrer erro no repositório")
+    void deveLancarExcecaoQuandoRepositorioFalhar() {
+        RuntimeException exBanco = new RuntimeException("Erro de conexão");
+
+        when(repository.findByTelefoneAndUsuario_Id(anyString(), any(UUID.class)))
+                .thenThrow(exBanco);
+
+        DataProviderException exception = assertThrows(DataProviderException.class,
+                () -> provider.consultarPorTelefoneEUsuario(telefone, id));
+
+        assertNotNull(exception.getMessage());
+    }
+
+
+    @Test
+    @DisplayName("Cenário com Mock Static do Mapper (Opcional - Mais Seguro)")
+    void deveMapearCorretamenteUsandoMockStatic() {
+        // Arrange
+        ClienteEntity entity = new ClienteEntity();
+        Cliente dominioEsperado = new Cliente();
+        dominioEsperado.setNome("Mockado");
+
+        when(repository.findByTelefoneAndUsuario_Id(telefone, id))
+                .thenReturn(Optional.of(entity));
+
+        // Mock do método estático (Requer dependência mockito-inline)
+        try (MockedStatic<ClienteMapper> mapperMock = Mockito.mockStatic(ClienteMapper.class)) {
+            mapperMock.when(() -> ClienteMapper.paraDomain(entity))
+                    .thenReturn(dominioEsperado);
+
+            // Act
+            Optional<Cliente> resultado = provider.consultarPorTelefoneEUsuario(telefone, id);
+
+            // Assert
+            assertTrue(resultado.isPresent());
+            assertEquals("Mockado", resultado.get().getNome());
+        }
     }
 }

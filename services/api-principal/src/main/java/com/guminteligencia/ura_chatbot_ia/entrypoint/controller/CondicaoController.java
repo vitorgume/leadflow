@@ -17,14 +17,14 @@ public class CondicaoController {
 
     private final CondicaoUseCase condicaoUseCase;
 
-    @PutMapping("id")
+    @PutMapping("{id}")
     public ResponseEntity<ResponseDto<CondicaoDto>> alterar(@PathVariable("id") UUID id, @RequestBody CondicaoDto novosDados) {
         CondicaoDto resultado = CondicaoMapper.paraDto(condicaoUseCase.alterar(id, CondicaoMapper.paraDomain(novosDados)));
         ResponseDto<CondicaoDto> response = new ResponseDto<>(resultado);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("id")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> deletar(@PathVariable("id") UUID id) {
         condicaoUseCase.deletar(id);
         return ResponseEntity.noContent().build();
