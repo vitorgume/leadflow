@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Setter
 @Builder
-public class ContextoEntity {
+public class ContextoEntityLeadflow {
 
     private UUID id;
     private String telefone;

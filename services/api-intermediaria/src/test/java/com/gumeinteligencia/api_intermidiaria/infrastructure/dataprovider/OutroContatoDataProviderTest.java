@@ -1,16 +1,15 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.dataprovider;
 
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
+import com.gumeinteligencia.api_intermidiaria.domain.OutroContato;
+import com.gumeinteligencia.api_intermidiaria.domain.Setor;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -32,14 +31,14 @@ class OutroContatoDataProviderTest {
     @InjectMocks
     private OutroContatoDataProvider dataProvider;
 
-    private List<OutroContatoEntity> outroContatos;
+    private List<OutroContatoEntityLeadflow> outroContatos;
 
     @BeforeEach
     void setUp() {
         outroContatos = new ArrayList<>();
 
         for (int i = 0; i < 2; i++) {
-            outroContatos.add(OutroContatoEntity.builder()
+            outroContatos.add(OutroContatoEntityLeadflow.builder()
                     .id(UUID.randomUUID())
                     .nome("Nome teste")
                     .setor(Setor.LOGISTICA)

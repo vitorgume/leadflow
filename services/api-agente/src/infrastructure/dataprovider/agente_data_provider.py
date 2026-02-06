@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class AgenteDataProvider:
     mensagem_erro_enviar_mensagem_ia = "Erro ao enviar mensagem a IA."
-    modelo_chat = "gpt-4.1"
+    modelo_chat = "gpt-5"
     modelo_json = "gpt-4"
 
     def enviar_mensagem(self, historico, api_key: str) -> str:

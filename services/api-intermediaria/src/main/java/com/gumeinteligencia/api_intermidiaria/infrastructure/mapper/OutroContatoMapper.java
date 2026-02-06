@@ -1,11 +1,11 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.mapper;
 
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
+import com.gumeinteligencia.api_intermidiaria.domain.OutroContato;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 
 public class OutroContatoMapper {
 
-    public static OutroContato paraDomain(OutroContatoEntity entity) {
+    public static OutroContato paraDomain(OutroContatoEntityLeadflow entity) {
         return OutroContato.builder()
                 .id(entity.getId())
                 .nome(entity.getNome())
@@ -15,8 +15,8 @@ public class OutroContatoMapper {
                 .build();
     }
 
-    public static OutroContatoEntity paraEntity(OutroContato domain) {
-        return OutroContatoEntity.builder()
+    public static OutroContatoEntityLeadflow paraEntity(OutroContato domain) {
+        return OutroContatoEntityLeadflow.builder()
                 .id(domain.getId())
                 .nome(domain.getNome())
                 .descricao(domain.getDescricao())

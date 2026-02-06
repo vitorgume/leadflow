@@ -13,12 +13,12 @@ import com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.TextoDto
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.ContextoMapper;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.CLienteRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ContextoRepository;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ConversaAgenteRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -83,11 +83,14 @@ class MensagemControllerTest {
     private ValidadorMensagemUseCase validadorMensagemUseCase;
 
     @MockitoBean
+    private ConversaAgenteRepository conversaAgenteRepository;
+
+    @MockitoBean
     private CLienteRepository cLienteRepository;
 
     private MensagemDto mensagemDto;
 
-    private ContextoEntity contextoEntity;
+    private ContextoEntityLeadflow contextoEntityLeadflow;
 
     @BeforeEach
     void setUp() {
@@ -96,7 +99,7 @@ class MensagemControllerTest {
                 .text(TextoDto.builder().message("Olá, gostaria de um orçamento.").build())
                 .build();
 
-        contextoEntity = ContextoEntity.builder()
+        contextoEntityLeadflow = ContextoEntityLeadflow.builder()
                 .id(UUID.randomUUID())
                 .telefone("45999999999")
                 .status(StatusContexto.ATIVO)
@@ -108,7 +111,7 @@ class MensagemControllerTest {
     void deveProcessarMensagemDeUmNovoContextoComSucesso() throws Exception {
         when(outroContatoRepository.listar()).thenReturn(List.of());
         when(contextoRepository.buscarPorTelefone(any())).thenReturn(Optional.empty());
-        when(contextoRepository.salvar(any())).thenReturn(contextoEntity);
+        when(contextoRepository.salvar(any())).thenReturn(contextoEntityLeadflow);
         when(mensageriaGateway.enviarParaFila(any())).thenReturn(null);
 
         String mensagemJson = objectMapper.writeValueAsString(mensagemDto);
@@ -124,8 +127,8 @@ class MensagemControllerTest {
     @Test
     void deveProcessarMensagemDeUmContextoExistenteComSucesso() throws Exception {
         when(outroContatoRepository.listar()).thenReturn(List.of());
-        when(contextoUseCase.consultarPorTelefone(any())).thenReturn(Optional.of(ContextoMapper.paraDomain(contextoEntity)));
-        when(contextoRepository.salvar(any())).thenReturn(contextoEntity);
+        when(contextoUseCase.consultarPorTelefone(any())).thenReturn(Optional.of(ContextoMapper.paraDomain(contextoEntityLeadflow)));
+        when(contextoRepository.salvar(any())).thenReturn(contextoEntityLeadflow);
         when(mensageriaGateway.enviarParaFila(any())).thenReturn(null);
 
         String mensagemJson = objectMapper.writeValueAsString(mensagemDto);

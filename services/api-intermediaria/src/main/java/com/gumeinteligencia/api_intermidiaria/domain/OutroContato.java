@@ -1,4 +1,4 @@
-package com.gumeinteligencia.api_intermidiaria.domain.outroContato;
+package com.gumeinteligencia.api_intermidiaria.domain;
 
 import lombok.*;
 

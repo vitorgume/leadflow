@@ -5,7 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.TipoContato;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.OutroContatoMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.OutroContatoRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +42,7 @@ class OutroContatoDataProviderTest {
     private final String NOME = "Contato Teste";
     private final String TELEFONE = "5511999999999";
 
+<<<<<<< HEAD
     // Mensagens de erro copiadas da classe original para validação
     private static final String MSG_ERRO_NOME = "Erro ao consultar por nome outro contato.";
     private static final String MSG_ERRO_TIPO = "Erro ao consultra por tipo outro contato.";
@@ -50,6 +51,16 @@ class OutroContatoDataProviderTest {
     private static final String MSG_ERRO_ID = "Erro ao consultar por id outro contato.";
     private static final String MSG_ERRO_LISTAR = "Erro ao listar por usuario outro contato.";
     private static final String MSG_ERRO_DELETAR = "Erro ao deletar por id outro contato.";
+=======
+    private OutroContatoEntityLeadflow entity;
+    private OutroContato domain;
+
+    @BeforeEach
+    void setup() {
+        entity = mock(OutroContatoEntityLeadflow.class);
+        domain = mock(OutroContato.class);
+    }
+>>>>>>> main
 
     @Test
     @DisplayName("ConsultarPorNome: Deve retornar contato mapeado")

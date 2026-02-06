@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.config;
 
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntityLeadflow;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
@@ -33,14 +33,14 @@ class DynamoDbConfigTest {
     @Test
     void deveCriarTabelaDeContextoComNomeConfigurado() {
         DynamoDbEnhancedClient enhancedClient = mock(DynamoDbEnhancedClient.class);
-        DynamoDbTable<ContextoEntity> table = mock(DynamoDbTable.class);
+        DynamoDbTable<ContextoEntityLeadflow> table = mock(DynamoDbTable.class);
         when(enhancedClient.table(eq("contexto-custom"), any(TableSchema.class)))
                 .thenReturn(table);
 
-        DynamoDbTable<ContextoEntity> resultado = config.contextoTable(enhancedClient, "contexto-custom");
+        DynamoDbTable<ContextoEntityLeadflow> resultado = config.contextoTable(enhancedClient, "contexto-custom");
 
         assertSame(table, resultado);
-        ArgumentCaptor<TableSchema<ContextoEntity>> schemaCaptor = ArgumentCaptor.forClass(TableSchema.class);
+        ArgumentCaptor<TableSchema<ContextoEntityLeadflow>> schemaCaptor = ArgumentCaptor.forClass(TableSchema.class);
         verify(enhancedClient).table(eq("contexto-custom"), schemaCaptor.capture());
         assertNotNull(schemaCaptor.getValue());
     }

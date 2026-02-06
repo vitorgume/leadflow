@@ -1,7 +1,10 @@
 package com.gumeinteligencia.api_intermidiaria.application.usecase.validadorMensagens;
 
 import com.gumeinteligencia.api_intermidiaria.application.usecase.OutroContatoUseCase;
+<<<<<<< HEAD
 import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
+=======
+>>>>>>> main
 import com.gumeinteligencia.api_intermidiaria.domain.Mensagem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,6 @@ public class ValidadorTelefoneOutroContato implements MensagemValidator {
 
     @Override
     public boolean deveIgnorar(Mensagem mensagem) {
-        return outroContatoUseCase.listar().stream().map(OutroContato::getTelefone).toList().contains(mensagem.getTelefone());
+        return outroContatoUseCase.consultarPorTelefone(mensagem.getTelefone()).isPresent();
     }
 }

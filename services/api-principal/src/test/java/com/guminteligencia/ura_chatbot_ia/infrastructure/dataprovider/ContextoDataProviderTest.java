@@ -4,7 +4,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.ContextoMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.ContextoRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntityLeadflow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,7 @@ class ContextoDataProviderTest {
 
     private Contexto domainIn;
     private Contexto domainOut;
-    private ContextoEntity entity;
+    private ContextoEntityLeadflow entity;
 
     private final String ERR_DELETE = "Erro ao deletar contexto do banco de dados.";
     private final String ERR_FIND = "Erro ao consultar contexto pelo seu id.";
@@ -43,7 +43,7 @@ class ContextoDataProviderTest {
     void setup() {
         domainIn = mock(Contexto.class);
         domainOut = mock(Contexto.class);
-        entity = mock(ContextoEntity.class);
+        entity = mock(ContextoEntityLeadflow.class);
         id = UUID.randomUUID();
     }
 

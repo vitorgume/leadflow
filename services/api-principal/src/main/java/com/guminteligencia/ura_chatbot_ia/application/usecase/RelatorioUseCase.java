@@ -38,7 +38,6 @@ public class RelatorioUseCase {
 
         List<Usuario> usuarios = usuarioUseCase.listar();
 
-
         usuarios.forEach(usuario -> {
             List<ObjetoRelatorioDto> relatorio;
 

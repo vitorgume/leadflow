@@ -11,7 +11,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class OutroContatoEntity {
+public class OutroContatoEntityLeadflow {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

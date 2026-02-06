@@ -17,7 +17,7 @@ public class WebClientConfig {
     public WebClient webClient(WebClient.Builder builder) {
         return builder
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
-                        .responseTimeout(Duration.ofSeconds(30))))
+                        .responseTimeout(Duration.ofSeconds(60))))
                 .build();
     }
 

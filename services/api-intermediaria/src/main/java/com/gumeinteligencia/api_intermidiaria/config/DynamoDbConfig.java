@@ -1,7 +1,7 @@
 package com.gumeinteligencia.api_intermidiaria.config;
 
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,8 +12,6 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-
-import java.net.URI;
 
 @Configuration
 @Profile("prod")
@@ -41,21 +39,23 @@ public class DynamoDbConfig {
 
     // 3) Tabela: Contexto
     @Bean
-    public DynamoDbTable<ContextoEntity> contextoTable(
+    public DynamoDbTable<ContextoEntityLeadflow> contextoTable(
             DynamoDbEnhancedClient enhancedClient,
             @Value("${app.dynamo.contexto-table:${DYNAMO_CONTEXTO_TABLE:contexto_entity_leadflow}}")
             String tableName
     ) {
-        return enhancedClient.table(tableName, TableSchema.fromBean(ContextoEntity.class));
+        System.out.println(">>> [DYNAMO] Tabela de CONTEXTO configurada: " + tableName);
+        return enhancedClient.table(tableName, TableSchema.fromBean(ContextoEntityLeadflow.class));
     }
 
     // 4) Tabela: Outro Contato
     @Bean
-    public DynamoDbTable<OutroContatoEntity> outroContatoTable(
+    public DynamoDbTable<OutroContatoEntityLeadflow> outroContatoTable(
             DynamoDbEnhancedClient enhancedClient,
             @Value("${app.dynamo.outro-contato-table:${DYNAMO_OUTRO_CONTATO_TABLE:outro_contato_entity_leadflow}}")
             String tableName
     ) {
-        return enhancedClient.table(tableName, TableSchema.fromBean(OutroContatoEntity.class));
+        System.out.println(">>> [DYNAMO] Tabela de OUTRO_CONTATO configurada: " + tableName);
+        return enhancedClient.table(tableName, TableSchema.fromBean(OutroContatoEntityLeadflow.class));
     }
 }
