@@ -31,7 +31,7 @@ public class RelatorioUseCase {
     private final MensagemUseCase mensagemUseCase;
     private final UsuarioUseCase usuarioUseCase;
 
-    @Scheduled(cron = "0 35 17 * * MON-FRI")
+    @Scheduled(cron = "0 0 16 * * MON-FRI")
     public void enviarRelatorioDiarioVendedores() {
         log.info("Gerando relatório de contatos dos vendedores.");
         DayOfWeek dataHoje = LocalDate.now().getDayOfWeek();
