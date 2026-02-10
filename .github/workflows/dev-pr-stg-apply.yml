@@ -204,7 +204,6 @@ jobs:
           echo "FLYWAY_PASSWORD=${DB_PASS}" >> $GITHUB_ENV
 
       - name: Run Flyway migrate (Docker)
-        working-directory: ${{ env.MIGRATIONS_DIR }}/..
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/migrations/flyway:/flyway/sql" \
