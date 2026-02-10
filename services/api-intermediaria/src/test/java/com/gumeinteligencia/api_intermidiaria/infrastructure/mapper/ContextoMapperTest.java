@@ -3,7 +3,7 @@ package com.gumeinteligencia.api_intermidiaria.infrastructure.mapper;
 import com.gumeinteligencia.api_intermidiaria.domain.Contexto;
 import com.gumeinteligencia.api_intermidiaria.domain.MensagemContexto;
 import com.gumeinteligencia.api_intermidiaria.domain.StatusContexto;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import java.util.UUID;
 class ContextoMapperTest {
 
     private Contexto contextoDomain;
-    private ContextoEntityLeadflow contextoEntityLeadflow;
+    private ContextoEntity contextoEntity;
 
     @BeforeEach
     void setUp() {
@@ -25,7 +25,7 @@ class ContextoMapperTest {
                 .mensagens(List.of(MensagemContexto.builder().mensagem("Ola").build()))
                 .build();
 
-        contextoEntityLeadflow = ContextoEntityLeadflow.builder()
+        contextoEntity = ContextoEntity.builder()
                 .id(UUID.randomUUID())
                 .telefone("000000000000")
                 .status(StatusContexto.ATIVO)
@@ -35,17 +35,17 @@ class ContextoMapperTest {
 
     @Test
     void deveRetornarDomain() {
-        Contexto resultado = ContextoMapper.paraDomain(contextoEntityLeadflow);
+        Contexto resultado = ContextoMapper.paraDomain(contextoEntity);
 
-        Assertions.assertEquals(contextoEntityLeadflow.getId(), resultado.getId());
-        Assertions.assertEquals(contextoEntityLeadflow.getTelefone(), resultado.getTelefone());
-        Assertions.assertEquals(contextoEntityLeadflow.getStatus(), resultado.getStatus());
-        Assertions.assertEquals(contextoEntityLeadflow.getMensagens(), resultado.getMensagens());
+        Assertions.assertEquals(contextoEntity.getId(), resultado.getId());
+        Assertions.assertEquals(contextoEntity.getTelefone(), resultado.getTelefone());
+        Assertions.assertEquals(contextoEntity.getStatus(), resultado.getStatus());
+        Assertions.assertEquals(contextoEntity.getMensagens(), resultado.getMensagens());
     }
 
     @Test
     void deveRetornarEntity() {
-        ContextoEntityLeadflow resultado = ContextoMapper.paraEntity(contextoDomain);
+        ContextoEntity resultado = ContextoMapper.paraEntity(contextoDomain);
 
         Assertions.assertEquals(contextoDomain.getId(), resultado.getId());
         Assertions.assertEquals(contextoDomain.getTelefone(), resultado.getTelefone());

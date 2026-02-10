@@ -2,7 +2,7 @@ package com.gumeinteligencia.api_intermidiaria.application.usecase.validadorMens
 
 import com.gumeinteligencia.api_intermidiaria.application.usecase.OutroContatoUseCase;
 import com.gumeinteligencia.api_intermidiaria.domain.Mensagem;
-import com.gumeinteligencia.api_intermidiaria.domain.OutroContato;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

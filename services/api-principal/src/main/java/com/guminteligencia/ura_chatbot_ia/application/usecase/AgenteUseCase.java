@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,10 +44,10 @@ public class AgenteUseCase {
         return resposta;
     }
 
-    public Qualificacao enviarJsonTrasformacao(String texto) {
+    public Qualificacao enviarJsonTrasformacao(String texto, UUID idUsuario) {
         log.info("Enviando texto para ser transformado em JSON. Texto: {}", texto);
 
-        String response = gateway.enviarJsonTrasformacao(texto);
+        String response = gateway.enviarJsonTrasformacao(texto, idUsuario);
 
         Qualificacao qualificacao = parseJson(response);
 

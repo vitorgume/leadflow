@@ -1,7 +1,7 @@
 package com.gumeinteligencia.api_intermidiaria.config;
 
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
@@ -47,7 +47,7 @@ class ConfigTest {
         DynamoDbConfig config = new DynamoDbConfig();
 
         DynamoDbEnhancedClient enhancedClient = config.dynamoDbEnhancedClient(lowLevel);
-        DynamoDbTable<ContextoEntityLeadflow> contextoTable = config.contextoTable(enhancedClient, "contexto_entity_leadflow");
+        DynamoDbTable<ContextoEntity> contextoTable = config.contextoTable(enhancedClient, "contexto_entity_leadflow");
         DynamoDbTable<OutroContatoEntityLeadflow> outroContatoTable = config.outroContatoTable(enhancedClient, "outro_contato_entity_leadflow");
 
         assertNotNull(enhancedClient);

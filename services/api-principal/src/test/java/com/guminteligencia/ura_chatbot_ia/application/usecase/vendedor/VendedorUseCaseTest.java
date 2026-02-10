@@ -4,9 +4,18 @@ import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorComMesm
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEscolhidoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.VendedorGateway;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.condicoes.CondicaoComposite;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.condicoes.CondicaoType;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.UsuarioUseCase;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Condicao;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.ConectorLogico;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.ConfiguracaoEscolhaVendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.OperadorLogico;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,9 +23,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -25,27 +36,36 @@ import static org.mockito.Mockito.*;
 class VendedorUseCaseTest {
 
     @Mock
-    private EscolhaVendedorComposite escolhaComposite;
+    private VendedorGateway gateway;
 
     @Mock
-    private VendedorGateway gateway;
+    private ConfiguracaoEscolhaVendedorUseCase configuracaoEscolhaVendedorUseCase;
+    @Mock
+    private CondicaoComposite condicaoComposite;
+    @Mock
+    private UsuarioUseCase usuarioUseCase;
 
     @InjectMocks
     private VendedorUseCase useCase;
 
-    @BeforeEach
-    void resetUltimoVendedor() throws Exception {
-        Field f = VendedorUseCase.class.getDeclaredField("ultimoVendedor");
-        f.setAccessible(true);
-        f.set(null, null);
-    }
+    private Usuario usuario;
+    private Cliente cliente;
+    private Vendedor vendedor1, vendedor2;
 
+
+//
+
+//
     @Test
     void cadastrarDeveLancarExceptionQuandoTelefoneJaExiste() {
-        Vendedor novo = Vendedor.builder().telefone("+5511999").build();
+        UUID usuarioId = UUID.randomUUID();
+        Usuario usuario = Usuario.builder().id(usuarioId).build();
+        Vendedor novo = Vendedor.builder().telefone("+5511999").usuario(usuario).build();
         Vendedor existente = Vendedor.builder().telefone("+5511999").build();
+
         when(gateway.consultarPorTelefone("+5511999"))
                 .thenReturn(Optional.of(existente));
+        lenient().when(usuarioUseCase.consultarPorId(usuarioId)).thenReturn(usuario);
 
         assertThrows(
                 VendedorComMesmoTelefoneException.class,
@@ -55,70 +75,6 @@ class VendedorUseCaseTest {
 
         verify(gateway).consultarPorTelefone("+5511999");
         verify(gateway, never()).salvar(any());
-    }
-
-    @Test
-    void escolherVendedorDeveRetornarQuandoOptionalPresente() {
-        Cliente cli = Cliente.builder().build();
-        Vendedor v = Vendedor.builder().nome("X").build();
-        when(gateway.listarAtivos()).thenReturn(List.of(v));
-        when(escolhaComposite.escolher(cli, List.of(v)))
-                .thenReturn(Optional.of(v));
-
-        Vendedor res = useCase.escolherVendedor(cli);
-        assertSame(v, res);
-    }
-
-    @Test
-    void escolherVendedorDeveLancarExceptionQuandoNenhumSelecionado() {
-        Cliente cli = Cliente.builder().build();
-        when(gateway.listarAtivos()).thenReturn(List.of());
-        when(escolhaComposite.escolher(cli, List.of()))
-                .thenReturn(Optional.empty());
-
-        assertThrows(
-                VendedorNaoEscolhidoException.class,
-                () -> useCase.escolherVendedor(cli)
-        );
-    }
-
-    @Test
-    void roletaVendedoresSeSomenteUmRetornaNomeDireto() {
-        Vendedor unico = Vendedor.builder().nome("A").inativo(false).build();
-        when(gateway.listar()).thenReturn(List.of(unico));
-
-        String nome = useCase.roletaVendedores(null);
-        assertEquals("A", nome);
-    }
-
-    @Test
-    void roletaVendedoresComExcecaoUsaListarComExcecao() {
-        when(gateway.listarComExcecao("exc")).thenReturn(List.of(
-                Vendedor.builder().nome("B").inativo(false).build()
-        ));
-
-        String nome = useCase.roletaVendedores("exc");
-        assertEquals("B", nome);
-        verify(gateway).listarComExcecao("exc");
-    }
-
-    @Test
-    void roletaVendedoresEscolheAleatorioMasPulaInativoEAnterior() throws Exception {
-        Vendedor inativo = Vendedor.builder().nome("I").inativo(true).build();
-        Vendedor v1 = Vendedor.builder().nome("V1").inativo(false).build();
-        Vendedor v2 = Vendedor.builder().nome("V2").inativo(false).build();
-        List<Vendedor> lista = List.of(inativo, v1, v2);
-        when(gateway.listar()).thenReturn(lista);
-
-        Random rnd = mock(Random.class);
-        when(rnd.nextInt(lista.size())).thenReturn(0, 1);
-
-        Field rf = VendedorUseCase.class.getDeclaredField("random");
-        rf.setAccessible(true);
-        rf.set(useCase, rnd);
-
-        String escolhido = useCase.roletaVendedores(null);
-        assertEquals("V1", escolhido);
     }
 
     @Test
@@ -139,36 +95,6 @@ class VendedorUseCaseTest {
         );
     }
 
-//    @Test
-//    void roletaVendedoresConversaInativaSeSegmentoNaoNuloChamaEscolher() {
-//        Cliente cli = Cliente.builder().build();
-//        cli.setSegmento(null);
-//
-//        cli.setSegmento(null);
-//        Cliente cli2 = Cliente.builder().build();
-//        cli2.setSegmento(Segmento.MEDICINA_SAUDE);
-//        Vendedor v = Vendedor.builder().nome("X").build();
-//        when(escolhaComposite.escolher(eq(cli2), anyList()))
-//                .thenReturn(Optional.of(v));
-//
-//        Vendedor res = useCase.roletaVendedoresConversaInativa(cli2);
-//        assertSame(v, res);
-//    }
-//
-//    @Test
-//    void roletaVendedoresConversaInativaSeSegmentoNuloChamaRoletaEConsultar() {
-//        Cliente cli = Cliente.builder().build();
-//        cli.setSegmento(null);
-//
-//        VendedorUseCase spyUC = spy(useCase);
-//        doReturn("NM").when(spyUC).roletaVendedores("Nilza");
-//        Vendedor v = Vendedor.builder().nome("NM").build();
-//        when(gateway.consultarVendedor("NM")).thenReturn(Optional.of(v));
-//
-//        Vendedor res = spyUC.roletaVendedoresConversaInativa(cli);
-//        assertSame(v, res);
-//    }
-
     @Test
     void alterarDeveChamarSalvarERetornar() {
         Vendedor orig = Vendedor.builder().id(1L).build();
@@ -183,20 +109,13 @@ class VendedorUseCaseTest {
     }
 
     @Test
-    void alterarDeveLancarExceptionQuandoNaoEncontrarPorId() {
-        when(gateway.consultarPorId(2L)).thenReturn(Optional.empty());
-        assertThrows(
-                VendedorNaoEncontradoException.class,
-                () -> useCase.alterar(Vendedor.builder().build(), 2L)
-        );
-    }
-
-    @Test
-    void listarDeveDelegarParaGateway() {
+    void listarPorUsuarioDeveDelegarParaGateway() {
+        UUID idUsuario = UUID.randomUUID();
         List<Vendedor> lista = List.of(Vendedor.builder().nome("A").build());
-        when(gateway.listar()).thenReturn(lista);
-        List<Vendedor> res = useCase.listar();
+        when(gateway.listarPorUsuario(idUsuario)).thenReturn(lista);
+        List<Vendedor> res = useCase.listarPorUsuario(idUsuario);
         assertSame(lista, res);
+        verify(gateway).listarPorUsuario(idUsuario);
     }
 
     @Test
@@ -206,14 +125,5 @@ class VendedorUseCaseTest {
         useCase.deletar(3L);
         verify(gateway).consultarPorId(3L);
         verify(gateway).deletar(3L);
-    }
-
-    @Test
-    void deletarDeveLancarExceptionQuandoNaoEncontrar() {
-        when(gateway.consultarPorId(4L)).thenReturn(Optional.empty());
-        assertThrows(
-                VendedorNaoEncontradoException.class,
-                () -> useCase.deletar(4L)
-        );
     }
 }

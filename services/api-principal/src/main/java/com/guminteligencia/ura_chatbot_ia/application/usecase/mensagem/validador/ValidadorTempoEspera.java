@@ -23,7 +23,7 @@ public class ValidadorTempoEspera implements ContextoValidator {
 
     @Override
     public boolean permitirProcessar(Contexto contexto) {
-        return clienteUseCase.consultarPorTelefone(contexto.getTelefone())
+        return clienteUseCase.consultarPorTelefoneEUsuario(contexto.getTelefone(), contexto.getTelefoneUsuario())
                 .map(cliente -> {
                     ConversaAgente conv;
 

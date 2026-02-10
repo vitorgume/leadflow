@@ -3,6 +3,8 @@ package com.guminteligencia.ura_chatbot_ia.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.util.Map;
+
 @AllArgsConstructor
 @Getter
 @Setter
@@ -12,17 +14,5 @@ import lombok.*;
 public class Qualificacao {
 
     private String nome;
-    private String cpf;
-
-    @JsonProperty("consentimento_atendimento")
-    private Boolean consentimentoAtendimnento;
-
-    @JsonProperty("tipo_consulta")
-    private Integer tipoConsulta;
-
-    @JsonProperty("dor_desejo_paciente")
-    private String dorDesejoPaciente;
-
-    @JsonProperty("preferencia_horario")
-    private Integer preferenciaHorario;
+    private Map<String, Object> atributosVariaveis;
 }

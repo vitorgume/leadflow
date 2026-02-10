@@ -3,7 +3,7 @@ import uuid
 from src.infrastructure.entity.conversa_entity import ConversaEntity
 from src.infrastructure.mapper.conversa_mapper import ConversaMapper
 from src.domain.conversa import Conversa
-from src.config.database import SessionLocal, Base
+from src.config.database import SessionLocal
 from src.infrastructure.exceptions.data_provider_exception import DataProviderException
 from sqlalchemy.exc import SQLAlchemyError
 import logging
@@ -34,6 +34,8 @@ class ConversaDataProvider:
         try:
             uuid_bytes = uuid.UUID(id).bytes
             entity = session.query(ConversaEntity).filter(ConversaEntity.id_conversa == uuid_bytes).first()
+            if entity is None:
+                return None
             return self.conversa_mapper.paraDomain(entity)
         except SQLAlchemyError as e:
             logger.exception("Erro ao consultar conversa no banco de dados %s", e)

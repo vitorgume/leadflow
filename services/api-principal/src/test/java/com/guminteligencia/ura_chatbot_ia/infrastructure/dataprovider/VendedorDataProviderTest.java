@@ -1,25 +1,29 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.VendedorMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.VendedorRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.VendedorEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.vendedor.VendedorEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class VendedorDataProviderTest {
 
     @Mock
@@ -41,6 +45,7 @@ class VendedorDataProviderTest {
     private VendedorEntity entityOut;
     private Vendedor domainIn;
     private Vendedor domainOut;
+    private final UUID ID_USUARIO = UUID.randomUUID();
 
     @BeforeEach
     void setup() {
@@ -85,34 +90,34 @@ class VendedorDataProviderTest {
     }
 
     @Test
-    void deveListarComSucesso() {
+    void deveListarPorUsuarioComSucesso() {
         List<VendedorEntity> raw = List.of(entityIn);
         List<Vendedor> domList = List.of(domainOut);
 
-        when(repository.findAll()).thenReturn(raw);
+        when(repository.findByUsuario_Id(Mockito.any())).thenReturn(raw);
         try (MockedStatic<VendedorMapper> ms = mockStatic(VendedorMapper.class)) {
             ms.when(() -> VendedorMapper.paraDomain(entityIn)).thenReturn(domainOut);
 
-            List<Vendedor> result = provider.listar();
+            List<Vendedor> result = provider.listarPorUsuario(ID_USUARIO);
             assertEquals(domList, result);
 
-            verify(repository).findAll();
+            verify(repository).findByUsuario_Id(Mockito.any());
             ms.verify(() -> VendedorMapper.paraDomain(entityIn));
         }
     }
 
     @Test
-    void deveLancarExceptionAoListar() {
-        when(repository.findAll()).thenThrow(new RuntimeException("fail-list"));
+    void deveLancarExceptionAoListarPorUsuario() {
+        when(repository.findByUsuario_Id(Mockito.any())).thenThrow(new RuntimeException("fail-list"));
         DataProviderException ex = assertThrows(
                 DataProviderException.class,
-                () -> provider.listar()
+                () -> provider.listarPorUsuario(Mockito.any())
         );
         assertEquals(ERR_LIST, ex.getMessage());
     }
 
     @Test
-    void deveListarComExcecaoComSucesso() {
+    void deveListarPorUsuarioComExcecaoComSucesso() {
         List<VendedorEntity> raw = List.of(entityIn);
         List<Vendedor> domList = List.of(domainOut);
 
@@ -129,7 +134,7 @@ class VendedorDataProviderTest {
     }
 
     @Test
-    void deveLancarExceptionAoListarComExcecao() {
+    void deveLancarExceptionAoListarPorUsuarioComExcecao() {
         when(repository.listarComExcecao(any()))
                 .thenThrow(new RuntimeException("fail-exc"));
         DataProviderException ex = assertThrows(
@@ -254,7 +259,7 @@ class VendedorDataProviderTest {
     }
 
     @Test
-    void deveListarAtivosComSucesso() {
+    void deveListarPorUsuarioAtivosComSucesso() {
         List<VendedorEntity> raw = List.of(entityIn);
         List<Vendedor> domList = List.of(domainOut);
 

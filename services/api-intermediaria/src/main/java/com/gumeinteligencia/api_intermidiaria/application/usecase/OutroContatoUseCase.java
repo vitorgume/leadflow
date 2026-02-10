@@ -1,7 +1,7 @@
 package com.gumeinteligencia.api_intermidiaria.application.usecase;
 
 import com.gumeinteligencia.api_intermidiaria.application.gateways.OutroContatoGateway;
-import com.gumeinteligencia.api_intermidiaria.domain.OutroContato;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

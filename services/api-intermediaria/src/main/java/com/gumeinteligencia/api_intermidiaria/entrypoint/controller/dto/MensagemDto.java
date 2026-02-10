@@ -8,6 +8,7 @@ import lombok.*;
 @ToString
 @Builder
 public class MensagemDto {
+    private String connectedPhone;
     private String phone;
     private TextoDto text;
     private ImageDto image;

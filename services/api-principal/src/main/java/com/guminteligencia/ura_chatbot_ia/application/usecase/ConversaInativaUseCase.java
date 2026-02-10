@@ -1,12 +1,14 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,7 +22,7 @@ import java.util.List;
 public class ConversaInativaUseCase {
 
     private final ConversaAgenteUseCase conversaAgenteUseCase;
-    private final VendedorUseCase vendedorUseCase;
+    private final EscolhaVendedorUseCase escolhaVendedorUseCase;
     private final CrmUseCase crmUseCase;
     private final MensagemUseCase mensagemUseCase;
     private final MensagemBuilder mensagemBuilder;
@@ -30,14 +32,14 @@ public class ConversaInativaUseCase {
 
     public ConversaInativaUseCase (
         ConversaAgenteUseCase conversaAgenteUseCase,
-        VendedorUseCase vendedorUseCase,
+        EscolhaVendedorUseCase escolhaVendedorUseCase,
         CrmUseCase crmUseCase,
         MensagemUseCase mensagemUseCase,
         MensagemBuilder mensagemBuilder,
         @Value("${spring.profiles.active}") String profile
     ) {
         this.conversaAgenteUseCase = conversaAgenteUseCase;
-        this.vendedorUseCase = vendedorUseCase;
+        this.escolhaVendedorUseCase = escolhaVendedorUseCase;
         this.crmUseCase = crmUseCase;
         this.mensagemUseCase = mensagemUseCase;
         this.mensagemBuilder = mensagemBuilder;
@@ -82,7 +84,7 @@ public class ConversaInativaUseCase {
                 } else {
                     conversa.setStatus(StatusConversa.INATIVO_G2);
                     conversa.setFinalizada(true);
-                    Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
+                    Vendedor vendedor = escolhaVendedorUseCase.roletaVendedoresContatosInativos(conversa.getCliente().getUsuario().getId());
                     conversa.setVendedor(vendedor);
                     crmUseCase.atualizarCrm(vendedor, conversa.getCliente(), conversa);
                 }

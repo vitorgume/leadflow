@@ -10,12 +10,9 @@ public class ClienteMapper {
                 .id(cliente.getId())
                 .nome(cliente.getNome())
                 .telefone(cliente.getTelefone())
-                .cpf(cliente.getCpf())
-                .consentimentoAtendimnento(cliente.getConsentimentoAtendimnento())
-                .tipoConsulta(cliente.getTipoConsulta())
-                .dorDesejoPaciente(cliente.getDorDesejoPaciente())
-                .preferenciaHorario(cliente.getPreferenciaHorario())
+                .atributosQualificacao(cliente.getAtributosQualificacao())
                 .inativo(cliente.isInativo())
+                .usuario(UsuarioMapper.paraDto(cliente.getUsuario()))
                 .build();
     }
 }

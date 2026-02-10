@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.repository;
 
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntity;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,18 +28,18 @@ class ContextoRepositoryTest {
     private ContextoRepository repository;
 
     @Captor
-    private ArgumentCaptor<ContextoEntityLeadflow> entityCaptor;
+    private ArgumentCaptor<ContextoEntity> entityCaptor;
 
     @Captor
     private ArgumentCaptor<Key> keyCaptor;
 
     private UUID id;
-    private ContextoEntityLeadflow dummyEntity;
+    private ContextoEntity dummyEntity;
 
     @BeforeEach
     void setup() {
         id = UUID.randomUUID();
-        dummyEntity = new ContextoEntityLeadflow();
+        dummyEntity = new ContextoEntity();
         dummyEntity.setId(id);
     }
 
@@ -53,25 +53,25 @@ class ContextoRepositoryTest {
 
     @Test
     void deveConsultarPorIdRetornarOptionalEmpty() {
-        when(dynamoDbTemplate.load(any(Key.class), eq(ContextoEntityLeadflow.class)))
+        when(dynamoDbTemplate.load(any(Key.class), eq(ContextoEntity.class)))
                 .thenReturn(null);
 
-        Optional<ContextoEntityLeadflow> result = repository.consultarPorId(id);
+        Optional<ContextoEntity> result = repository.consultarPorId(id);
 
         assertTrue(result.isEmpty());
 
         Key expectedKey = Key.builder()
                 .partitionValue(id.toString())
                 .build();
-        verify(dynamoDbTemplate).load(eq(expectedKey), eq(ContextoEntityLeadflow.class));
+        verify(dynamoDbTemplate).load(eq(expectedKey), eq(ContextoEntity.class));
     }
 
     @Test
     void consultarPorIdDeveRetornarContexto() {
-        when(dynamoDbTemplate.load(any(Key.class), eq(ContextoEntityLeadflow.class)))
+        when(dynamoDbTemplate.load(any(Key.class), eq(ContextoEntity.class)))
                 .thenReturn(dummyEntity);
 
-        Optional<ContextoEntityLeadflow> result = repository.consultarPorId(id);
+        Optional<ContextoEntity> result = repository.consultarPorId(id);
 
         assertTrue(result.isPresent());
         assertSame(dummyEntity, result.get());
@@ -79,12 +79,12 @@ class ContextoRepositoryTest {
         Key expectedKey = Key.builder()
                 .partitionValue(id.toString())
                 .build();
-        verify(dynamoDbTemplate).load(eq(expectedKey), eq(ContextoEntityLeadflow.class));
+        verify(dynamoDbTemplate).load(eq(expectedKey), eq(ContextoEntity.class));
     }
 
     @Test
     void consultaPorIdQuandoTemplateLancaException() {
-        when(dynamoDbTemplate.load(any(Key.class), eq(ContextoEntityLeadflow.class)))
+        when(dynamoDbTemplate.load(any(Key.class), eq(ContextoEntity.class)))
                 .thenThrow(new RuntimeException("Dynamo falhou"));
 
         RuntimeException ex = assertThrows(RuntimeException.class,

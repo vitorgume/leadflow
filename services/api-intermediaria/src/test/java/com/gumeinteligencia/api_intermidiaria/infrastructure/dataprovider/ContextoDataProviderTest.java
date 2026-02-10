@@ -6,7 +6,7 @@ import com.gumeinteligencia.api_intermidiaria.domain.StatusContexto;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.MensagemContextoListConverter;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ContextoRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +42,7 @@ class ContextoDataProviderTest {
     @InjectMocks
     private ContextoDataProvider dataProvider;
 
-    private ContextoEntityLeadflow contextoEntityLeadflow;
+    private ContextoEntity contextoEntity;
     private MensagemContexto mensagemContexto;
 
     @BeforeEach
@@ -53,7 +53,7 @@ class ContextoDataProviderTest {
                 .audioUrl("http://audio")
                 .build();
 
-        contextoEntityLeadflow = ContextoEntityLeadflow.builder()
+        contextoEntity = ContextoEntity.builder()
                 .id(UUID.randomUUID())
                 .telefone("45999999999")
                 .status(StatusContexto.ATIVO)
@@ -63,11 +63,11 @@ class ContextoDataProviderTest {
 
     @Test
     void deveConsultarPorTelefone() {
-        AttributeValue mensagensAttr = new MensagemContextoListConverter().transformFrom(contextoEntityLeadflow.getMensagens());
+        AttributeValue mensagensAttr = new MensagemContextoListConverter().transformFrom(contextoEntity.getMensagens());
         Map<String, AttributeValue> itemMap = Map.of(
-                "id", AttributeValue.fromS(contextoEntityLeadflow.getId().toString()),
-                "telefone", AttributeValue.fromS(contextoEntityLeadflow.getTelefone()),
-                "status", AttributeValue.fromS(contextoEntityLeadflow.getStatus().name()),
+                "id", AttributeValue.fromS(contextoEntity.getId().toString()),
+                "telefone", AttributeValue.fromS(contextoEntity.getTelefone()),
+                "status", AttributeValue.fromS(contextoEntity.getStatus().name()),
                 "mensagens", mensagensAttr
         );
 
@@ -77,10 +77,10 @@ class ContextoDataProviderTest {
 
         when(dynamoDbClient.query(any(QueryRequest.class))).thenReturn(mockResponse);
 
-        Optional<Contexto> resultado = dataProvider.consultarPorTelefone(contextoEntityLeadflow.getTelefone());
+        Optional<Contexto> resultado = dataProvider.consultarPorTelefone(contextoEntity.getTelefone());
 
         assertTrue(resultado.isPresent());
-        assertEquals(contextoEntityLeadflow.getTelefone(), resultado.get().getTelefone());
+        assertEquals(contextoEntity.getTelefone(), resultado.get().getTelefone());
         assertEquals(StatusContexto.ATIVO, resultado.get().getStatus());
         assertEquals(1, resultado.get().getMensagens().size());
         assertEquals(mensagemContexto.getMensagem(), resultado.get().getMensagens().get(0).getMensagem());
@@ -90,10 +90,10 @@ class ContextoDataProviderTest {
 
     @Test
     void deveConsultarPorTelefoneSemStatusEPreencherAtivo() {
-        AttributeValue mensagensAttr = new MensagemContextoListConverter().transformFrom(contextoEntityLeadflow.getMensagens());
+        AttributeValue mensagensAttr = new MensagemContextoListConverter().transformFrom(contextoEntity.getMensagens());
         Map<String, AttributeValue> itemMap = Map.of(
-                "id", AttributeValue.fromS(contextoEntityLeadflow.getId().toString()),
-                "telefone", AttributeValue.fromS(contextoEntityLeadflow.getTelefone()),
+                "id", AttributeValue.fromS(contextoEntity.getId().toString()),
+                "telefone", AttributeValue.fromS(contextoEntity.getTelefone()),
                 "mensagens", mensagensAttr
         );
 
@@ -103,7 +103,7 @@ class ContextoDataProviderTest {
 
         when(dynamoDbClient.query(any(QueryRequest.class))).thenReturn(mockResponse);
 
-        Optional<Contexto> resultado = dataProvider.consultarPorTelefone(contextoEntityLeadflow.getTelefone());
+        Optional<Contexto> resultado = dataProvider.consultarPorTelefone(contextoEntity.getTelefone());
 
         assertTrue(resultado.isPresent());
         assertEquals(StatusContexto.ATIVO, resultado.get().getStatus());
@@ -112,9 +112,9 @@ class ContextoDataProviderTest {
     @Test
     void deveRetornarMensagensVaziasQuandoNaoExistirem() {
         Map<String, AttributeValue> itemMap = Map.of(
-                "id", AttributeValue.fromS(contextoEntityLeadflow.getId().toString()),
-                "telefone", AttributeValue.fromS(contextoEntityLeadflow.getTelefone()),
-                "status", AttributeValue.fromS(contextoEntityLeadflow.getStatus().name())
+                "id", AttributeValue.fromS(contextoEntity.getId().toString()),
+                "telefone", AttributeValue.fromS(contextoEntity.getTelefone()),
+                "status", AttributeValue.fromS(contextoEntity.getStatus().name())
         );
 
         QueryResponse mockResponse = QueryResponse.builder()
@@ -123,7 +123,7 @@ class ContextoDataProviderTest {
 
         when(dynamoDbClient.query(any(QueryRequest.class))).thenReturn(mockResponse);
 
-        Optional<Contexto> resultado = dataProvider.consultarPorTelefone(contextoEntityLeadflow.getTelefone());
+        Optional<Contexto> resultado = dataProvider.consultarPorTelefone(contextoEntity.getTelefone());
 
         assertTrue(resultado.isPresent());
         assertNotNull(resultado.get().getMensagens());
@@ -166,18 +166,18 @@ class ContextoDataProviderTest {
 
     @Test
     void deveSalvarComSucesso() {
-        when(repository.salvar(any())).thenReturn(contextoEntityLeadflow);
+        when(repository.salvar(any())).thenReturn(contextoEntity);
 
         Contexto salvo = dataProvider.salvar(Contexto.builder()
-                .id(contextoEntityLeadflow.getId())
-                .telefone(contextoEntityLeadflow.getTelefone())
-                .mensagens(contextoEntityLeadflow.getMensagens())
-                .status(contextoEntityLeadflow.getStatus())
+                .id(contextoEntity.getId())
+                .telefone(contextoEntity.getTelefone())
+                .mensagens(contextoEntity.getMensagens())
+                .status(contextoEntity.getStatus())
                 .build());
 
         assertNotNull(salvo);
-        assertEquals(contextoEntityLeadflow.getTelefone(), salvo.getTelefone());
-        assertEquals(contextoEntityLeadflow.getMensagens(), salvo.getMensagens());
+        assertEquals(contextoEntity.getTelefone(), salvo.getTelefone());
+        assertEquals(contextoEntity.getMensagens(), salvo.getMensagens());
     }
 
     @Test

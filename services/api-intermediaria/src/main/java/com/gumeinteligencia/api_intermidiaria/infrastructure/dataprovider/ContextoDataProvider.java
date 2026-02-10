@@ -8,7 +8,7 @@ import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProv
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.ContextoMapper;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.MensagemContextoListConverter;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ContextoRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,6 +26,7 @@ public class ContextoDataProvider implements ContextoGateway {
 
     private final ContextoRepository repository;
     private final DynamoDbClient dynamoDbClient;
+    private final MensagemContextoListConverter mensagemContextoListConverter = new MensagemContextoListConverter();
     private final String MENSAGEM_ERRO_CONSULTAR_CONTEXTO_PELO_TELEFONE_E_ATIVO = "Erro ao consultar contexto pelo seu telefone e ativo.";
     private final String MENSAGEM_ERRO_SALVAR_CONTEXTO = "Erro ao salvar contexto.";
 
@@ -53,7 +54,7 @@ public class ContextoDataProvider implements ContextoGateway {
 
         if (response.hasItems() && !response.items().isEmpty()) {
             Map<String, AttributeValue> item = response.items().get(0);
-            ContextoEntityLeadflow contexto = converterParaContextoEntity(item);
+            ContextoEntity contexto = converterParaContextoEntity(item);
             return Optional.of(contexto).map(ContextoMapper::paraDomain);
         }
 
@@ -62,21 +63,21 @@ public class ContextoDataProvider implements ContextoGateway {
 
     @Override
     public Contexto salvar(Contexto contexto) {
-        ContextoEntityLeadflow contextoEntityLeadflow = ContextoMapper.paraEntity(contexto);
+        ContextoEntity contextoEntity = ContextoMapper.paraEntity(contexto);
 
         try {
-            contextoEntityLeadflow = repository.salvar(contextoEntityLeadflow);
+            contextoEntity = repository.salvar(contextoEntity);
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_SALVAR_CONTEXTO, ex);
             throw new DataProviderException(MENSAGEM_ERRO_SALVAR_CONTEXTO, ex.getCause());
         }
 
-        return ContextoMapper.paraDomain(contextoEntityLeadflow);
+        return ContextoMapper.paraDomain(contextoEntity);
     }
 
-    private ContextoEntityLeadflow converterParaContextoEntity(Map<String, AttributeValue> item) {
+    private ContextoEntity converterParaContextoEntity(Map<String, AttributeValue> item) {
         List<MensagemContexto> mensagens = Optional.ofNullable(item.get("mensagens"))
-                .map(MensagemContextoListConverter::fromAttributeValue)
+                .map(mensagemContextoListConverter::fromAttributeValue)
                 .orElseGet(Collections::emptyList);
 
         StatusContexto status = Optional.ofNullable(item.get("status"))
@@ -85,7 +86,7 @@ public class ContextoDataProvider implements ContextoGateway {
                 .map(StatusContexto::valueOf)
                 .orElse(StatusContexto.ATIVO);
 
-        return ContextoEntityLeadflow.builder()
+        return ContextoEntity.builder()
                 .id(UUID.fromString(item.get("id").s()))
                 .telefone(item.get("telefone").s())
                 .mensagens(mensagens)

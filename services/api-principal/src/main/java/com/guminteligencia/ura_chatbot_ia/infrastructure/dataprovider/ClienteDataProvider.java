@@ -3,6 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.ClienteGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ObjetoRelatorioDto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.ClienteMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.RelatorioMapper;
@@ -26,6 +27,7 @@ public class ClienteDataProvider implements ClienteGateway {
     private final String MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE = "Erro ao consultar cliente pelo seu telefone.";
     private final String MENSAGEM_ERRO_GERAR_RELATORIO = "Erro ao gerar relatório de contatos.";
     private final String MENSAGEM_ERRO_GERAR_RELATORIO_SEGUNDA_FEIRA = "Erro ao gerar relatório de segunda feira.";
+    private final String MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE_E_USUARIO = "Erro ao consultar cliente pelo telefone e usuário.";
     private final ClienteRepository repository;
 
     @Override
@@ -72,11 +74,11 @@ public class ClienteDataProvider implements ClienteGateway {
     }
 
     @Override
-    public List<RelatorioContatoDto> getRelatorioContato() {
-        List<RelatorioContatoDto> relatorios;
+    public List<ObjetoRelatorioDto> getRelatorioContato(UUID idUsuario) {
+        List<ObjetoRelatorioDto> relatorios;
 
         try {
-            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorio());
+            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorio(idUsuario));
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_GERAR_RELATORIO, ex);
             throw new DataProviderException(MENSAGEM_ERRO_GERAR_RELATORIO, ex.getCause());
@@ -86,16 +88,30 @@ public class ClienteDataProvider implements ClienteGateway {
     }
 
     @Override
-    public List<RelatorioContatoDto> getRelatorioContatoSegundaFeira() {
-        List<RelatorioContatoDto> relatorios;
+    public List<ObjetoRelatorioDto> getRelatorioContatoSegundaFeira(UUID idUsuario) {
+        List<ObjetoRelatorioDto> relatorios;
 
         try {
-            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorioSegundaFeira());
+            relatorios = RelatorioMapper.paraDto(repository.gerarRelatorioSegundaFeira(idUsuario));
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_GERAR_RELATORIO_SEGUNDA_FEIRA, ex);
             throw new DataProviderException(MENSAGEM_ERRO_GERAR_RELATORIO_SEGUNDA_FEIRA, ex.getCause());
         }
 
         return relatorios;
+    }
+
+    @Override
+    public Optional<Cliente> consultarPorTelefoneEUsuario(String telefone, UUID idUsuario) {
+        Optional<ClienteEntity> cliente;
+
+        try {
+            cliente = repository.findByTelefoneAndUsuario_Id(telefone, idUsuario);
+        } catch (Exception ex) {
+            log.error(MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE_E_USUARIO, ex);
+            throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE_E_USUARIO, ex.getCause());
+        }
+
+        return cliente.map(ClienteMapper::paraDomain);
     }
 }

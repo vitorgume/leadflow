@@ -7,6 +7,7 @@ public class MensagemMapper {
 
     public static Mensagem paraDomain(MensagemDto dto) {
         return Mensagem.builder()
+                .telefoneConectado(dto.getConnectedPhone())
                 .telefone(dto.getPhone())
                 .mensagem(dto.getText() == null ? "" : dto.getText().getMessage())
                 .urlAudio(dto.getAudio() == null ? "" : dto.getAudio().getAudioUrl())

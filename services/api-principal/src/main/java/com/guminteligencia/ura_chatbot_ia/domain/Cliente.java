@@ -2,6 +2,7 @@ package com.guminteligencia.ura_chatbot_ia.domain;
 
 import lombok.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -9,23 +10,17 @@ import java.util.UUID;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
 public class Cliente {
     private UUID id;
     private String nome;
     private String telefone;
-    private String cpf;
-    private Boolean consentimentoAtendimnento;
-    private TipoConsulta tipoConsulta;
-    private String dorDesejoPaciente;
-    private PreferenciaHorario preferenciaHorario;
+    private Map<String, Object> atributosQualificacao;
     private boolean inativo;
+    private Usuario usuario;
 
     public void setDados(Cliente cliente) {
         this.nome = cliente.getNome();
-        this.cpf = cliente.getCpf();
-        this.consentimentoAtendimnento = cliente.getConsentimentoAtendimnento();
-        this.tipoConsulta = cliente.getTipoConsulta();
-        this.dorDesejoPaciente = cliente.getDorDesejoPaciente();
-        this.preferenciaHorario = cliente.getPreferenciaHorario();
+        this.atributosQualificacao = cliente.getAtributosQualificacao();
     }
 }

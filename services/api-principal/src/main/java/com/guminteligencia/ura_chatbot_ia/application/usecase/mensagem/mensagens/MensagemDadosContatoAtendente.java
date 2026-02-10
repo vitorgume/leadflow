@@ -5,6 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Component
 public class MensagemDadosContatoAtendente implements MensagemType {
@@ -18,42 +19,18 @@ public class MensagemDadosContatoAtendente implements MensagemType {
 
         mensagem.append("Dados do contato acima:\n");
 
-        if(cliente.getNome() != null) {
-            mensagem.append("Nome: ").append(cliente.getNome()).append("\n");
-        } else {
-            mensagem.append("Nome: ").append("Nome não informado").append("\n");
-        }
+        for (Map.Entry<String, Object> dado : cliente.getAtributosQualificacao().entrySet()) {
+            String nomeCampo = dado.getKey();
+            Object valorCampo = dado.getValue();
 
-        if(cliente.getCpf() != null) {
-            mensagem.append("Cpf: ").append(cliente.getCpf()).append("\n");
-        } else {
-            mensagem.append("Cpf: ").append("Cpf não informado").append("\n");
-        }
+            nomeCampo = nomeCampo.replace("_", " ");
+            String nomeCampoNormalizado = nomeCampo.substring(0, 1).toUpperCase() + nomeCampo.substring(1);
 
-        if(cliente.getConsentimentoAtendimnento() != null) {
-            String resposta = cliente.getConsentimentoAtendimnento() ? "Está consciente" : "Não está consentido";
-
-            mensagem.append("Consentimento Atendimento: ").append(resposta).append("\n");
-        } else {
-            mensagem.append("Consentimento Atendimento: ").append("Consentimento atendimento não informado").append("\n");
-        }
-
-        if(cliente.getTipoConsulta() != null) {
-            mensagem.append("Tipo da Consutla: ").append(cliente.getTipoConsulta().getDescricao()).append("\n");
-        } else {
-            mensagem.append("Tipo da Consulta: ").append("Tipo da consulta não informado.").append("\n");
-        }
-
-        if(cliente.getDorDesejoPaciente() != null) {
-            mensagem.append("Dor do Paciente: ").append(cliente.getDorDesejoPaciente()).append("\n");
-        } else {
-            mensagem.append("Dor do Paciente: ").append("Dor do paciente não informada").append("\n");
-        }
-
-        if(cliente.getPreferenciaHorario() != null) {
-            mensagem.append("Preferência de Horário: ").append(cliente.getPreferenciaHorario().getDescricao()).append("\n");
-        } else {
-            mensagem.append("Preferência de Horário: ").append("Preferência de horário não informada").append("\n");
+            if(valorCampo != null) {
+                mensagem.append(nomeCampoNormalizado + ": ").append(valorCampo).append("\n");
+            } else {
+                mensagem.append(nomeCampoNormalizado + ": ").append(nomeCampoNormalizado + " não informado");
+            }
         }
 
         if(cliente.getTelefone() != null) {

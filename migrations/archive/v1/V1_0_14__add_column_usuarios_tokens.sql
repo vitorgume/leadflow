@@ -1,0 +1,4 @@
+ALTER TABLE usuarios
+ADD COLUMN whatsapp_token TEXT DEFAULT NULL,
+ADD COLUMN whatsapp_id_instance VARCHAR(255) DEFAULT NULL,
+ADD COLUMN agente_api_key TEXT DEFAULT NULL;

@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.config;
 
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,11 +38,11 @@ public class DynamoDbConfig {
 
     // 3) Tabela: Contexto
     @Bean
-    public DynamoDbTable<ContextoEntityLeadflow> contextoTable(
+    public DynamoDbTable<ContextoEntity> contextoTable(
             DynamoDbEnhancedClient enhancedClient,
             @Value("${app.dynamo.contexto-table:${DYNAMO_CONTEXTO_TABLE:contexto_entity_leadflow}}")
             String tableName
     ) {
-        return enhancedClient.table(tableName, TableSchema.fromBean(ContextoEntityLeadflow.class));
+        return enhancedClient.table(tableName, TableSchema.fromBean(ContextoEntity.class));
     }
 }

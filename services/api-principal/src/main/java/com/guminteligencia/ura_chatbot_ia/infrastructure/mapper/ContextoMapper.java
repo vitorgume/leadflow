@@ -3,7 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntity;
 import software.amazon.awssdk.services.sqs.model.Message;
 
 public class ContextoMapper {
@@ -11,21 +11,23 @@ public class ContextoMapper {
     private static final ObjectMapper objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    public static Contexto paraDomain(ContextoEntityLeadflow entity) {
+    public static Contexto paraDomain(ContextoEntity entity) {
         return Contexto.builder()
                 .id(entity.getId())
                 .mensagens(entity.getMensagens())
                 .telefone(entity.getTelefone())
                 .status(entity.getStatus())
+                .telefoneUsuario(entity.getTelefoneUsuario())
                 .build();
     }
 
-    public static ContextoEntityLeadflow paraEntity(Contexto domain) {
-        return ContextoEntityLeadflow.builder()
+    public static ContextoEntity paraEntity(Contexto domain) {
+        return ContextoEntity.builder()
                 .id(domain.getId())
                 .mensagens(domain.getMensagens())
                 .telefone(domain.getTelefone())
                 .status(domain.getStatus())
+                .telefoneUsuario(domain.getTelefoneUsuario())
                 .build();
     }
 

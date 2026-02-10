@@ -1,11 +1,10 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.dataprovider;
 
 import com.gumeinteligencia.api_intermidiaria.application.gateways.OutroContatoGateway;
-import com.gumeinteligencia.api_intermidiaria.domain.OutroContato;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.OutroContatoMapper;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

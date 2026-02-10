@@ -1,6 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity;
 
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.vendedor.VendedorEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

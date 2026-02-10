@@ -1,7 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor;
 
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 

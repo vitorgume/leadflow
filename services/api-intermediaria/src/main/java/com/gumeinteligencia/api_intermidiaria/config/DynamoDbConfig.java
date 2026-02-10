@@ -1,7 +1,7 @@
 package com.gumeinteligencia.api_intermidiaria.config;
 
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,13 +39,13 @@ public class DynamoDbConfig {
 
     // 3) Tabela: Contexto
     @Bean
-    public DynamoDbTable<ContextoEntityLeadflow> contextoTable(
+    public DynamoDbTable<ContextoEntity> contextoTable(
             DynamoDbEnhancedClient enhancedClient,
             @Value("${app.dynamo.contexto-table:${DYNAMO_CONTEXTO_TABLE:contexto_entity_leadflow}}")
             String tableName
     ) {
         System.out.println(">>> [DYNAMO] Tabela de CONTEXTO configurada: " + tableName);
-        return enhancedClient.table(tableName, TableSchema.fromBean(ContextoEntityLeadflow.class));
+        return enhancedClient.table(tableName, TableSchema.fromBean(ContextoEntity.class));
     }
 
     // 4) Tabela: Outro Contato

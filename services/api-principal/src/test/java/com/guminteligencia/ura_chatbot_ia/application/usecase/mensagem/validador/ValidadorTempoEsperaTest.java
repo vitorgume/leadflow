@@ -12,10 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -46,21 +48,25 @@ class ValidadorTempoEsperaTest {
 
     final String tel = "+5511999000111";
 
+    private final String TELEFONE_USUARIO = "+5511999000112";
+
     @BeforeEach
     void setup() {
+
         when(ctx.getTelefone()).thenReturn(tel);
+        when(ctx.getTelefoneUsuario()).thenReturn(TELEFONE_USUARIO);
     }
 
     @Test
     void deveRetornarFalseSeClienteNaoEncontrado() {
-        when(clienteUseCase.consultarPorTelefone(tel)).thenReturn(Optional.empty());
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel, TELEFONE_USUARIO)).thenReturn(Optional.empty());
         assertTrue(validadorTempoEspera.permitirProcessar(ctx));
         verifyNoInteractions(conversaAgenteUseCase, mensageriaUseCase);
     }
 
     @Test
     void deveRetornaFalseConversaNaoFinalizada() {
-        when(clienteUseCase.consultarPorTelefone(tel)).thenReturn(Optional.of(cliente));
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel, TELEFONE_USUARIO)).thenReturn(Optional.of(cliente));
         when(conversaAgenteUseCase.consultarPorCliente(cliente.getId()))
                 .thenReturn(conv);
         when(conv.getFinalizada()).thenReturn(false);
@@ -71,24 +77,32 @@ class ValidadorTempoEsperaTest {
 
     @Test
     void deveRetornarFalseEDeletarMensagemSeEstiverDentroDos30minutos() {
-        when(clienteUseCase.consultarPorTelefone(tel)).thenReturn(Optional.of(cliente));
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel, TELEFONE_USUARIO)).thenReturn(Optional.of(cliente));
         when(conversaAgenteUseCase.consultarPorCliente(cliente.getId()))
                 .thenReturn(conv);
 
-        LocalDateTime fixed = LocalDateTime.of(2025,8,1,12,0);
-        try (MockedStatic<LocalDateTime> mt = mockStatic(LocalDateTime.class)) {
+        LocalDateTime fixed = LocalDateTime.of(2025, 8, 1, 12, 0);
+
+        // --- CORREÇÃO AQUI ---
+        // Adicione o Mockito.CALLS_REAL_METHODS
+        try (MockedStatic<LocalDateTime> mt = mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+
+            // Agora configuramos apenas o 'now' para retornar o valor fixo
             mt.when(LocalDateTime::now).thenReturn(fixed);
+
             when(conv.getFinalizada()).thenReturn(true);
             when(conv.getDataUltimaMensagem())
                     .thenReturn(fixed.minusMinutes(10));
 
+            // O log.info vai funcionar porque os outros métodos estáticos do LocalDateTime
+            // (usados pelo Logger) vão chamar a implementação real.
             assertFalse(validadorTempoEspera.permitirProcessar(ctx));
         }
     }
 
     @Test
     void deveRetornarTrueNaoDeletarSeMensagemDepois30minutos() {
-        when(clienteUseCase.consultarPorTelefone(tel)).thenReturn(Optional.of(cliente));
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel, TELEFONE_USUARIO)).thenReturn(Optional.of(cliente));
         when(conversaAgenteUseCase.consultarPorCliente(cliente.getId()))
                 .thenReturn(conv);
 

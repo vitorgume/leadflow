@@ -1,0 +1,167 @@
+package com.guminteligencia.ura_chatbot_ia.entrypoint.controller.usuario;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.UsuarioUseCase;
+import com.guminteligencia.ura_chatbot_ia.domain.ConfiguracaoCrm;
+import com.guminteligencia.ura_chatbot_ia.domain.CrmType;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.entrypoint.controller.UsuarioController;
+import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.ConfiguracaoCrmDto;
+import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.UsuarioDto;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.Map;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@ExtendWith(MockitoExtension.class)
+public class UsuarioControllerUnitTest {
+
+    @Mock
+    private UsuarioUseCase usuarioUseCase;
+
+    @InjectMocks
+    private UsuarioController controller;
+
+    private MockMvc mockMvc;
+    private final ObjectMapper om = new ObjectMapper();
+    private final UUID ID_USUARIO = UUID.randomUUID();
+
+    @BeforeEach
+    void setup() {
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    }
+
+    @Test
+    @DisplayName("Cadastrar: Deve retornar 201 Created")
+    void cadastrarDeveRetornarCreated() throws Exception {
+        // Arrange
+        UsuarioDto dtoInput = UsuarioDto.builder()
+                .id(ID_USUARIO)
+                .nome("nome teste")
+                .telefone("00000000000")
+                .senha("senhateste123")
+                .email("emailteste@123")
+                .telefoneConectado("00000000000")
+                .atributosQualificacao(Map.of("teste", "valor_teste"))
+                .configuracaoCrm(
+                        ConfiguracaoCrmDto.builder()
+                                .crmType(CrmType.KOMMO)
+                                .mapeamentoCampos(Map.of("teste", "teste"))
+                                .idTagAtivo("id-teste")
+                                .idTagAtivo("id-teste")
+                                .idEtapaAtivos("id-teste")
+                                .idEtapaInativos("id-teste")
+                                .acessToken("acess-token-teste")
+                                .build()
+                )
+                .mensagemDirecionamentoVendedor("mensagem-teste")
+                .mensagemRecontatoG1("mensagem-teste")
+                .whatsappToken("token-teste")
+                .whatsappIdInstance("id-teste")
+                .agenteApiKey("api-key-teste")
+                .build();
+
+        Usuario domainRetorno = Usuario.builder()
+                .id(ID_USUARIO)
+                .nome("nome teste")
+                .telefone("00000000000")
+                .senha("senhateste123")
+                .email("emailteste@123")
+                .telefoneConectado("00000000000")
+                .atributosQualificacao(Map.of("teste", "valor_teste"))
+                .configuracaoCrm(
+                        ConfiguracaoCrm.builder()
+                                .crmType(CrmType.KOMMO)
+                                .mapeamentoCampos(Map.of("teste", "teste"))
+                                .idTagAtivo("id-teste")
+                                .idTagAtivo("id-teste")
+                                .idEtapaAtivos("id-teste")
+                                .idEtapaInativos("id-teste")
+                                .acessToken("acess-token-teste")
+                                .build()
+                )
+                .mensagemDirecionamentoVendedor("mensagem-teste")
+                .mensagemRecontatoG1("mensagem-teste")
+                .whatsappToken("token-teste")
+                .whatsappIdInstance("id-teste")
+                .agenteApiKey("api-key-teste")
+                .build();
+
+        when(usuarioUseCase.cadastrar(any(Usuario.class))).thenReturn(domainRetorno);
+
+        // Act & Assert
+        mockMvc.perform(post("/usuarios/cadastro")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(dtoInput)))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/usuarios/cadastro/" + ID_USUARIO))
+                .andExpect(jsonPath("$.dado.id").value(ID_USUARIO.toString()))
+                .andExpect(jsonPath("$.dado.nome").value("nome teste"));
+    }
+
+    @Test
+    @DisplayName("ConsultarPorId: Deve retornar 200 OK")
+    void consultarPorIdDeveRetornarOk() throws Exception {
+        // Arrange
+        Usuario domainRetorno = Usuario.builder()
+                .id(ID_USUARIO)
+                .nome("nome teste")
+                .telefone("00000000000")
+                .senha("senhateste123")
+                .email("emailteste@123")
+                .telefoneConectado("00000000000")
+                .atributosQualificacao(Map.of("teste", "valor_teste"))
+                .configuracaoCrm(
+                        ConfiguracaoCrm.builder()
+                                .crmType(CrmType.KOMMO)
+                                .mapeamentoCampos(Map.of("teste", "teste"))
+                                .idTagAtivo("id-teste")
+                                .idTagAtivo("id-teste")
+                                .idEtapaAtivos("id-teste")
+                                .idEtapaInativos("id-teste")
+                                .acessToken("acess-token-teste")
+                                .build()
+                )
+                .mensagemDirecionamentoVendedor("mensagem-teste")
+                .mensagemRecontatoG1("mensagem-teste")
+                .whatsappToken("token-teste")
+                .whatsappIdInstance("id-teste")
+                .agenteApiKey("api-key-teste")
+                .build();
+
+        when(usuarioUseCase.consultarPorId(ID_USUARIO)).thenReturn(domainRetorno);
+
+        // Act & Assert
+        mockMvc.perform(get("/usuarios/{id}", ID_USUARIO)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dado.id").value(ID_USUARIO.toString()))
+                .andExpect(jsonPath("$.dado.nome").value("nome teste"));
+    }
+
+    @Test
+    @DisplayName("Deletar: Deve retornar 204 No Content")
+    void deletarDeveRetornarNoContent() throws Exception {
+        // Act & Assert
+        mockMvc.perform(delete("/usuarios/{id}", ID_USUARIO))
+                .andExpect(status().isNoContent());
+
+        verify(usuarioUseCase).deletar(ID_USUARIO);
+    }
+}

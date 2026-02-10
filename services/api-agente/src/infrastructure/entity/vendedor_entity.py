@@ -1,5 +1,5 @@
 from sqlalchemy import Column, BigInteger, String, Boolean
-from src.config.database import Base
+from src.config.base_class import Base
 
 class VendedorEntity(Base):
     __tablename__ = "vendedores"

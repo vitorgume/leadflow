@@ -4,7 +4,10 @@ import com.gumeinteligencia.api_intermidiaria.domain.PreferenciaHorario;
 import com.gumeinteligencia.api_intermidiaria.domain.TipoConsulta;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Entity(name = "Cliente")
@@ -23,24 +26,10 @@ public class ClienteEntity {
     private UUID id;
     private String nome;
     private String telefone;
-    private String cpf;
 
-    @Column(name = "consentimento_atendimento")
-    private Boolean consentimentoAtendimnento;
-
-    @Enumerated(EnumType.ORDINAL)
-    private TipoConsulta tipoConsulta;
-
-    @Column(name = "dor_desejo_paciente")
-    private String dorDesejoPaciente;
-
-
-    @Column(name = "link_midia")
-    private String linkMidia;
-
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "preferencia_horario")
-    private PreferenciaHorario preferenciaHorario;
+    @Column(name = "atributos_qualificacao")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> atributosQualificacao;
 
     private boolean inativo;
 }

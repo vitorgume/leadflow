@@ -2,7 +2,7 @@ package com.gumeinteligencia.api_intermidiaria.infrastructure.repository;
 
 import com.gumeinteligencia.api_intermidiaria.domain.MensagemContexto;
 import com.gumeinteligencia.api_intermidiaria.domain.StatusContexto;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +37,11 @@ class ContextoRepositoryTest {
     private final UUID id = UUID.fromString("d1aea9b5-4007-459f-8629-b3ea7a22ca6b");
     private final String telefone = "45999999999";
 
-    private ContextoEntityLeadflow contexto;
+    private ContextoEntity contexto;
 
     @BeforeEach
     void setUp() {
-        contexto = ContextoEntityLeadflow.builder()
+        contexto = ContextoEntity.builder()
                 .id(id)
                 .telefone(telefone)
                 .status(StatusContexto.ATIVO)
@@ -53,7 +53,7 @@ class ContextoRepositoryTest {
     void deveSalvarContextoComSucesso() {
         when(dynamoDbTemplate.save(contexto)).thenReturn(contexto);
 
-        ContextoEntityLeadflow salvo = contextoRepository.salvar(contexto);
+        ContextoEntity salvo = contextoRepository.salvar(contexto);
 
         verify(dynamoDbTemplate).save(contexto);
         assertEquals(contexto.getId(), salvo.getId());
@@ -63,9 +63,9 @@ class ContextoRepositoryTest {
     void deveBuscarPorIdComSucesso() {
         Key key = Key.builder().partitionValue(id.toString()).build();
 
-        when(dynamoDbTemplate.load(eq(key), eq(ContextoEntityLeadflow.class))).thenReturn(contexto);
+        when(dynamoDbTemplate.load(eq(key), eq(ContextoEntity.class))).thenReturn(contexto);
 
-        Optional<ContextoEntityLeadflow> encontrado = contextoRepository.buscarPorId(id.toString());
+        Optional<ContextoEntity> encontrado = contextoRepository.buscarPorId(id.toString());
 
         assertTrue(encontrado.isPresent());
         assertEquals(contexto.getTelefone(), encontrado.get().getTelefone());
@@ -75,9 +75,9 @@ class ContextoRepositoryTest {
     void deveRetornarVazioAoBuscarPorIdInexistente() {
         Key key = Key.builder().partitionValue("inexistente").build();
 
-        when(dynamoDbTemplate.load(eq(key), eq(ContextoEntityLeadflow.class))).thenReturn(null);
+        when(dynamoDbTemplate.load(eq(key), eq(ContextoEntity.class))).thenReturn(null);
 
-        Optional<ContextoEntityLeadflow> encontrado = contextoRepository.buscarPorId("inexistente");
+        Optional<ContextoEntity> encontrado = contextoRepository.buscarPorId("inexistente");
 
         assertTrue(encontrado.isEmpty());
     }
@@ -86,12 +86,12 @@ class ContextoRepositoryTest {
     void deveBuscarPorTelefoneComSucesso() {
         contexto.setTelefone(telefone);
 
-        Page<ContextoEntityLeadflow> page = Page.create(List.of(contexto), null);
-        PageIterable<ContextoEntityLeadflow> iterable = PageIterable.create(() -> List.of(page).iterator());
+        Page<ContextoEntity> page = Page.create(List.of(contexto), null);
+        PageIterable<ContextoEntity> iterable = PageIterable.create(() -> List.of(page).iterator());
 
-        when(dynamoDbTemplate.scan(ScanEnhancedRequest.builder().build(), ContextoEntityLeadflow.class)).thenReturn(iterable);
+        when(dynamoDbTemplate.scan(ScanEnhancedRequest.builder().build(), ContextoEntity.class)).thenReturn(iterable);
 
-        Optional<ContextoEntityLeadflow> resultado = contextoRepository.buscarPorTelefone(telefone);
+        Optional<ContextoEntity> resultado = contextoRepository.buscarPorTelefone(telefone);
 
         assertTrue(resultado.isPresent());
         assertEquals(telefone, resultado.get().getTelefone());
@@ -99,12 +99,12 @@ class ContextoRepositoryTest {
 
     @Test
     void deveRetornarVazioAoBuscarTelefoneInexistente() {
-        Page<ContextoEntityLeadflow> page = Page.create(List.of(), null);
-        PageIterable<ContextoEntityLeadflow> iterable = PageIterable.create(() -> List.of(page).iterator());
+        Page<ContextoEntity> page = Page.create(List.of(), null);
+        PageIterable<ContextoEntity> iterable = PageIterable.create(() -> List.of(page).iterator());
 
-        when(dynamoDbTemplate.scan(ScanEnhancedRequest.builder().build(), ContextoEntityLeadflow.class)).thenReturn(iterable);
+        when(dynamoDbTemplate.scan(ScanEnhancedRequest.builder().build(), ContextoEntity.class)).thenReturn(iterable);
 
-        Optional<ContextoEntityLeadflow> resultado = contextoRepository.buscarPorTelefone("000000000");
+        Optional<ContextoEntity> resultado = contextoRepository.buscarPorTelefone("000000000");
 
         assertTrue(resultado.isEmpty());
     }

@@ -2,7 +2,7 @@ from sqlalchemy import Column, DateTime, Boolean, BigInteger, ForeignKey
 from sqlalchemy.dialects.mysql import BINARY
 from sqlalchemy.orm import relationship
 
-from src.config.database import Base
+from src.config.base_class import Base
 
 
 class ConversaEntity(Base):

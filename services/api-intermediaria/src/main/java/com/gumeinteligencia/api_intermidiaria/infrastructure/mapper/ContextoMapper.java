@@ -1,25 +1,27 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.mapper;
 
 import com.gumeinteligencia.api_intermidiaria.domain.Contexto;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 
 public class ContextoMapper {
 
-    public static Contexto paraDomain(ContextoEntityLeadflow entity) {
+    public static Contexto paraDomain(ContextoEntity entity) {
         return Contexto.builder()
                 .id(entity.getId())
                 .mensagens(entity.getMensagens())
                 .telefone(entity.getTelefone())
                 .status(entity.getStatus())
+                .telefoneUsuario(entity.getTelefoneUsuario())
                 .build();
     }
 
-    public static ContextoEntityLeadflow paraEntity(Contexto domain) {
-        return ContextoEntityLeadflow.builder()
+    public static ContextoEntity paraEntity(Contexto domain) {
+        return ContextoEntity.builder()
                 .id(domain.getId())
                 .mensagens(domain.getMensagens())
                 .telefone(domain.getTelefone())
                 .status(domain.getStatus())
+                .telefoneUsuario(domain.getTelefoneUsuario())
                 .build();
     }
 }

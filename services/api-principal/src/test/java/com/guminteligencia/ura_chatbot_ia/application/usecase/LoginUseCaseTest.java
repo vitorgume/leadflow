@@ -2,8 +2,8 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.CredenciasIncorretasException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.LoginGateway;
-import com.guminteligencia.ura_chatbot_ia.domain.Administrador;
 import com.guminteligencia.ura_chatbot_ia.domain.LoginResponse;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 class LoginUseCaseTest {
 
     @Mock
-    private AdministradorUseCase administradorUseCase;
+    private UsuarioUseCase usuarioUseCase;
 
     @Mock
     private LoginGateway loginGateway;
@@ -36,20 +36,21 @@ class LoginUseCaseTest {
     private final String senhaHash = "HASHED";
     private final UUID adminId = UUID.randomUUID();
 
-    private Administrador administrador;
+    private Usuario usuario;
 
     @BeforeEach
     void setup() {
-        administrador = Administrador.builder()
+        usuario = Usuario.builder()
                 .id(adminId)
                 .telefone(email)
                 .senha(senhaHash)
+                .email(email) // Set email here
                 .build();
     }
 
     @Test
     void deveAutenticarComCredenciaisValidas() {
-        when(administradorUseCase.consultarPorTelefone(email)).thenReturn(administrador);
+        when(usuarioUseCase.consultarPorEmail(email)).thenReturn(usuario);
         when(criptografiaUseCase.validaSenha(senhaBruta, senhaHash)).thenReturn(true);
         when(loginGateway.gerarToken(email)).thenReturn("TOKEN123");
 
@@ -58,19 +59,20 @@ class LoginUseCaseTest {
         assertEquals(adminId, response.getId(), "Deve retornar o ID do administrador");
         assertEquals("TOKEN123", response.getToken(), "Deve retornar o token gerado pelo gateway");
 
-        verify(administradorUseCase).consultarPorTelefone(email);
+        verify(usuarioUseCase).consultarPorEmail(email);
         verify(criptografiaUseCase).validaSenha(senhaBruta, senhaHash);
         verify(loginGateway).gerarToken(email);
     }
 
     @Test
     void deveLancarCredenciasIncorretasQuandoEmailDiferente() {
-        Administrador outro = Administrador.builder()
+        Usuario outro = Usuario.builder()
                 .id(adminId)
                 .telefone("outro@example.com")
                 .senha(senhaHash)
+                .email("outro@example.com") // Set email here
                 .build();
-        when(administradorUseCase.consultarPorTelefone(email)).thenReturn(outro);
+        when(usuarioUseCase.consultarPorEmail(email)).thenReturn(outro);
 
         assertThrows(
                 CredenciasIncorretasException.class,
@@ -78,13 +80,13 @@ class LoginUseCaseTest {
                 "Quando o email do administrador não coincidir, deve lançar CredenciasIncorretasException"
         );
 
-        verify(administradorUseCase).consultarPorTelefone(email);
+        verify(usuarioUseCase).consultarPorEmail(email);
         verifyNoInteractions(criptografiaUseCase, loginGateway);
     }
 
     @Test
     void deveLancarCredenciasIncorretasQuandoSenhaInvalida() {
-        when(administradorUseCase.consultarPorTelefone(email)).thenReturn(administrador);
+        when(usuarioUseCase.consultarPorEmail(email)).thenReturn(usuario);
         when(criptografiaUseCase.validaSenha(senhaBruta, senhaHash)).thenReturn(false);
 
         assertThrows(
@@ -93,7 +95,7 @@ class LoginUseCaseTest {
                 "Quando a senha for inválida, deve lançar CredenciasIncorretasException"
         );
 
-        verify(administradorUseCase).consultarPorTelefone(email);
+        verify(usuarioUseCase).consultarPorEmail(email);
         verify(criptografiaUseCase).validaSenha(senhaBruta, senhaHash);
         verifyNoInteractions(loginGateway);
     }

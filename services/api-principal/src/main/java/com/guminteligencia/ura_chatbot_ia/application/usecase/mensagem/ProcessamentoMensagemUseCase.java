@@ -108,7 +108,7 @@ public class ProcessamentoMensagemUseCase {
     private void processarMensagem(Contexto contexto) {
         log.info("Processando nova mensagem. Contexto: {}", contexto);
 
-        Optional<Cliente> cliente = clienteUseCase.consultarPorTelefone(contexto.getTelefone());
+        Optional<Cliente> cliente = clienteUseCase.consultarPorTelefoneEUsuario(contexto.getTelefone(), contexto.getTelefoneUsuario());
 
         if (cliente.isPresent()) {
             try {

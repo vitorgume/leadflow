@@ -4,7 +4,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.ContextoMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.ContextoRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntityLeadflow;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ContextoEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ContextoDataProviderTest {
 
     @Mock
@@ -30,7 +32,7 @@ class ContextoDataProviderTest {
 
     private Contexto domainIn;
     private Contexto domainOut;
-    private ContextoEntityLeadflow entity;
+    private ContextoEntity entity;
 
     private final String ERR_DELETE = "Erro ao deletar contexto do banco de dados.";
     private final String ERR_FIND = "Erro ao consultar contexto pelo seu id.";
@@ -41,7 +43,7 @@ class ContextoDataProviderTest {
     void setup() {
         domainIn = mock(Contexto.class);
         domainOut = mock(Contexto.class);
-        entity = mock(ContextoEntityLeadflow.class);
+        entity = mock(ContextoEntity.class);
         id = UUID.randomUUID();
     }
 

@@ -9,12 +9,9 @@ public class ClienteMapper {
                 .id(entity.getId())
                 .nome(entity.getNome())
                 .telefone(entity.getTelefone())
-                .cpf(entity.getCpf())
-                .consentimentoAtendimnento(entity.getConsentimentoAtendimnento())
-                .tipoConsulta(entity.getTipoConsulta())
-                .dorDesejoPaciente(entity.getDorDesejoPaciente())
-                .preferenciaHorario(entity.getPreferenciaHorario())
+                .atributosQualificacao(entity.getAtributosQualificacao())
                 .inativo(entity.isInativo())
+                .usuario(UsuarioMapper.paraDomain(entity.getUsuario()))
                 .build();
     }
 
@@ -23,12 +20,9 @@ public class ClienteMapper {
                 .id(domain.getId())
                 .nome(domain.getNome())
                 .telefone(domain.getTelefone())
-                .cpf(domain.getCpf())
-                .consentimentoAtendimnento(domain.getConsentimentoAtendimnento())
-                .tipoConsulta(domain.getTipoConsulta())
-                .dorDesejoPaciente(domain.getDorDesejoPaciente())
-                .preferenciaHorario(domain.getPreferenciaHorario())
+                .atributosQualificacao(domain.getAtributosQualificacao())
                 .inativo(domain.isInativo())
+                .usuario(UsuarioMapper.paraEntity(domain.getUsuario()))
                 .build();
     }
 }

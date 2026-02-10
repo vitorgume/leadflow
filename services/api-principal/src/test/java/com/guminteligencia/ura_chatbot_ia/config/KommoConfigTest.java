@@ -23,7 +23,7 @@ class KommoConfigTest {
     @Test
     void deveValidarUrlDoKommo() {
         assertThrows(IllegalArgumentException.class,
-                () -> config.kommoWebClient(WebClient.builder(), "sem-protocolo", "token"));
+                () -> config.kommoWebClient(WebClient.builder(), "sem-protocolo"));
     }
 
     @Test
@@ -39,8 +39,7 @@ class KommoConfigTest {
 
         WebClient webClient = config.kommoWebClient(
                 WebClient.builder().exchangeFunction(exchange),
-                "https://api.exemplo.com",
-                "token-123"
+                "https://api.exemplo.com"
         );
 
         KommoConfig.KommoApiException exception = assertThrows(
@@ -51,7 +50,6 @@ class KommoConfigTest {
         ClientRequest request = capturedRequest.get();
         assertNotNull(request);
         assertTrue(request.url().toString().startsWith("https://api.exemplo.com/contatos"));
-        assertEquals("Bearer token-123", request.headers().getFirst(HttpHeaders.AUTHORIZATION));
         assertEquals("application/hal+json", request.headers().getFirst(HttpHeaders.ACCEPT));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         assertTrue(exception.getMessage().contains("falha"));

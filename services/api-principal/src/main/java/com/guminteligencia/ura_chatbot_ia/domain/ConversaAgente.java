@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.domain;
 
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.*;
 
 import java.time.LocalDateTime;

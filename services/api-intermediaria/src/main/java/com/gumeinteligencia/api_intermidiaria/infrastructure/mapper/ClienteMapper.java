@@ -11,12 +11,7 @@ public class ClienteMapper {
                 .id(entity.getId())
                 .nome(entity.getNome())
                 .telefone(entity.getTelefone())
-                .cpf(entity.getCpf())
-                .consentimentoAtendimnento(entity.getConsentimentoAtendimnento())
-                .tipoConsulta(entity.getTipoConsulta())
-                .dorDesejoPaciente(entity.getDorDesejoPaciente())
-                .linkMidia(entity.getLinkMidia())
-                .preferenciaHorario(entity.getPreferenciaHorario())
+                .atributosQualificacao(entity.getAtributosQualificacao())
                 .inativo(entity.isInativo())
                 .build();
     }

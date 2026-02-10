@@ -1,10 +1,9 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.dataprovider;
 
-import com.gumeinteligencia.api_intermidiaria.domain.OutroContato;
-import com.gumeinteligencia.api_intermidiaria.domain.Setor;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

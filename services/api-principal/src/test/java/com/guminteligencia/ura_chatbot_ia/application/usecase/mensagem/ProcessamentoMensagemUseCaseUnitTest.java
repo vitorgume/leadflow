@@ -47,13 +47,15 @@ class ProcessamentoMensagemUseCaseUnitTest {
                 .getDeclaredMethod("processarMensagem", Contexto.class);
         processarMensagemMethod.setAccessible(true);
     }
-
+//
     @Test
     void deveProcessarContextoNovoQuandoClienteNaoPossuiConversa() throws Exception {
-        Contexto contexto = Contexto.builder().telefone("+5511").build();
+        Contexto contexto = mock(Contexto.class);
+        when(contexto.getTelefone()).thenReturn("+5511");
+        when(contexto.getTelefoneUsuario()).thenReturn("telefoneUsuario1");
         Cliente cliente = Cliente.builder().telefone("+5511").build();
 
-        when(clienteUseCase.consultarPorTelefone("+5511"))
+        when(clienteUseCase.consultarPorTelefoneEUsuario("+5511", "telefoneUsuario1"))
                 .thenReturn(Optional.of(cliente));
         when(conversaAgenteUseCase.consultarPorCliente(any()))
                 .thenThrow(new ConversaAgenteNaoEncontradoException());
@@ -66,11 +68,13 @@ class ProcessamentoMensagemUseCaseUnitTest {
 
     @Test
     void deveProcessarContextoExistenteQuandoConversaEncontrada() throws Exception {
-        Contexto contexto = Contexto.builder().telefone("+5522").build();
+        Contexto contexto = mock(Contexto.class);
+        when(contexto.getTelefone()).thenReturn("+5522");
+        when(contexto.getTelefoneUsuario()).thenReturn("telefoneUsuario2");
         Cliente cliente = Cliente.builder().telefone("+5522").build();
         ConversaAgente conversa = ConversaAgente.builder().id(UUID.randomUUID()).build();
 
-        when(clienteUseCase.consultarPorTelefone("+5522"))
+        when(clienteUseCase.consultarPorTelefoneEUsuario("+5522", "telefoneUsuario2"))
                 .thenReturn(Optional.of(cliente));
         when(conversaAgenteUseCase.consultarPorCliente(any()))
                 .thenReturn(conversa);
@@ -83,8 +87,10 @@ class ProcessamentoMensagemUseCaseUnitTest {
 
     @Test
     void deveProcessarContextoNovoQuandoClienteNaoEncontrado() throws Exception {
-        Contexto contexto = Contexto.builder().telefone("+5533").build();
-        when(clienteUseCase.consultarPorTelefone("+5533"))
+        Contexto contexto = mock(Contexto.class);
+        when(contexto.getTelefone()).thenReturn("+5533");
+        when(contexto.getTelefoneUsuario()).thenReturn("telefoneUsuario3");
+        when(clienteUseCase.consultarPorTelefoneEUsuario("+5533", "telefoneUsuario3"))
                 .thenReturn(Optional.empty());
 
         processarMensagemMethod.invoke(useCase, contexto);

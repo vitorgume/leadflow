@@ -1,7 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.repository;
 
-import com.gumeinteligencia.api_intermidiaria.domain.Setor;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntityLeadflow;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

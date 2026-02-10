@@ -63,8 +63,10 @@ class ProcessamentoMensagemUseCaseTest {
         id2 = UUID.randomUUID();
         aviso1 = AvisoContexto.builder().idContexto(id1).mensagemFila(msg1).build();
         aviso2 = AvisoContexto.builder().idContexto(id2).mensagemFila(msg2).build();
+        lenient().when(ctx1.getTelefoneUsuario()).thenReturn("telefoneUsuario1");
+        lenient().when(ctx2.getTelefoneUsuario()).thenReturn("telefoneUsuario2");
     }
-
+//
     @Test
     void deveNaoFazerNadaQuandoNenhumContextoNaFila() {
         when(mensageriaUseCase.listarAvisos()).thenReturn(List.of());
@@ -96,7 +98,7 @@ class ProcessamentoMensagemUseCaseTest {
         when(ctx1.getTelefone()).thenReturn(tel1);
 
         Cliente cliente = mock(Cliente.class);
-        when(clienteUseCase.consultarPorTelefone(tel1))
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel1, "telefoneUsuario1"))
                 .thenReturn(Optional.of(cliente));
 
         useCase.consumirFila();
@@ -121,7 +123,7 @@ class ProcessamentoMensagemUseCaseTest {
         when(ctx1.getMensagemFila()).thenReturn(msg1);
         when(ctx1.getTelefone()).thenReturn(tel1);
 
-        when(clienteUseCase.consultarPorTelefone(tel1))
+        when(clienteUseCase.consultarPorTelefoneEUsuario(tel1, "telefoneUsuario1"))
                 .thenReturn(Optional.empty());
 
         useCase.consumirFila();

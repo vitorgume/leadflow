@@ -4,6 +4,8 @@ import com.guminteligencia.ura_chatbot_ia.application.exceptions.ClienteNaoEncon
 import com.guminteligencia.ura_chatbot_ia.application.gateways.ClienteGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ObjetoRelatorioDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +18,23 @@ import java.util.UUID;
 public class ClienteUseCase {
 
     private final ClienteGateway gateway;
+    private final UsuarioUseCase usuarioUseCase;
 
-    public Optional<Cliente> consultarPorTelefone(String telefone) {
-        return gateway.consultarPorTelefone(telefone);
+    public Optional<Cliente> consultarPorTelefoneEUsuario(String telefone, String telefoneUsuario) {
+        Usuario usuario = usuarioUseCase.consultarPorTelefoneConectado(telefoneUsuario);
+
+        return gateway.consultarPorTelefoneEUsuario(telefone, usuario.getId());
     }
 
-    public Cliente cadastrar(String telefone) {
+    public Cliente cadastrar(String telefone, String telefoneUsuario) {
+
+        Usuario usuario = usuarioUseCase.consultarPorTelefoneConectado(telefoneUsuario);
 
         Cliente cliente = Cliente.builder()
                 .telefone(telefone)
-                .consentimentoAtendimnento(false)
+                .atributosQualificacao(usuario.getAtributosQualificacao())
                 .inativo(false)
+                .usuario(usuario)
                 .build();
 
         return gateway.salvar(cliente);
@@ -41,7 +49,7 @@ public class ClienteUseCase {
     private Cliente consultarPorId(UUID idCliente) {
         Optional<Cliente> cliente = gateway.consultarPorId(idCliente);
 
-        if(cliente.isEmpty()) {
+        if (cliente.isEmpty()) {
             throw new ClienteNaoEncontradoException();
         }
 
@@ -49,11 +57,11 @@ public class ClienteUseCase {
     }
 
 
-    public List<RelatorioContatoDto> getRelatorioSegundaFeira() {
-        return gateway.getRelatorioContato();
+    public List<ObjetoRelatorioDto> getRelatorioSegundaFeira(UUID idUsuario) {
+        return gateway.getRelatorioContato(idUsuario);
     }
 
-    public List<RelatorioContatoDto> getRelatorio() {
-        return gateway.getRelatorioContatoSegundaFeira();
+    public List<ObjetoRelatorioDto> getRelatorio(UUID idUsuario) {
+        return gateway.getRelatorioContatoSegundaFeira(idUsuario);
     }
 }

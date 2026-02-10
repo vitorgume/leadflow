@@ -2,37 +2,39 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
+from src.application.usecase.base_conhecimento_usuario_use_case import BaseConhecimentoUsuarioUseCase
+from src.application.usecase.cliente_use_case import ClienteUseCase
+from src.application.usecase.prompt_usuario_usecase import PromptUsuarioUseCase
+from src.application.usecase.usuario_use_case import UsuarioUseCase
 from src.domain.conversa import Conversa
 from src.domain.mensagem import Mensagem
+from src.domain.usuario import Usuario
 from src.infrastructure.dataprovider.agente_data_provider import AgenteDataProvider
 
 logger = logging.getLogger(__name__)
 
 
 class AgenteUseCase:
-    def __init__(self, agente_data_provider: AgenteDataProvider):
+
+    def __init__(self, agente_data_provider: AgenteDataProvider, prompt_usuario_usecase: PromptUsuarioUseCase, base_conhecimento_usuario_use_case: BaseConhecimentoUsuarioUseCase, cliente_use_case: ClienteUseCase, usuario_use_case: UsuarioUseCase):
         self.agente_data_provider = agente_data_provider
+        self.prompt_usuario_usecase = prompt_usuario_usecase
+        self.base_conhecimento_usuario_use_case = base_conhecimento_usuario_use_case
+        self.cliente_use_case = cliente_use_case
+        self.usuario_use_case = usuario_use_case
 
-    def _carregar_prompt_padrao(self) -> str:
-        caminho = Path("src/resources/system_prompt_agent_chat.txt")
-        with open(caminho, "r", encoding="utf-8") as file:
-            return file.read()
-
-    def _carregar_base_conhecimento(self) -> str:
-        caminho = Path("src/resources/base_conhecimento_agente.txt")
-        if not caminho.exists():
-            logger.warning("Base de conhecimento nao encontrada em %s", caminho)
-            return ""
-        with open(caminho, "r", encoding="utf-8") as file:
-            return file.read()
 
     def processar(self, mensagem: Union[str, Mensagem], conversa: Conversa) -> str:
         logger.info("Processando mensagem para o agente. Mensagem: %s Conversa: %s", mensagem, conversa)
 
+        cliente = self.cliente_use_case.consutlar_por_id(conversa.cliente_id)
+        usuario = self.usuario_use_case.consultar_por_id(cliente.usuario_id)
+
+        prompt_usuario = self.prompt_usuario_usecase.consultar_prompt_usuario(cliente.usuario_id)
         historico = [
             {
                 "role": "system",
-                "content": self._carregar_prompt_padrao()
+                "content": prompt_usuario.prompt if prompt_usuario else ""
             }
         ]
 
@@ -44,17 +46,27 @@ class AgenteUseCase:
         if isinstance(mensagem, str):
             conteudo_usuario = mensagem
         else:
-            conteudo_usuario, _ = self._preparar_conteudo_usuario(mensagem)
+            conteudo_usuario, _ = self._preparar_conteudo_usuario(mensagem, usuario)
 
         historico.append({"role": "user", "content": conteudo_usuario})
 
-        resposta = self.agente_data_provider.enviar_mensagem(historico)
+        base_conhecimento = self.base_conhecimento_usuario_use_case.consultar_base_conhecimento_usuario(cliente.usuario_id)
+
+        if base_conhecimento and base_conhecimento.conteudo:
+            base_conhecimento_system = {
+                "role": "system",
+                "content": f"BASE_DE_CONHECIMENTO:\n{base_conhecimento.conteudo}"
+            }
+
+            historico.append(base_conhecimento_system)
+
+        resposta = self.agente_data_provider.enviar_mensagem(historico, usuario.agente_api_key)
 
         logger.info("Mensagem processada pelo agente com sucesso. Resposta: %s", resposta)
 
         return resposta
 
-    def _preparar_conteudo_usuario(self, mensagem: Mensagem) -> Tuple[Union[str, List[Dict[str, Any]]], str]:
+    def _preparar_conteudo_usuario(self, mensagem: Mensagem, usuario: Usuario) -> Tuple[Union[str, List[Dict[str, Any]]], str]:
         # Texto base da mensagem (pode ser vazio)
         texto_base = mensagem.message or ""
 
@@ -68,7 +80,7 @@ class AgenteUseCase:
         ]
 
         for indice, audio_url in enumerate(audios_validos, start=1):
-            transcricao = self.agente_data_provider.transcrever_audio(audio_url)
+            transcricao = self.agente_data_provider.transcrever_audio(audio_url, usuario.agente_api_key)
             transcricoes.append(f"[Audio {indice}] {transcricao}")
 
         if transcricoes:
@@ -97,7 +109,7 @@ class AgenteUseCase:
         conteudo_historico = texto_base
         if imagens_data_uri:
             complemento = f"[{len(imagens_data_uri)} imagem(ns) anexada(s)]"
-            conteudo_historico = f"{texto_base}\n\n{complemento}" if texto_base else complemento
+            conteudo_historico = f"{texto_base}\n\n{complemento}" if texto_base else f"\n\n{complemento}"
 
         # --- CONTEÚDO PARA O MODELO --------------------------------
         if imagens_data_uri:

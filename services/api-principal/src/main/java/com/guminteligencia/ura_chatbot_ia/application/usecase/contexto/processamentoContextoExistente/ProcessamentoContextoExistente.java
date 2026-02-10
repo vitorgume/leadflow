@@ -37,7 +37,7 @@ public class ProcessamentoContextoExistente {
             processo = processarContextoExistenteFactory.create(resposta, conversaAgente);
             processo.processar(resposta, conversaAgente, cliente);
         } catch (Exception ex) {
-            log.error("Erro ao processar contexto existente, Resposta: {}, Erro: {}", resposta, ex.getMessage());
+            log.error("Erro ao processar contexto existente, Resposta: {}, Erro: {}", resposta, ex.toString());
             conversaAgente.setDataUltimaMensagem(LocalDateTime.now());
             conversaAgenteUseCase.salvar(conversaAgente);
         }

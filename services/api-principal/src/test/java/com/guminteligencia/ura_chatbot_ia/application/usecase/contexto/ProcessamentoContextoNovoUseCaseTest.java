@@ -1,25 +1,24 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.contexto;
 
-import com.guminteligencia.ura_chatbot_ia.application.usecase.AgenteUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.ClienteUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.ConversaAgenteUseCase;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
-import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
-import com.guminteligencia.ura_chatbot_ia.domain.Contexto;
-import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processamentoContextoExistente.ProcessamentoContextoExistente;
+import com.guminteligencia.ura_chatbot_ia.domain.*;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,142 +31,198 @@ class ProcessamentoContextoNovoUseCaseTest {
     private ConversaAgenteUseCase conversaAgenteUseCase;
 
     @Mock
-    private MensagemUseCase mensagemUseCase;
-
-    @Mock
-    private AgenteUseCase agenteUseCase;
+    private ProcessamentoContextoExistente processamentoContextoExistente;
 
     @InjectMocks
     private ProcessamentoContextoNovoUseCase useCase;
 
-    @Mock
-    private Contexto contexto;
+    private Cliente cliente;
+    private ConversaAgente conversaAgente;
+    private Usuario usuario;
 
-    @Mock
-    private Cliente clienteSalvo;
+    // Mocks de dados comuns
+    private final String TELEFONE_CLIENTE = "5511999999999";
+    private final String TELEFONE_USUARIO = "5511888888888";
 
-    @Mock
-    private ConversaAgente novaConversa;
+    @BeforeEach
+    void setUp() {
+        usuario = Usuario.builder()
+                .id(UUID.randomUUID())
+                .nome("nome teste")
+                .telefone("00000000000")
+                .senha("senhateste123")
+                .email("emailteste@123")
+                .telefoneConectado("00000000000")
+                .atributosQualificacao(Map.of("teste", new Object()))
+                .configuracaoCrm(
+                        ConfiguracaoCrm.builder()
+                                .crmType(CrmType.KOMMO)
+                                .mapeamentoCampos(Map.of("teste", "teste"))
+                                .idTagAtivo("id-teste")
+                                .idTagAtivo("id-teste")
+                                .idEtapaAtivos("id-teste")
+                                .idEtapaInativos("id-teste")
+                                .acessToken("acess-token-teste")
+                                .build()
+                )
+                .mensagemDirecionamentoVendedor("mensagem-teste")
+                .mensagemRecontatoG1("mensagem-teste")
+                .whatsappToken("token-teste")
+                .whatsappIdInstance("id-teste")
+                .agenteApiKey("api-key-teste")
+                .build();
 
-    private final String telefone = "+5511999000111";
-    private final List<com.guminteligencia.ura_chatbot_ia.domain.MensagemContexto> mensagens =
-            List.of(com.guminteligencia.ura_chatbot_ia.domain.MensagemContexto.builder().mensagem("oi").build());
+        cliente = Cliente.builder()
+                .id(UUID.randomUUID())
+                .nome("Nome domain")
+                .telefone("00000000000")
+                .atributosQualificacao(Map.of("teste", new Object()))
+                .inativo(false)
+                .usuario(usuario)
+                .build();
+
+        conversaAgente = ConversaAgente.builder()
+                .id(UUID.randomUUID())
+                .cliente(cliente)
+                .vendedor(Vendedor.builder().id(1L).usuario(Usuario.builder().id(UUID.randomUUID()).configuracaoCrm(ConfiguracaoCrm.builder().crmType(CrmType.KOMMO).build()).build()).build())
+                .dataCriacao(LocalDateTime.now())
+                .finalizada(false)
+                .dataUltimaMensagem(LocalDateTime.now().plusHours(1))
+                .recontato(false)
+                .build();
+    }
 
     @Test
-    void deveProcessarFluxoCompletoContextoNovo() {
-        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
-        when(contexto.getTelefone()).thenReturn(telefone);
-        when(contexto.getMensagens()).thenReturn(mensagens);
-        when(clienteUseCase.cadastrar(telefone)).thenReturn(clienteSalvo);
-        when(conversaAgenteUseCase.criar(clienteSalvo)).thenReturn(novaConversa);
-        when(agenteUseCase.enviarMensagem(clienteSalvo, novaConversa, mensagens))
-                .thenReturn("resposta");
-        when(clienteSalvo.getTelefone()).thenReturn(telefone);
+    @DisplayName("Cenário 1: Cliente JÁ EXISTE - Deve recuperar cliente, criar conversa e processar")
+    void deveProcessarComClienteExistente() {
+        // Arrange
+        Contexto contexto = new Contexto();
+        contexto.setTelefone(TELEFONE_CLIENTE);
+        contexto.setTelefoneUsuario(TELEFONE_USUARIO);
 
+        cliente.setTelefone(TELEFONE_CLIENTE);
+
+        // Mock: Cliente é encontrado
+        when(clienteUseCase.consultarPorTelefoneEUsuario(TELEFONE_CLIENTE, TELEFONE_USUARIO))
+                .thenReturn(Optional.of(cliente));
+
+        // Mock: Criação de conversa
+        when(conversaAgenteUseCase.criar(cliente)).thenReturn(conversaAgente);
+
+        // Act
         useCase.processarContextoNovo(contexto);
 
-        InOrder ord = inOrder(clienteUseCase,
-                conversaAgenteUseCase,
-                agenteUseCase,
-                mensagemUseCase,
-                novaConversa,
-                conversaAgenteUseCase);
+        // Assert
+        // Verifica se consultou
+        verify(clienteUseCase).consultarPorTelefoneEUsuario(TELEFONE_CLIENTE, TELEFONE_USUARIO);
 
-        ord.verify(clienteUseCase).cadastrar(telefone);
-        ord.verify(conversaAgenteUseCase).criar(clienteSalvo);
-        ord.verify(agenteUseCase).enviarMensagem(clienteSalvo, novaConversa, mensagens);
-        ord.verify(mensagemUseCase).enviarMensagem("resposta", telefone, true);
-        ord.verify(novaConversa).setDataUltimaMensagem(Mockito.any(LocalDateTime.class));
-        ord.verify(conversaAgenteUseCase).salvar(novaConversa);
-        ord.verifyNoMoreInteractions();
+        // CRUCIAL: Verifica se NÃO tentou cadastrar um novo cliente (pois já existia)
+        verify(clienteUseCase, never()).cadastrar(any(), any());
+
+        // Verifica fluxo restante
+        verify(conversaAgenteUseCase).criar(cliente);
+        verify(conversaAgenteUseCase).salvar(conversaAgente);
+        verify(processamentoContextoExistente).processarContextoExistente(cliente, contexto);
     }
 
     @Test
-    void fluxoNaoDeveContinuarAoTerExceptionLancadaAoCadastrarCLiente() {
-        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
-        when(clienteUseCase.cadastrar(Mockito.anyString()))
-                .thenThrow(new RuntimeException("erro-cadastrar"));
+    @DisplayName("Cenário 2: Cliente NÃO EXISTE - Deve cadastrar novo cliente, criar conversa e processar")
+    void deveProcessarCriandoNovoCliente() {
+        // Arrange
+        Contexto contexto = new Contexto();
+        contexto.setTelefone(TELEFONE_CLIENTE);
+        contexto.setTelefoneUsuario(TELEFONE_USUARIO);
 
-        when(contexto.getTelefone()).thenReturn(telefone);
+        cliente.setTelefone(TELEFONE_CLIENTE);
 
-        RuntimeException ex = assertThrows(
-                RuntimeException.class,
-                () -> useCase.processarContextoNovo(contexto)
-        );
-        assertEquals("erro-cadastrar", ex.getMessage());
+        // Mock: Cliente NÃO é encontrado (Empty)
+        when(clienteUseCase.consultarPorTelefoneEUsuario(TELEFONE_CLIENTE, TELEFONE_USUARIO))
+                .thenReturn(Optional.empty());
 
-        verify(clienteUseCase).cadastrar(telefone);
-        verifyNoInteractions(conversaAgenteUseCase, agenteUseCase, mensagemUseCase);
+        // Mock: Simula o cadastro retornando o novo cliente
+        when(clienteUseCase.cadastrar(TELEFONE_CLIENTE, TELEFONE_USUARIO))
+                .thenReturn(cliente);
+
+        when(conversaAgenteUseCase.criar(cliente)).thenReturn(conversaAgente);
+
+        // Act
+        useCase.processarContextoNovo(contexto);
+
+        // Assert
+        // Verifica se consultou
+        verify(clienteUseCase).consultarPorTelefoneEUsuario(TELEFONE_CLIENTE, TELEFONE_USUARIO);
+
+        // CRUCIAL: Verifica se O MÉTODO CADASTRAR FOI CHAMADO
+        verify(clienteUseCase).cadastrar(TELEFONE_CLIENTE, TELEFONE_USUARIO);
+
+        // Verifica fluxo restante com o NOVO cliente
+        verify(conversaAgenteUseCase).criar(cliente);
+        verify(conversaAgenteUseCase).salvar(conversaAgente);
+        verify(processamentoContextoExistente).processarContextoExistente(cliente, contexto);
     }
 
     @Test
-    void fluxoNaoDeveContinuarAoTerExceptionLancadaAoCriarConversaAgente() {
-        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
-        when(clienteUseCase.cadastrar(Mockito.anyString())).thenReturn(clienteSalvo);
-        when(conversaAgenteUseCase.criar(Mockito.any()))
-                .thenThrow(new IllegalStateException("erro-criar"));
-        when(contexto.getTelefone()).thenReturn(telefone);
+    @DisplayName("Cenário 3: Erro ao Consultar Cliente - Deve propagar exceção e parar fluxo")
+    void devePropagarErroAoConsultarCliente() {
+        // Arrange
+        Contexto contexto = new Contexto();
+        contexto.setTelefone(TELEFONE_CLIENTE);
+        contexto.setTelefoneUsuario(TELEFONE_USUARIO);
 
-        IllegalStateException ex = assertThrows(
-                IllegalStateException.class,
-                () -> useCase.processarContextoNovo(contexto)
-        );
-        assertEquals("erro-criar", ex.getMessage());
+        when(clienteUseCase.consultarPorTelefoneEUsuario(any(), any()))
+                .thenThrow(new RuntimeException("Erro banco de dados"));
 
-        verify(clienteUseCase).cadastrar(telefone);
-        verify(conversaAgenteUseCase).criar(clienteSalvo);
-        verifyNoInteractions(agenteUseCase, mensagemUseCase);
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> useCase.processarContextoNovo(contexto));
+
+        // Garante que o fluxo parou antes de tentar criar conversa
+        verify(conversaAgenteUseCase, never()).criar(any());
+        verify(processamentoContextoExistente, never()).processarContextoExistente(any(), any());
     }
 
     @Test
-    void fluxoNaoDeveContinuarAoTerExceotionLancadaNoEnvioMensagemAgenteUseCase() {
-        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
-        when(clienteUseCase.cadastrar(Mockito.anyString())).thenReturn(clienteSalvo);
-        when(conversaAgenteUseCase.criar(Mockito.any())).thenReturn(novaConversa);
-        when(agenteUseCase.enviarMensagem(any(), any(), anyList()))
-                .thenThrow(new RuntimeException("erro-agente"));
-        when(contexto.getTelefone()).thenReturn(telefone);
+    @DisplayName("Cenário 4: Erro ao Cadastrar Cliente - Deve propagar exceção")
+    void devePropagarErroAoCadastrarCliente() {
+        // Arrange
+        Contexto contexto = new Contexto();
+        contexto.setTelefone(TELEFONE_CLIENTE);
+        contexto.setTelefoneUsuario(TELEFONE_USUARIO);
 
-        RuntimeException ex = assertThrows(
-                RuntimeException.class,
-                () -> useCase.processarContextoNovo(contexto)
-        );
-        assertEquals("erro-agente", ex.getMessage());
+        // Simula cliente não encontrado
+        when(clienteUseCase.consultarPorTelefoneEUsuario(any(), any())).thenReturn(Optional.empty());
 
-        verify(clienteUseCase).cadastrar(telefone);
-        verify(conversaAgenteUseCase).criar(clienteSalvo);
-        verify(agenteUseCase, never()).enviarMensagem(clienteSalvo, novaConversa, mensagens);
-        verifyNoInteractions(mensagemUseCase);
+        // Simula erro no cadastro
+        when(clienteUseCase.cadastrar(any(), any()))
+                .thenThrow(new RuntimeException("Erro ao salvar cliente"));
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> useCase.processarContextoNovo(contexto));
+
+        // Garante que não avançou para conversa
+        verify(conversaAgenteUseCase, never()).criar(any());
     }
 
     @Test
-    void processarContextoNovo_quandoSalvarFalha_propagatesEParaFluxo() {
-        when(clienteUseCase.consultarPorTelefone(telefone)).thenReturn(java.util.Optional.empty());
-        when(contexto.getTelefone()).thenReturn(telefone);
-        when(contexto.getMensagens()).thenReturn(mensagens);
-        when(clienteUseCase.cadastrar(telefone)).thenReturn(clienteSalvo);
-        when(clienteSalvo.getTelefone()).thenReturn(telefone);
-        when(conversaAgenteUseCase.criar(clienteSalvo)).thenReturn(novaConversa);
-        when(agenteUseCase.enviarMensagem(clienteSalvo, novaConversa, mensagens))
-                .thenReturn("resposta");
+    @DisplayName("Cenário 5: Erro ao Processar Contexto Existente - Deve propagar exceção")
+    void devePropagarErroAoProcessarContextoExistente() {
+        // Arrange
+        Contexto contexto = new Contexto();
+        contexto.setTelefone(TELEFONE_CLIENTE);
+        contexto.setTelefoneUsuario(TELEFONE_USUARIO);
 
-        doThrow(new IllegalArgumentException("erro-msg"))
-                .when(conversaAgenteUseCase).salvar(any());
+        when(clienteUseCase.consultarPorTelefoneEUsuario(any(), any())).thenReturn(Optional.of(cliente));
+        when(conversaAgenteUseCase.criar(cliente)).thenReturn(conversaAgente);
 
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> useCase.processarContextoNovo(contexto)
-        );
-        assertEquals("erro-msg", ex.getMessage());
+        // Simula erro na última etapa
+        doThrow(new RuntimeException("Erro processamento final"))
+                .when(processamentoContextoExistente).processarContextoExistente(cliente, contexto);
 
-        verify(clienteUseCase).cadastrar(telefone);
-        verify(conversaAgenteUseCase).criar(clienteSalvo);
-        verify(agenteUseCase).enviarMensagem(clienteSalvo, novaConversa, mensagens);
-        verify(mensagemUseCase).enviarMensagem(eq("resposta"), eq(telefone), eq(true));
-        verify(novaConversa).setDataUltimaMensagem(any());
-        verify(conversaAgenteUseCase).salvar(any());
-        verifyNoMoreInteractions(clienteUseCase, conversaAgenteUseCase, agenteUseCase, mensagemUseCase, novaConversa);
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> useCase.processarContextoNovo(contexto));
+
+        // Verifica que tudo anterior foi chamado
+        verify(conversaAgenteUseCase).salvar(conversaAgente);
+        // Mas o método principal falhou
+        verify(processamentoContextoExistente).processarContextoExistente(cliente, contexto);
     }
-
-
 }

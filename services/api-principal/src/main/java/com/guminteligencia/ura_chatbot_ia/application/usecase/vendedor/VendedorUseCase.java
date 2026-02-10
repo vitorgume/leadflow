@@ -2,27 +2,25 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor;
 
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorComMesmoTelefoneException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEncontradoException;
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.VendedorNaoEscolhidoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.VendedorGateway;
-import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.UsuarioUseCase;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class VendedorUseCase {
 
-    private final EscolhaVendedorComposite escolhaVendedorComposite;
     private final VendedorGateway gateway;
-    private final Random random = new Random();
-    private static String ultimoVendedor = null;
+    private final UsuarioUseCase usuarioUseCase;
 
     public Vendedor cadastrar(Vendedor novoVendedor) {
         log.info("Cadastrando novo vendedor. Novo vendedor: {}", novoVendedor);
@@ -33,39 +31,15 @@ public class VendedorUseCase {
             throw new VendedorComMesmoTelefoneException();
         }
 
+        Usuario usuario = usuarioUseCase.consultarPorId(novoVendedor.getUsuario().getId());
+        novoVendedor.setUsuario(usuario);
+        novoVendedor.setInativo(false);
+
         novoVendedor = gateway.salvar(novoVendedor);
 
         log.info("Novo vendedor cadastrado com sucesso. Vendedor: {}", novoVendedor);
 
         return novoVendedor;
-    }
-
-
-    public Vendedor escolherVendedor(Cliente cliente) {
-        List<Vendedor> candidatos = gateway.listarAtivos();
-        return escolhaVendedorComposite.escolher(cliente, candidatos).orElseThrow(VendedorNaoEscolhidoException::new);
-    }
-
-
-    public String roletaVendedores(String excecao) {
-        List<Vendedor> vendedores;
-
-        if (excecao == null) {
-            vendedores = gateway.listar();
-        } else {
-            vendedores = gateway.listarComExcecao(excecao);
-        }
-
-        if (vendedores.size() <= 1) return vendedores.get(0).getNome();
-
-        Vendedor vendedor;
-        do {
-            vendedor = vendedores.get(random.nextInt(vendedores.size()));
-        } while (vendedor.getInativo() || vendedor.getNome().equals(ultimoVendedor));
-
-        ultimoVendedor = vendedor.getNome();
-        return vendedor.getNome();
-
     }
 
     public Vendedor consultarVendedor(String nome) {
@@ -92,10 +66,10 @@ public class VendedorUseCase {
         return vendedor;
     }
 
-    public List<Vendedor> listar() {
+    public List<Vendedor> listarPorUsuario(UUID idUsuario) {
         log.info("Listando vendedores.");
 
-        List<Vendedor> vendedores = gateway.listar();
+        List<Vendedor> vendedores = gateway.listarPorUsuario(idUsuario);
 
         log.info("Vendedores listados com sucesso. Vendedores: {}", vendedores);
 
@@ -111,21 +85,11 @@ public class VendedorUseCase {
         log.info("Vendedor deletado com sucesso.");
     }
 
-    private Vendedor consultarPorId(Long idVendedor) {
+    public Vendedor consultarPorId(Long idVendedor) {
         log.info("Consultando vendedor pelo id. Id vendedor: {}", idVendedor);
         Optional<Vendedor> vendedor = gateway.consultarPorId(idVendedor);
 
         if (vendedor.isEmpty()) {
-            throw new VendedorNaoEncontradoException();
-        }
-
-        return vendedor.get();
-    }
-
-    public Vendedor consultarVendedorPadrao() {
-        Optional<Vendedor> vendedor = gateway.consultarVendedorPadrao();
-
-        if(vendedor.isEmpty()) {
             throw new VendedorNaoEncontradoException();
         }
 

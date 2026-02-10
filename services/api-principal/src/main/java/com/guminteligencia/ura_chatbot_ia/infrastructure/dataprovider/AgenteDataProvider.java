@@ -12,6 +12,7 @@ import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -65,9 +66,10 @@ public class AgenteDataProvider implements AgenteGateway {
     }
 
     @Override
-    public String enviarJsonTrasformacao(String texto) {
+    public String enviarJsonTrasformacao(String texto, UUID idUsuario) {
         Map<String, String> body = Map.of(
-                "mensagem", texto
+                "mensagem", texto,
+                "id_usuario", idUsuario.toString()
         );
 
         String uri = agenteUriApi + "/chat/json";

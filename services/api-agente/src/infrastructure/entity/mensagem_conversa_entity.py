@@ -1,6 +1,6 @@
-from sqlalchemy import Column, String, ForeignKey, DateTime
+from sqlalchemy import Column, String, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship
-from src.config.database import Base
+from src.config.base_class import Base
 from sqlalchemy.dialects.mysql import BINARY
 
 class MensagemConversaEntity(Base):
@@ -8,7 +8,7 @@ class MensagemConversaEntity(Base):
 
     id_mensagem_conversa = Column(BINARY(16), primary_key=True, index=True)
     responsavel = Column(String(50), nullable=False)
-    conteudo = Column(String(2000), nullable=False)
+    conteudo = Column(Text, nullable=False)
     id_conversa = Column(BINARY(16), ForeignKey("conversas_agente.id_conversa"), nullable=False)
     data = Column(DateTime(timezone=True), nullable=True)
 

@@ -1,46 +1,43 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.EscolhaNaoIdentificadoException;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.GatewayEnum;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
-import com.guminteligencia.ura_chatbot_ia.domain.PreferenciaHorario;
-import com.guminteligencia.ura_chatbot_ia.domain.TipoConsulta;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ObjetoRelatorioDto;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.objetoRelatorio.RelatorioProjection;
+import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
+@Slf4j
 public class RelatorioMapper {
-    public static List<RelatorioContatoDto> paraDto(List<Object[]> objects) {
-        return objects.stream()
-                .map(obj -> {
-                            RelatorioContatoDto relatorio = RelatorioContatoDto.builder()
-                                    .nome((String) obj[0])
-                                    .telefone((String) obj[1])
-                                    .cpf((String) obj[2])
-                                    .consentimentoAtendimnento((Boolean) obj[3])
-                                    .dorDesejoPaciente((String) obj[5])
-                                    .linkMidia((String) obj[6])
-                                    .dataCriacao(((Timestamp) obj[8]).toLocalDateTime())
-                                    .nomeVendedor((String) obj[9])
-                                    .build();
 
-                            try {
-                                relatorio.setTipoConsulta(GatewayEnum.gateayTipoConsultaRelatorio(String.valueOf(obj[4])));
-                            } catch (EscolhaNaoIdentificadoException ex) {
-                                relatorio.setTipoConsulta(TipoConsulta.NAO_INFORMADO);
-                            }
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-                            try {
-                                relatorio.setPreferenciaHorario(GatewayEnum.gatewayPreferenciaHorarioRelatorio(String.valueOf(obj[7])));
-                            } catch (EscolhaNaoIdentificadoException ex) {
-                                relatorio.setPreferenciaHorario(PreferenciaHorario.NAO_INFORMADO);
-                            }
+    // Recebe a lista da Interface RelatorioProjection
+    public static List<ObjetoRelatorioDto> paraDto(List<RelatorioProjection> projections) {
+        return projections.stream().map(proj ->
+                ObjetoRelatorioDto.builder()
+                        .nome(proj.getNome())
+                        .telefone(proj.getTelefone())
+                        .atributos_qualificacao(parseJsonToMap(proj.getAtributosQualificacao()))
+                        .nome_vendedor(proj.getNomeVendedor())
+                        .data_criacao(proj.getDataCriacao())
+                        .build()
+        ).toList();
+    }
 
-
-                            return relatorio;
-                        }
-                )
-                .collect(Collectors.toList());
+    private static Map<String, String> parseJsonToMap(String json) {
+        if (json == null || json.isBlank()) {
+            return Collections.emptyMap();
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            log.error("Erro ao converter a string JSON para Map no RelatorioMapper. JSON: {}", json, e);
+            return Collections.emptyMap();
+        }
     }
 }

@@ -1,119 +1,114 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 
-import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.RelatorioContatoDto;
-import com.guminteligencia.ura_chatbot_ia.domain.PreferenciaHorario;
-import com.guminteligencia.ura_chatbot_ia.domain.TipoConsulta;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ObjetoRelatorioDto;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.objetoRelatorio.RelatorioProjection;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class RelatorioMapperTest {
 
-    private Object[] makeRow(String nome,
-                             String telefone,
-                             String cpf,
-                             Boolean consentimento,
-                             String tipoConsultaCodigo,
-                             String dorDesejoPaciente,
-                             String linkMidia,
-                             String preferenciaHorarioCodigo,
-                             LocalDateTime dataCriacao,
-                             String vendedorNome) {
-        return new Object[] {
-                nome,
-                telefone,
-                cpf,
-                consentimento,
-                tipoConsultaCodigo,
-                dorDesejoPaciente,
-                linkMidia,
-                preferenciaHorarioCodigo,
-                Timestamp.valueOf(dataCriacao),
-                vendedorNome
-        };
+    @Test
+    @DisplayName("Deve mapear projeção para DTO corretamente com JSON válido")
+    void deveMapearComJsonValido() {
+        // Arrange
+        RelatorioProjection projection = mock(RelatorioProjection.class);
+        LocalDateTime agora = LocalDateTime.now();
+        String jsonValido = "{\"segmento\": \"Varejo\", \"prioridade\": \"Alta\"}";
+
+        when(projection.getNome()).thenReturn("João Silva");
+        when(projection.getTelefone()).thenReturn("11999999999");
+        when(projection.getAtributosQualificacao()).thenReturn(jsonValido);
+        when(projection.getNomeVendedor()).thenReturn("Vendedor A");
+        when(projection.getDataCriacao()).thenReturn(agora);
+
+        // Act
+        List<ObjetoRelatorioDto> result = RelatorioMapper.paraDto(List.of(projection));
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+
+        ObjetoRelatorioDto dto = result.get(0);
+        assertEquals("João Silva", dto.getNome());
+        assertEquals("11999999999", dto.getTelefone());
+        assertEquals("Vendedor A", dto.getNome_vendedor());
+        assertEquals(agora, dto.getData_criacao());
+
+        // Validação do Map (JSON parseado)
+        Map<String, String> mapQualificacao = dto.getAtributos_qualificacao();
+        assertNotNull(mapQualificacao);
+        assertEquals(2, mapQualificacao.size());
+        assertEquals("Varejo", mapQualificacao.get("segmento"));
+        assertEquals("Alta", mapQualificacao.get("prioridade"));
     }
 
     @Test
-    void deveTransformarParaDtoComDadosValidos() {
-        var dataCriacao = LocalDateTime.of(2025, 7, 30, 14, 20);
-        Object[] row = makeRow(
-                "Ana",
-                "+5511999",
-                "12345678900",
-                true,
-                "0",
-                "Dor nas costas",
-                "https://link.com",
-                "1",
-                dataCriacao,
-                "Joao"
-        );
+    @DisplayName("Deve retornar Map vazio quando JSON for nulo ou vazio")
+    void deveRetornarMapVazioQuandoJsonNuloOuVazio() {
+        // Arrange
+        RelatorioProjection projNulo = mock(RelatorioProjection.class);
+        when(projNulo.getAtributosQualificacao()).thenReturn(null);
 
-        List<RelatorioContatoDto> dtoList = RelatorioMapper.paraDto(List.<Object[]>of(row));
+        RelatorioProjection projVazio = mock(RelatorioProjection.class);
+        when(projVazio.getAtributosQualificacao()).thenReturn("");
 
-        assertEquals(1, dtoList.size());
-        RelatorioContatoDto dto = dtoList.get(0);
+        RelatorioProjection projBlank = mock(RelatorioProjection.class);
+        when(projBlank.getAtributosQualificacao()).thenReturn("   ");
 
-        assertAll("campos principais",
-                () -> assertEquals("Ana", dto.getNome()),
-                () -> assertEquals("+5511999", dto.getTelefone()),
-                () -> assertEquals("12345678900", dto.getCpf()),
-                () -> assertEquals(true, dto.getConsentimentoAtendimnento()),
-                () -> assertEquals("Dor nas costas", dto.getDorDesejoPaciente()),
-                () -> assertEquals("https://link.com", dto.getLinkMidia()),
-                () -> assertEquals(dataCriacao, dto.getDataCriacao()),
-                () -> assertEquals("Joao", dto.getNomeVendedor())
-        );
-        assertEquals(TipoConsulta.ESTETICA_FACIAL_CORPORAL, dto.getTipoConsulta());
-        assertEquals(PreferenciaHorario.TARDE, dto.getPreferenciaHorario());
+        // Act
+        List<ObjetoRelatorioDto> result = RelatorioMapper.paraDto(List.of(projNulo, projVazio, projBlank));
+
+        // Assert
+        assertEquals(3, result.size());
+
+        // Verifica se todos retornaram map vazio (e não null)
+        assertTrue(result.get(0).getAtributos_qualificacao().isEmpty());
+        assertTrue(result.get(1).getAtributos_qualificacao().isEmpty());
+        assertTrue(result.get(2).getAtributos_qualificacao().isEmpty());
     }
 
     @Test
-    void deveAtribuirTipoConsultaNaoInformadoQuandoCodigoInvalido() {
-        var dataCriacao = LocalDateTime.of(2025, 7, 30, 14, 20);
-        Object[] row = makeRow(
-                "Bruno",
-                "+5522333",
-                "123",
-                false,
-                "codigo_invalido",
-                "Dor de cabeca",
-                null,
-                "0",
-                dataCriacao,
-                "Maria"
-        );
+    @DisplayName("Deve tratar JsonProcessingException e retornar Map vazio quando JSON for inválido")
+    void deveTratarJsonInvalido() {
+        // Arrange
+        RelatorioProjection projection = mock(RelatorioProjection.class);
+        // JSON quebrado (faltando aspas e chaves)
+        String jsonInvalido = "{segmento: Varejo";
 
-        RelatorioContatoDto dto = RelatorioMapper.paraDto(List.<Object[]>of(row)).get(0);
+        when(projection.getAtributosQualificacao()).thenReturn(jsonInvalido);
+        // Configura outros campos para não dar NPE se o mapper acessar
+        when(projection.getNome()).thenReturn("Cliente Erro");
 
-        assertEquals(TipoConsulta.NAO_INFORMADO, dto.getTipoConsulta());
-        assertEquals(PreferenciaHorario.MANHA, dto.getPreferenciaHorario());
+        // Act
+        List<ObjetoRelatorioDto> result = RelatorioMapper.paraDto(List.of(projection));
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+
+        // O método deve capturar a exception no log e retornar map vazio
+        Map<String, String> map = result.get(0).getAtributos_qualificacao();
+        assertNotNull(map);
+        assertTrue(map.isEmpty());
     }
 
     @Test
-    void deveAtribuirPreferenciaHorarioNaoInformadaQuandoCodigoInvalido() {
-        var dataCriacao = LocalDateTime.of(2025, 7, 30, 14, 20);
-        Object[] row = makeRow(
-                "Carla",
-                "+5533444",
-                "987",
-                true,
-                "1",
-                "Dor abdominal",
-                "https://link.com/video",
-                "preferencia_invalida",
-                dataCriacao,
-                "Pedro"
-        );
+    @DisplayName("Deve retornar lista vazia quando input for vazio")
+    void deveRetornarListaVazia() {
+        // Act
+        List<ObjetoRelatorioDto> result = RelatorioMapper.paraDto(Collections.emptyList());
 
-        RelatorioContatoDto dto = RelatorioMapper.paraDto(List.<Object[]>of(row)).get(0);
-
-        assertEquals(TipoConsulta.SAUDE_CAPILAR, dto.getTipoConsulta());
-        assertEquals(PreferenciaHorario.NAO_INFORMADO, dto.getPreferenciaHorario());
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }

@@ -3,11 +3,14 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.MensagemConversa;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ClienteEntity;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConversaAgenteEntity;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.MensagemConversaEntity;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.VendedorEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.vendedor.VendedorEntity;
+import com.guminteligencia.ura_chatbot_ia.domain.ConfiguracaoCrm;
+import com.guminteligencia.ura_chatbot_ia.domain.CrmType;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConfiguracaoCrmEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.UUID;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.UsuarioEntity;
 
 class MensagemConversaMapperTest {
 
@@ -30,8 +35,8 @@ class MensagemConversaMapperTest {
                 .data(LocalDateTime.of(2025, Month.OCTOBER, 8, 14, 41))
                 .conversaAgente(ConversaAgente.builder()
                         .id(UUID.randomUUID())
-                        .cliente(Cliente.builder().id(UUID.randomUUID()).build())
-                        .vendedor(Vendedor.builder().id(1L).build())
+                        .cliente(Cliente.builder().id(UUID.randomUUID()).usuario(Usuario.builder().id(UUID.randomUUID()).configuracaoCrm(ConfiguracaoCrm.builder().crmType(CrmType.KOMMO).build()).build()).build())
+                        .vendedor(Vendedor.builder().id(1L).usuario(Usuario.builder().id(UUID.randomUUID()).configuracaoCrm(ConfiguracaoCrm.builder().crmType(CrmType.KOMMO).build()).build()).build())
                         .build()
                 )
                 .build();
@@ -42,8 +47,8 @@ class MensagemConversaMapperTest {
                 .data(LocalDateTime.of(2025, Month.OCTOBER, 8, 14, 41))
                 .conversaAgente(ConversaAgenteEntity.builder()
                         .id(UUID.randomUUID())
-                        .cliente(ClienteEntity.builder().id(UUID.randomUUID()).build())
-                        .vendedor(VendedorEntity.builder().id(1L).build())
+                        .cliente(ClienteEntity.builder().id(UUID.randomUUID()).usuario(UsuarioEntity.builder().id(UUID.randomUUID()).configuracaoCrm(ConfiguracaoCrmEntity.builder().crmType(CrmType.KOMMO).build()).build()).build())
+                        .vendedor(VendedorEntity.builder().id(1L).usuario(UsuarioEntity.builder().id(UUID.randomUUID()).configuracaoCrm(ConfiguracaoCrmEntity.builder().crmType(CrmType.KOMMO).build()).build()).build())
                         .build()
                 )
                 .build();

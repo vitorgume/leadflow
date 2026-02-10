@@ -1,14 +1,15 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processamentoContextoExistente;
 
-import com.guminteligencia.ura_chatbot_ia.application.mapper.EnumMapper;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.AgenteUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.ClienteUseCase;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.CrmUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.*;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProcessarClienteQualificado implements ProcessamentoContextoExistenteType {
 
-    private final VendedorUseCase vendedorUseCase;
+    private final EscolhaVendedorUseCase escolhaVendedorUseCase;
     private final ClienteUseCase clienteUseCase;
     private final MensagemUseCase mensagemUseCase;
     private final MensagemBuilder mensagemBuilder;
@@ -30,19 +31,16 @@ public class ProcessarClienteQualificado implements ProcessamentoContextoExisten
     @Override
     public void processar(String resposta, ConversaAgente conversaAgente, Cliente cliente) {
         log.info("Processando cliente qualificado. Resposta: {}, ConversaAgente: {}, Cliente: {}", resposta, conversaAgente, cliente);
-        Qualificacao qualificacao = agenteUseCase.enviarJsonTrasformacao(resposta);
+        Qualificacao qualificacao = agenteUseCase.enviarJsonTrasformacao(resposta, cliente.getUsuario().getId());
 
         Cliente clienteQualificado = Cliente.builder()
                 .nome(qualificacao.getNome())
-                .cpf(qualificacao.getCpf())
-                .consentimentoAtendimnento(qualificacao.getConsentimentoAtendimnento())
-                .tipoConsulta(EnumMapper.tipoConsultaMapper(qualificacao.getTipoConsulta()))
-                .dorDesejoPaciente(qualificacao.getDorDesejoPaciente())
-                .preferenciaHorario(EnumMapper.preferenciaHorarioMapper(qualificacao.getPreferenciaHorario()))
+                .atributosQualificacao(qualificacao.getAtributosVariaveis())
                 .build();
 
         Cliente clienteSalvo = clienteUseCase.alterar(clienteQualificado, conversaAgente.getCliente().getId());
-        Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
+
+        Vendedor vendedor = escolhaVendedorUseCase.escolherVendedor(clienteSalvo);
         conversaAgente.setStatus(StatusConversa.ATIVO);
 
         mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.MENSAGEM_DIRECIONAMENTO_VENDEDOR, vendedor.getNome(), clienteSalvo), clienteSalvo.getTelefone(), false);

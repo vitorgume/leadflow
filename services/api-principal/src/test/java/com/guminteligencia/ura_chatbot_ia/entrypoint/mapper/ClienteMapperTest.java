@@ -6,8 +6,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.guminteligencia.ura_chatbot_ia.domain.PreferenciaHorario;
-import com.guminteligencia.ura_chatbot_ia.domain.TipoConsulta;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.domain.ConfiguracaoCrm;
+import com.guminteligencia.ura_chatbot_ia.domain.CrmType;
 
 import java.util.UUID;
 
@@ -21,12 +22,11 @@ class ClienteMapperTest {
                 .id(UUID.randomUUID())
                 .nome("Nome teste")
                 .telefone("5544998748377")
-                .cpf("12345678900")
-                .consentimentoAtendimnento(true)
-                .tipoConsulta(TipoConsulta.SAUDE_CAPILAR)
-                .dorDesejoPaciente("Dor ou desejo do paciente")
-                .preferenciaHorario(PreferenciaHorario.TARDE)
                 .inativo(false)
+                .usuario(Usuario.builder()
+                        .id(UUID.randomUUID())
+                        .configuracaoCrm(ConfiguracaoCrm.builder().crmType(CrmType.KOMMO).build())
+                        .build()) // Added dummy Usuario with ConfiguracaoCrm
                 .build();
     }
 
@@ -37,12 +37,6 @@ class ClienteMapperTest {
         Assertions.assertEquals(clienteDomain.getId(), resultado.getId());
         Assertions.assertEquals(clienteDomain.getNome(), resultado.getNome());
         Assertions.assertEquals(clienteDomain.getTelefone(), resultado.getTelefone());
-        Assertions.assertEquals(clienteDomain.getCpf(), resultado.getCpf());
-        Assertions.assertEquals(clienteDomain.getConsentimentoAtendimnento(), resultado.getConsentimentoAtendimnento());
-        Assertions.assertEquals(clienteDomain.getTipoConsulta(), resultado.getTipoConsulta());
-        Assertions.assertEquals(clienteDomain.getDorDesejoPaciente(), resultado.getDorDesejoPaciente());
-        Assertions.assertEquals(clienteDomain.getPreferenciaHorario(), resultado.getPreferenciaHorario());
         Assertions.assertEquals(clienteDomain.isInativo(), resultado.isInativo());
-        Assertions.assertNull(resultado.getLinkMidia());
     }
 }

@@ -1,13 +1,14 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processamentoContextoExistente;
 
-import com.guminteligencia.ura_chatbot_ia.application.usecase.CrmUseCase;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ProcessarConversaInativa implements ProcessamentoContextoExistenteType {
 
-    private final VendedorUseCase vendedorUseCase;
+    private final EscolhaVendedorUseCase escolhaVendedorUseCase;
     private final CrmUseCase crmUseCase;
     private final MensagemUseCase mensagemUseCase;
     private final MensagemBuilder mensagemBuilder;
@@ -29,7 +30,7 @@ public class ProcessarConversaInativa implements ProcessamentoContextoExistenteT
 
         log.info("Processando conversa inativa. Resposta: {}, Conversa: {}, Cliente: {}", resposta, conversaAgente, cliente);
         conversaAgente.setFinalizada(true);
-        Vendedor vendedor = vendedorUseCase.consultarVendedorPadrao();
+        Vendedor vendedor = escolhaVendedorUseCase.escolherVendedor(cliente);
         conversaAgente.setVendedor(vendedor);
         mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, vendedor.getNome(), cliente), cliente.getTelefone(), true);
 

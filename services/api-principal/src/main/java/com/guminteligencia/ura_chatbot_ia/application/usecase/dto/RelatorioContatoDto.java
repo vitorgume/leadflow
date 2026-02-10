@@ -1,7 +1,5 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.dto;
 
-import com.guminteligencia.ura_chatbot_ia.domain.PreferenciaHorario;
-import com.guminteligencia.ura_chatbot_ia.domain.TipoConsulta;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +16,8 @@ public class RelatorioContatoDto {
     private String telefone;
     private String cpf;
     private Boolean consentimentoAtendimnento;
-    private TipoConsulta tipoConsulta;
     private String dorDesejoPaciente;
     private String linkMidia;
-    private PreferenciaHorario preferenciaHorario;
     private LocalDateTime dataCriacao;
     private String nomeVendedor;
 }

@@ -32,11 +32,13 @@ class AgenteUseCaseTest {
     private ConversaAgente conversa;
     private UUID clienteId;
     private UUID conversaId;
+    private UUID idUsuario;
 
     @BeforeEach
     void setup() {
         clienteId = UUID.randomUUID();
         conversaId = UUID.randomUUID();
+        idUsuario = UUID.randomUUID();
 
         cliente = Cliente.builder()
                 .id(clienteId)
@@ -88,10 +90,10 @@ class AgenteUseCaseTest {
     @Test
     void deveLancarRuntimeExceptionQuandoGatewayRetornarJsonInvalidoEmTransformacao() {
         String texto = "qualquer texto";
-        when(gateway.enviarJsonTrasformacao(texto)).thenReturn("not a json");
+        when(gateway.enviarJsonTrasformacao(texto, idUsuario)).thenReturn("not a json");
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> useCase.enviarJsonTrasformacao(texto));
+                () -> useCase.enviarJsonTrasformacao(texto, idUsuario));
         assertTrue(ex.getMessage().contains("Erro ao tentar mapear JSON da IA"));
     }
 
@@ -100,11 +102,11 @@ class AgenteUseCaseTest {
         String texto = "texto";
         Qualificacao qual = new Qualificacao();
         qual.setNome("Ana");
-        String json = new ObjectMapper().writeValueAsString(qual);
+        String json = "{\"nome\":\"Ana\",\"atributos_variaveis\":null}";
 
-        when(gateway.enviarJsonTrasformacao(texto)).thenReturn(json);
+        when(gateway.enviarJsonTrasformacao(texto, idUsuario)).thenReturn(json);
 
-        Qualificacao resultado = useCase.enviarJsonTrasformacao(texto);
+        Qualificacao resultado = useCase.enviarJsonTrasformacao(texto, idUsuario);
 
         assertNotNull(resultado);
         assertEquals("Ana", resultado.getNome());
@@ -119,13 +121,13 @@ class AgenteUseCaseTest {
         qual.setNome("Ana");
 
         // JSON "normal"
-        String innerJson = new ObjectMapper().writeValueAsString(qual);
+        String innerJson = "{\"nome\":\"Ana\",\"atributos_variaveis\":null}";
         // Agora embrulha como STRING JSON (nó textual): "\"{...}\""
         String wrappedAsTextNode = new ObjectMapper().writeValueAsString(innerJson);
 
-        when(gateway.enviarJsonTrasformacao(texto)).thenReturn(wrappedAsTextNode);
+        when(gateway.enviarJsonTrasformacao(texto, idUsuario)).thenReturn(wrappedAsTextNode);
 
-        Qualificacao resultado = useCase.enviarJsonTrasformacao(texto);
+        Qualificacao resultado = useCase.enviarJsonTrasformacao(texto, idUsuario);
 
         assertNotNull(resultado);
         assertEquals("Ana", resultado.getNome());
@@ -138,10 +140,10 @@ class AgenteUseCaseTest {
         // Primeiro parse vira nó textual: "\"not a json\""
         String wrappedInvalid = new ObjectMapper().writeValueAsString("not a json");
 
-        when(gateway.enviarJsonTrasformacao(texto)).thenReturn(wrappedInvalid);
+        when(gateway.enviarJsonTrasformacao(texto, idUsuario)).thenReturn(wrappedInvalid);
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> useCase.enviarJsonTrasformacao(texto));
+                () -> useCase.enviarJsonTrasformacao(texto, idUsuario));
 
         assertTrue(ex.getMessage().contains("Erro ao tentar mapear JSON da IA"));
     }

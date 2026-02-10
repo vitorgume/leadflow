@@ -15,7 +15,15 @@ import java.util.List;
 
 public class MensagemContextoListConverter implements AttributeConverter<List<MensagemContexto>> {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final ObjectMapper mapper;
+
+    public MensagemContextoListConverter() {
+        this.mapper = new ObjectMapper();
+    }
+
+    public MensagemContextoListConverter(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public AttributeValue transformFrom(List<MensagemContexto> input) {
@@ -41,7 +49,7 @@ public class MensagemContextoListConverter implements AttributeConverter<List<Me
         return AttributeValueType.S;
     }
 
-    public static List<MensagemContexto> fromAttributeValue(AttributeValue input) {
+    public List<MensagemContexto> fromAttributeValue(AttributeValue input) {
         if (input == null || (input.nul() != null && input.nul())) {
             return Collections.emptyList();
         }
@@ -66,17 +74,17 @@ public class MensagemContextoListConverter implements AttributeConverter<List<Me
         return Collections.emptyList();
     }
 
-    private static String toJson(List<MensagemContexto> input) {
+    private String toJson(List<MensagemContexto> input) {
         try {
-            return MAPPER.writeValueAsString(input);
+            return mapper.writeValueAsString(input);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Erro convertendo lista de MensagemContexto para JSON", e);
         }
     }
 
-    private static List<MensagemContexto> fromJson(String json) {
+    private List<MensagemContexto> fromJson(String json) {
         try {
-            return MAPPER.readValue(json, new TypeReference<List<MensagemContexto>>() {});
+            return mapper.readValue(json, new TypeReference<List<MensagemContexto>>() {});
         } catch (IOException e) {
             throw new RuntimeException("Erro convertendo JSON para lista de MensagemContexto", e);
         }

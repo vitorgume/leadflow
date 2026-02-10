@@ -1,17 +1,18 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
 import com.guminteligencia.ura_chatbot_ia.application.gateways.VendedorGateway;
-import com.guminteligencia.ura_chatbot_ia.domain.Vendedor;
+import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.VendedorMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.VendedorRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.VendedorEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.vendedor.VendedorEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -44,11 +45,11 @@ public class VendedorDataProvider implements VendedorGateway {
     }
 
     @Override
-    public List<Vendedor> listar() {
+    public List<Vendedor> listarPorUsuario(UUID idUsuario) {
         List<VendedorEntity> vendedorEntities;
 
         try {
-            vendedorEntities = repository.findAll();
+            vendedorEntities = repository.findByUsuario_Id(idUsuario);
         } catch (Exception ex) {
             log.error(MENSAGEM_LISTAR_VENDEDORES, ex);
             throw new DataProviderException(MENSAGEM_LISTAR_VENDEDORES, ex.getCause());
@@ -135,19 +136,5 @@ public class VendedorDataProvider implements VendedorGateway {
         }
 
         return vendedorEntities.stream().map(VendedorMapper::paraDomain).toList();
-    }
-
-    @Override
-    public Optional<Vendedor> consultarVendedorPadrao() {
-        Optional<VendedorEntity> vendedorEntity;
-
-        try {
-            vendedorEntity = repository.findByPadraoIsTrue();
-        } catch (Exception ex) {
-            log.error(MENSAGEM_ERRO_CONSULTAR_VENDEDOR_PADRAO, ex);
-            throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_VENDEDOR_PADRAO, ex.getCause());
-        }
-
-        return vendedorEntity.map(VendedorMapper::paraDomain);
     }
 }

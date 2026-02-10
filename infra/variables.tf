@@ -57,14 +57,6 @@ variable "rds_username" {
   default = "appuser"
 }
 
-# Senha do MySQL (sensível)
-variable "rds_password" {
-  type        = string
-  default     = null
-  sensitive   = true
-  description = "Deprecated: não usado; senha vem de random_password.rds_appuser.result"
-}
-
 # Classe da instância (custo baixo p/ stg)
 variable "rds_instance_class" {
   type    = string
