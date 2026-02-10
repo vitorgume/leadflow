@@ -1,7 +1,5 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity;
 
-import com.gumeinteligencia.api_intermidiaria.domain.PreferenciaHorario;
-import com.gumeinteligencia.api_intermidiaria.domain.TipoConsulta;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;

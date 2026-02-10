@@ -1,4 +1,4 @@
-from src.application.exceptions.base_conhecimento_usuario_nao_encontraada_exception import \
+from src.application.exceptions.base_conhecimento_usuario_nao_encontrado_exception import \
     BaseConhecimentoUsuarioNaoEncontradoException
 from src.infrastructure.dataprovider.base_conhecimento_usuario_data_provider import BaseConhecimentoUsuarioDataProvider
 

@@ -17,8 +17,4 @@ public class OutroContatoUseCase {
     public List<OutroContato> listar() {
         return gateway.listar();
     }
-
-    public Optional<OutroContato> consultarPorTelefone(String telefone) {
-        return gateway.consultarPorTelefone(telefone);
-    }
 }

@@ -48,7 +48,7 @@ class ConfigTest {
 
         DynamoDbEnhancedClient enhancedClient = config.dynamoDbEnhancedClient(lowLevel);
         DynamoDbTable<ContextoEntity> contextoTable = config.contextoTable(enhancedClient, "contexto_entity_leadflow");
-        DynamoDbTable<OutroContatoEntityLeadflow> outroContatoTable = config.outroContatoTable(enhancedClient, "outro_contato_entity_leadflow");
+        DynamoDbTable<OutroContatoEntity> outroContatoTable = config.outroContatoTable(enhancedClient, "outro_contato_entity_leadflow");
 
         assertNotNull(enhancedClient);
         assertEquals("contexto_entity_leadflow", contextoTable.tableName());

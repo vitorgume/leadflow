@@ -15,22 +15,22 @@ import java.util.Optional;
 @Repository
 public class OutroContatoRepository {
 
-    private final DynamoDbTable<OutroContatoEntityLeadflow> outroContatoTable;
+    private final DynamoDbTable<OutroContatoEntity> outroContatoTable;
 
     public OutroContatoRepository(DynamoDbEnhancedClient dynamoDbEnhancedClient) {
-        this.outroContatoTable = dynamoDbEnhancedClient.table("outro_contato_entity_leadflow", TableSchema.fromBean(OutroContatoEntityLeadflow.class));
+        this.outroContatoTable = dynamoDbEnhancedClient.table("outro_contato_entity_leadflow", TableSchema.fromBean(OutroContatoEntity.class));
     }
 
-    public OutroContatoEntityLeadflow salvar(OutroContatoEntityLeadflow outroContato) {
+    public OutroContatoEntity salvar(OutroContatoEntity outroContato) {
         outroContatoTable.putItem(outroContato);
         return outroContato;
     }
 
-    public List<OutroContatoEntityLeadflow> listar() {
+    public List<OutroContatoEntity> listar() {
         return outroContatoTable.scan().items().stream().toList();
     }
 
-    public Optional<OutroContatoEntityLeadflow> consultarPorTelefone(String telefone) {
+    public Optional<OutroContatoEntity> consultarPorTelefone(String telefone) {
         QueryConditional queryConditional = QueryConditional.keyEqualTo(Key.builder().partitionValue(telefone).build());
 
         return outroContatoTable.index("TelefoneIndex").query(QueryEnhancedRequest.builder().queryConditional(queryConditional).build())

@@ -1,6 +1,7 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.repository;
 
 import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,18 +32,18 @@ class OutroContatoRepositoryTest {
     private DynamoDbEnhancedClient dynamoDbEnhancedClient;
 
     @Mock
-    private DynamoDbTable<OutroContatoEntityLeadflow> outroContatoTable;
+    private DynamoDbTable<OutroContatoEntity> outroContatoTable;
 
     private OutroContatoRepository outroContatoRepository;
 
-    private OutroContatoEntityLeadflow outroContato;
+    private OutroContatoEntity outroContato;
 
     @BeforeEach
     void setUp() {
         when(dynamoDbEnhancedClient.table(anyString(), any(TableSchema.class))).thenReturn(outroContatoTable);
         outroContatoRepository = new OutroContatoRepository(dynamoDbEnhancedClient);
 
-        outroContato = OutroContatoEntityLeadflow.builder()
+        outroContato = OutroContatoEntity.builder()
                 .id(UUID.randomUUID())
                 .nome("Maria")
                 .telefone("47999999999")
@@ -53,7 +54,7 @@ class OutroContatoRepositoryTest {
 
     @Test
     void deveSalvarOutroContatoComSucesso() {
-        OutroContatoEntityLeadflow salvo = outroContatoRepository.salvar(outroContato);
+        OutroContatoEntity salvo = outroContatoRepository.salvar(outroContato);
 
         verify(outroContatoTable).putItem(outroContato);
         assertEquals(outroContato, salvo);
@@ -61,12 +62,12 @@ class OutroContatoRepositoryTest {
 
     @Test
     void deveListarTodosOsContatos() {
-        Page<OutroContatoEntityLeadflow> page = Page.create(List.of(outroContato));
-        PageIterable<OutroContatoEntityLeadflow> iterable = PageIterable.create(() -> Collections.singletonList(page).iterator());
+        Page<OutroContatoEntity> page = Page.create(List.of(outroContato));
+        PageIterable<OutroContatoEntity> iterable = PageIterable.create(() -> Collections.singletonList(page).iterator());
 
         when(outroContatoTable.scan()).thenReturn(iterable);
 
-        List<OutroContatoEntityLeadflow> resultado = outroContatoRepository.listar();
+        List<OutroContatoEntity> resultado = outroContatoRepository.listar();
 
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
@@ -75,12 +76,12 @@ class OutroContatoRepositoryTest {
 
     @Test
     void deveRetornarListaVaziaSeNaoHouverContatos() {
-        Page<OutroContatoEntityLeadflow> page = Page.create(Collections.emptyList());
-        PageIterable<OutroContatoEntityLeadflow> iterable = PageIterable.create(() -> Collections.singletonList(page).iterator());
+        Page<OutroContatoEntity> page = Page.create(Collections.emptyList());
+        PageIterable<OutroContatoEntity> iterable = PageIterable.create(() -> Collections.singletonList(page).iterator());
 
         when(outroContatoTable.scan()).thenReturn(iterable);
 
-        List<OutroContatoEntityLeadflow> resultado = outroContatoRepository.listar();
+        List<OutroContatoEntity> resultado = outroContatoRepository.listar();
 
         assertNotNull(resultado);
         assertTrue(resultado.isEmpty());
@@ -89,14 +90,14 @@ class OutroContatoRepositoryTest {
     @Test
     void deveConsultarPorTelefoneComSucesso() {
         String telefone = "47999999999";
-        DynamoDbIndex<OutroContatoEntityLeadflow> index = mock(DynamoDbIndex.class);
-        Page<OutroContatoEntityLeadflow> page = Page.create(List.of(outroContato));
-        PageIterable<OutroContatoEntityLeadflow> iterable = PageIterable.create(() -> Collections.singletonList(page).iterator());
+        DynamoDbIndex<OutroContatoEntity> index = mock(DynamoDbIndex.class);
+        Page<OutroContatoEntity> page = Page.create(List.of(outroContato));
+        PageIterable<OutroContatoEntity> iterable = PageIterable.create(() -> Collections.singletonList(page).iterator());
 
         when(outroContatoTable.index("TelefoneIndex")).thenReturn(index);
         when(index.query(any(QueryEnhancedRequest.class))).thenReturn(iterable);
 
-        Optional<OutroContatoEntityLeadflow> resultado = outroContatoRepository.consultarPorTelefone(telefone);
+        Optional<OutroContatoEntity> resultado = outroContatoRepository.consultarPorTelefone(telefone);
 
         assertTrue(resultado.isPresent());
         assertEquals(outroContato, resultado.get());
@@ -106,14 +107,14 @@ class OutroContatoRepositoryTest {
     @Test
     void deveRetornarVazioQuandoConsultarPorTelefoneNaoExistente() {
         String telefone = "47000000000";
-        DynamoDbIndex<OutroContatoEntityLeadflow> index = mock(DynamoDbIndex.class);
-        Page<OutroContatoEntityLeadflow> page = Page.create(Collections.emptyList());
-        PageIterable<OutroContatoEntityLeadflow> iterable = PageIterable.create(() -> Collections.singletonList(page).iterator());
+        DynamoDbIndex<OutroContatoEntity> index = mock(DynamoDbIndex.class);
+        Page<OutroContatoEntity> page = Page.create(Collections.emptyList());
+        PageIterable<OutroContatoEntity> iterable = PageIterable.create(() -> Collections.singletonList(page).iterator());
 
         when(outroContatoTable.index("TelefoneIndex")).thenReturn(index);
         when(index.query(any(QueryEnhancedRequest.class))).thenReturn(iterable);
 
-        Optional<OutroContatoEntityLeadflow> resultado = outroContatoRepository.consultarPorTelefone(telefone);
+        Optional<OutroContatoEntity> resultado = outroContatoRepository.consultarPorTelefone(telefone);
 
         assertFalse(resultado.isPresent());
     }

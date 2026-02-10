@@ -4,6 +4,7 @@ import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
 import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,14 +31,14 @@ class OutroContatoDataProviderTest {
     @InjectMocks
     private OutroContatoDataProvider dataProvider;
 
-    private List<OutroContatoEntityLeadflow> outroContatos;
+    private List<OutroContatoEntity> outroContatos;
 
     @BeforeEach
     void setUp() {
         outroContatos = new ArrayList<>();
 
         for (int i = 0; i < 2; i++) {
-            outroContatos.add(OutroContatoEntityLeadflow.builder()
+            outroContatos.add(OutroContatoEntity.builder()
                     .id(UUID.randomUUID())
                     .nome("Nome teste")
                     .setor(Setor.LOGISTICA)

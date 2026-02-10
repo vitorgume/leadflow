@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,7 +32,7 @@ class ValidadorTelefoneOutroContatoTest {
     @Test
     void deveIgnorarQuandoTelefoneExisteEmOutroContato() {
         OutroContato contato = OutroContato.builder().telefone("44999999999").build();
-        when(outroContatoUseCase.consultarPorTelefone("44999999999")).thenReturn(Optional.of(contato));
+        when(outroContatoUseCase.listar()).thenReturn(List.of(contato));
 
         Mensagem mensagem = Mensagem.builder().telefone("44999999999").build();
 
@@ -40,7 +41,7 @@ class ValidadorTelefoneOutroContatoTest {
 
     @Test
     void naoDeveIgnorarQuandoTelefoneNaoExiste() {
-        when(outroContatoUseCase.consultarPorTelefone("44999999999")).thenReturn(Optional.empty());
+        when(outroContatoUseCase.listar()).thenReturn(List.of());
 
         Mensagem mensagem = Mensagem.builder().telefone("44999999999").build();
 

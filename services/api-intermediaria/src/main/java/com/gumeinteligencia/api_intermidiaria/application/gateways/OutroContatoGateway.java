@@ -7,6 +7,4 @@ import java.util.Optional;
 
 public interface OutroContatoGateway {
     List<OutroContato> listar();
-
-    Optional<OutroContato> consultarPorTelefone(String telefone);
 }

@@ -2,6 +2,7 @@ package com.gumeinteligencia.api_intermidiaria.infrastructure.mapper;
 
 import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
 import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ import java.util.UUID;
 class OutroContatoMapperTest {
 
     private OutroContato outroContatoDomain;
-    private OutroContatoEntityLeadflow outroContatoEntityLeadflow;
+    private OutroContatoEntity outroContatoEntity;
 
     @BeforeEach
     void setUp() {
@@ -23,7 +24,7 @@ class OutroContatoMapperTest {
                 .telefone("000000000000")
                 .build();
 
-        outroContatoEntityLeadflow = OutroContatoEntityLeadflow.builder()
+        outroContatoEntity = OutroContatoEntity.builder()
                 .id(UUID.randomUUID())
                 .nome("Nome teste")
                 .setor(Setor.LOGISTICA)
@@ -34,18 +35,18 @@ class OutroContatoMapperTest {
 
     @Test
     void paraDomain() {
-        OutroContato resultado = OutroContatoMapper.paraDomain(outroContatoEntityLeadflow);
+        OutroContato resultado = OutroContatoMapper.paraDomain(outroContatoEntity);
 
-        Assertions.assertEquals(outroContatoEntityLeadflow.getId(), resultado.getId());
-        Assertions.assertEquals(outroContatoEntityLeadflow.getNome(), resultado.getNome());
-        Assertions.assertEquals(outroContatoEntityLeadflow.getTelefone(), resultado.getTelefone());
-        Assertions.assertEquals(outroContatoEntityLeadflow.getDescricao(), resultado.getDescricao());
-        Assertions.assertEquals(outroContatoEntityLeadflow.getSetor(), resultado.getSetor());
+        Assertions.assertEquals(outroContatoEntity.getId(), resultado.getId());
+        Assertions.assertEquals(outroContatoEntity.getNome(), resultado.getNome());
+        Assertions.assertEquals(outroContatoEntity.getTelefone(), resultado.getTelefone());
+        Assertions.assertEquals(outroContatoEntity.getDescricao(), resultado.getDescricao());
+        Assertions.assertEquals(outroContatoEntity.getSetor(), resultado.getSetor());
     }
 
     @Test
     void paraEntity() {
-        OutroContatoEntityLeadflow resultado = OutroContatoMapper.paraEntity(outroContatoDomain);
+        OutroContatoEntity resultado = OutroContatoMapper.paraEntity(outroContatoDomain);
 
         Assertions.assertEquals(outroContatoDomain.getId(), resultado.getId());
         Assertions.assertEquals(outroContatoDomain.getNome(), resultado.getNome());
