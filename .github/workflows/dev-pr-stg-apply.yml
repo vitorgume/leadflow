@@ -186,12 +186,12 @@ jobs:
       # ---------- Flyway: roda migrações após RDS pronto ----------
       - name: Install tools (jq)
         run: sudo apt-get update && sudo apt-get install -y jq
-        
+
       - name: Get DB creds from Terraform Output
         working-directory: ${{ env.INFRA_DIR }}
         run: |
           # Pega os valores brutos (-raw) do output do Terraform
-          DB_ENDPOINT=$(terraform output -raw rds_endpoint)
+          DB_ENDPOINT=$(terraform output -raw rds_mysql_endpoint)
           DB_USER=$(terraform output -raw rds_username)
           DB_PASS=$(terraform output -raw rds_password)
           
