@@ -172,7 +172,7 @@ variable "WHASTAPP_TOKEN" {
 #############################
 variable "api_intermediaria_port" {
   type    = number
-  default = 8080
+  default = 8081
 }
 
 variable "api_agente_port" {
