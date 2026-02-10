@@ -186,15 +186,22 @@ jobs:
       # ---------- Flyway: roda migrações após RDS pronto ----------
       - name: Install tools (jq)
         run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Read DB creds from Secrets Manager
+        
+      - name: Get DB creds from Terraform Output
+        working-directory: ${{ env.INFRA_DIR }}
         run: |
-          SECRET_JSON=$(aws secretsmanager get-secret-value \
-            --secret-id "/${{ env.NAME_PREFIX }}/db-app-creds" \
-            --query SecretString --output text)
-          echo "FLYWAY_URL=$(echo "$SECRET_JSON" | jq -r .jdbc_url)" >> $GITHUB_ENV
-          echo "FLYWAY_USER=$(echo "$SECRET_JSON" | jq -r .username)" >> $GITHUB_ENV
-          echo "FLYWAY_PASSWORD=$(echo "$SECRET_JSON" | jq -r .password)" >> $GITHUB_ENV
+          # Pega os valores brutos (-raw) do output do Terraform
+          DB_ENDPOINT=$(terraform output -raw rds_endpoint)
+          DB_USER=$(terraform output -raw rds_username)
+          DB_PASS=$(terraform output -raw rds_password)
+          
+          # Monta a URL JDBC para o Flyway
+          echo "FLYWAY_URL=jdbc:mysql://${DB_ENDPOINT}/${{ env.TF_VAR_rds_db_name }}" >> $GITHUB_ENV
+          echo "FLYWAY_USER=${DB_USER}" >> $GITHUB_ENV
+          
+          # Mascara a senha no log do GitHub Actions por segurança
+          echo "::add-mask::${DB_PASS}"
+          echo "FLYWAY_PASSWORD=${DB_PASS}" >> $GITHUB_ENV
 
       - name: Run Flyway migrate (Docker)
         working-directory: ${{ env.MIGRATIONS_DIR }}/..

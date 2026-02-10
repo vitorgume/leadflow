@@ -13,6 +13,17 @@ output "rds_mysql_endpoint" {
   value = aws_db_instance.mysql.address
 }
 
+output "rds_username" {
+  description = "Usuário do banco de dados"
+  value       = aws_db_instance.mysql.username
+}
+
+output "rds_password" {
+  description = "Senha do banco de dados"
+  value       = random_password.rds_appuser.result
+  sensitive   = true # Importante!
+}
+
 output "apprunner_urls" {
   description = "URLs dos serviços App Runner"
 
