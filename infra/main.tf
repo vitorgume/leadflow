@@ -387,6 +387,7 @@ resource "aws_apprunner_service" "api_intermediaria" {
   }
 
   health_check_configuration {
+    protocol             = "HTTP"
     path                 = "/actuator/health"
     interval             = 10
     timeout              = 5
@@ -442,6 +443,7 @@ resource "aws_apprunner_service" "api_agente" {
   }
 
   health_check_configuration {
+    protocol             = "HTTP"
     path                 = "/health"
     interval             = 10
     timeout              = 5
@@ -516,6 +518,7 @@ resource "aws_apprunner_service" "api_principal" {
   }
 
   health_check_configuration {
+    protocol             = "HTTP"
     path                 = "/actuator/health"
     interval             = 10
     timeout              = 5
