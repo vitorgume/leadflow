@@ -1,5 +1,5 @@
 import pytest
-from src.application.exceptions.base_conhecimento_usuario_nao_encontraada_exception import BaseConhecimentoUsuarioNaoEncontradoException
+from src.application.exceptions.base_conhecimento_usuario_nao_encontrado_exception import BaseConhecimentoUsuarioNaoEncontradoException
 
 def test_base_conhecimento_usuario_nao_encontrado_exception_default_message():
     exception = BaseConhecimentoUsuarioNaoEncontradoException()

@@ -3,7 +3,6 @@ package com.gumeinteligencia.api_intermidiaria.config;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.function.client.WebClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -54,13 +53,5 @@ class ConfigTest {
         assertNotNull(enhancedClient);
         assertEquals("contexto_entity_leadflow", contextoTable.tableName());
         assertEquals("outro_contato_entity_leadflow", outroContatoTable.tableName());
-    }
-
-    @Test
-    void deveCriarWebClient() {
-        WebClientConfig config = new WebClientConfig("http://localhost:8080");
-        WebClient client = config.webClient(WebClient.builder());
-
-        assertNotNull(client);
     }
 }

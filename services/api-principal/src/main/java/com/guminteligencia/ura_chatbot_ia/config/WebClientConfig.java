@@ -23,6 +23,7 @@ public class WebClientConfig {
 
             builder.clientConnector(new ReactorClientHttpConnector(httpClient));
         };
+
     }
 
     // 2. Mantém o Retry global (pode ser usado por qualquer service)

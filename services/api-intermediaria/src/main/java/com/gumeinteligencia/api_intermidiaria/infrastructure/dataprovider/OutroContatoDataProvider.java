@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ public class OutroContatoDataProvider implements OutroContatoGateway {
 
     private final String MENSAGEM_ERRO_LISTAR_OUTROS_CONTATOS = "Erro ao listar outros contatos.";
     private final OutroContatoRepository repository;
+
 
     @Override
     public List<OutroContato> listar() {

@@ -1,6 +1,5 @@
 package com.guminteligencia.ura_chatbot_ia.domain.vendedor;
 
-import com.guminteligencia.ura_chatbot_ia.domain.Prioridade;
 import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import lombok.*;
 

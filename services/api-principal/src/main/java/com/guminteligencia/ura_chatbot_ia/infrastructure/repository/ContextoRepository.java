@@ -23,7 +23,7 @@ public class ContextoRepository {
         ContextoEntity contexto = dynamoDbTemplate.load(Key.builder()
                         .partitionValue(id.toString())
                         .build()
-                ,ContextoEntity.class
+                , ContextoEntity.class
         );
 
         return contexto == null ? Optional.empty() : Optional.of(contexto);
