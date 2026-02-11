@@ -1,22 +1,24 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.MensagemAgenteDto;
-import com.guminteligencia.ura_chatbot_ia.domain.Qualificacao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+import reactor.util.retry.RetryBackoffSpec;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,36 +26,46 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class AgenteDataProviderTest {
 
     @Mock
     private WebClient webClient;
 
+    // Mock do Builder com RETURNS_SELF para suportar encadeamento no construtor
+    @Mock(answer = Answers.RETURNS_SELF)
+    private WebClient.Builder webClientBuilder;
+
+    // Retry real para testar a lógica de retentativa
+    private RetryBackoffSpec retrySpec;
+
+    // Mocks da cadeia do WebClient
     @Mock
     private WebClient.RequestBodyUriSpec requestBodyUriSpec;
-
     @Mock
     private WebClient.RequestBodySpec requestBodySpec;
-
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersSpec;
-
     @Mock
     private WebClient.ResponseSpec responseSpec;
 
-    @InjectMocks
     private AgenteDataProvider provider;
 
-    private final String agenteUriApi = "http://agent"; // Valor simulado do @Value
+    private final String agenteUriApi = "http://agent-api.com";
     private final UUID ID_USUARIO = UUID.randomUUID();
     private final UUID ID_CONVERSA = UUID.randomUUID();
     private MensagemAgenteDto dto;
 
     @BeforeEach
     void setup() {
-        // Garante que o provider tenha a URL configurada corretamente
-        provider = new AgenteDataProvider(webClient, agenteUriApi);
+        // Configura o build() para retornar o mock do WebClient
+        when(webClientBuilder.build()).thenReturn(webClient);
+
+        // Configura um Retry real e rápido para os testes
+        retrySpec = Retry.fixedDelay(1, Duration.ofMillis(10));
+
+        // Instancia o provider manualmente com as dependências mockadas/reais
+        provider = new AgenteDataProvider(webClientBuilder, agenteUriApi, retrySpec);
+
         dto = MensagemAgenteDto.builder()
                 .clienteId(ID_USUARIO.toString())
                 .conversaId(ID_CONVERSA.toString())
@@ -64,12 +76,11 @@ class AgenteDataProviderTest {
     }
 
     @Test
-    @DisplayName("Deve enviar mensagem com sucesso e retornar Qualificacao")
+    @DisplayName("Deve enviar mensagem com sucesso e retornar String")
     void deveEnviarMensagemComSucesso() {
         // Arrange
         String resultadoEsperado = "Mensagem teste, teste mensagem";
 
-        // --- CORREÇÃO: Recriar o Map esperado igual ao código de produção ---
         Map<String, Object> bodyEsperado = Map.of(
                 "cliente_id", dto.getClienteId(),
                 "conversa_id", dto.getConversaId(),
@@ -78,16 +89,8 @@ class AgenteDataProviderTest {
                 "imagens_url", dto.getImagensUrl()
         );
 
-        // Configuração da cadeia do WebClient
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(agenteUriApi + "/chat")).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-
-        // --- CORREÇÃO: Usar o MAP no when ---
-        when(requestBodySpec.bodyValue(bodyEsperado)).thenReturn(requestHeadersSpec);
-
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(resultadoEsperado));
+        // Configura a cadeia de chamadas para o POST
+        mockWebClientPostChain(bodyEsperado, Mono.just(resultadoEsperado));
 
         // Act
         String result = provider.enviarMensagem(dto);
@@ -96,25 +99,16 @@ class AgenteDataProviderTest {
         assertNotNull(result);
         assertEquals(resultadoEsperado, result);
 
-        // Verifica chamadas
         verify(webClient).post();
         verify(requestBodyUriSpec).uri(agenteUriApi + "/chat");
-        verify(requestBodySpec).contentType(MediaType.APPLICATION_JSON);
-
-        // --- CORREÇÃO: Verificar com o MAP ---
         verify(requestBodySpec).bodyValue(bodyEsperado);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao falhar envio de mensagem")
     void deveLancarExceptionAoEnviarMensagem() {
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(dto)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(String.class))
-                .thenReturn(Mono.error(new RuntimeException("Erro API")));
+        // Arrange
+        mockWebClientPostChain(null, Mono.error(new RuntimeException("Erro API")));
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> provider.enviarMensagem(dto));
@@ -132,20 +126,13 @@ class AgenteDataProviderTest {
                 "id_usuario", ID_USUARIO.toString()
         );
 
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(expectedBody)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just("JSON_OK"));
+        mockWebClientPostChain(expectedBody, Mono.just("JSON_OK"));
 
         // Act
         String result = provider.enviarJsonTrasformacao(texto, ID_USUARIO);
 
         // Assert
         assertEquals("JSON_OK", result);
-
-        verify(webClient).post();
         verify(requestBodyUriSpec).uri(uri);
         verify(requestBodySpec).bodyValue(expectedBody);
     }
@@ -154,32 +141,17 @@ class AgenteDataProviderTest {
     @DisplayName("Deve lançar exceção ao falhar envio de JSON de transformação")
     void deveLancarExceptionAoEnviarJsonTransformacao() {
         // Arrange
-        String texto = "bad text";
-        String uri = agenteUriApi + "/chat/json";
-        Map<String, String> expectedBody = Map.of(
-                "mensagem", texto,
-                "id_usuario", ID_USUARIO.toString()
-        );
-
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(uri)).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(expectedBody)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(String.class))
-                .thenReturn(Mono.error(new RuntimeException("failJson")));
+        mockWebClientPostChain(null, Mono.error(new RuntimeException("Erro API")));
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> provider.enviarJsonTrasformacao(texto, ID_USUARIO));
+        assertThrows(RuntimeException.class, () -> provider.enviarJsonTrasformacao("bad text", ID_USUARIO));
     }
 
     @Test
-    @DisplayName("Deve acionar o Retry, passar pelo filtro de log e obter sucesso na segunda tentativa")
+    @DisplayName("Deve acionar o Retry e obter sucesso na segunda tentativa")
     void deveAcionarRetryEObterSucessoAposFalha() {
         // Arrange
         String resultadoEsperado = "Sucesso após retry";
-
-        // Configuração do corpo da requisição (igual ao teste de sucesso)
         Map<String, Object> bodyEsperado = Map.of(
                 "cliente_id", dto.getClienteId(),
                 "conversa_id", dto.getConversaId(),
@@ -188,44 +160,44 @@ class AgenteDataProviderTest {
                 "imagens_url", dto.getImagensUrl()
         );
 
-        // --- O PULO DO GATO ---
-        // Criamos um Mono que falha na primeira subscrição e funciona na segunda.
-        // Isso força o operador .retryWhen() a agir e executar o .filter()
-        java.util.concurrent.atomic.AtomicInteger contadorTentativas = new java.util.concurrent.atomic.AtomicInteger(0);
-
+        // Simula falha na primeira tentativa e sucesso na segunda
+        AtomicInteger contador = new AtomicInteger(0);
         Mono<String> monoSimulado = Mono.defer(() -> {
-            int tentativaAtual = contadorTentativas.incrementAndGet();
-            if (tentativaAtual == 1) {
-                // 1ª vez: Lança erro para ativar o Retry e o Log
-                return Mono.error(new RuntimeException("Erro temporário de conexão"));
+            if (contador.incrementAndGet() == 1) {
+                return Mono.error(new RuntimeException("Erro temporário"));
             }
-            // 2ª vez: Retorna sucesso
             return Mono.just(resultadoEsperado);
         });
 
-        // Configuração dos Mocks do WebClient
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(agenteUriApi + "/chat")).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(bodyEsperado)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-
-        // Aqui retornamos o nosso Mono "inteligente"
-        when(responseSpec.bodyToMono(String.class)).thenReturn(monoSimulado);
+        mockWebClientPostChain(bodyEsperado, monoSimulado);
 
         // Act
-        // Nota: Esse teste vai demorar pelo menos 2 segundos por causa do Duration.ofSeconds(2) no código original
         String result = provider.enviarMensagem(dto);
 
         // Assert
-        assertNotNull(result);
         assertEquals(resultadoEsperado, result);
+        assertEquals(2, contador.get()); // Garante que houve retentativa
+    }
 
-        // Verificamos se o contador incrementou 2 vezes (1 falha + 1 sucesso)
-        assertEquals(2, contadorTentativas.get());
+    // --- Helper para configurar a cadeia de mocks do POST ---
+    private void mockWebClientPostChain(Object body, Mono<String> responseMono) {
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
 
-        // Verifica se o fluxo do WebClient foi montado corretamente
-        verify(webClient).post();
-        verify(requestBodySpec).bodyValue(bodyEsperado);
+        // Pode manter anyString() aqui pois está DENTRO do when()
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+
+        // LÓGICA CORRIGIDA:
+        if (body != null) {
+            // Se passamos um objeto real (teste de sucesso), usamos ele
+            when(requestBodySpec.bodyValue(body)).thenReturn(requestHeadersSpec);
+        } else {
+            // Se passamos null (teste de erro), usamos o matcher any() AQUI DENTRO
+            when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
+        }
+
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(String.class)).thenReturn(responseMono);
     }
 }

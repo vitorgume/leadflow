@@ -91,7 +91,7 @@ class RelatorioUseCaseTest {
             useCase.enviarRelatorioDiarioVendedores();
 
             ArgumentCaptor<String> arquivoCap = ArgumentCaptor.forClass(String.class);
-            verify(mensagemUseCase).enviarRelatorio(arquivoCap.capture(), eq("Relatorio.xlsx"), eq("+55000000001"));
+            verify(mensagemUseCase).enviarRelatorio(arquivoCap.capture(), eq("Relatorio.xlsx"), eq("+55000000001"), eq(dummyUser));
 
             byte[] decoded = Base64.getDecoder().decode(arquivoCap.getValue());
             try (Workbook wb = new XSSFWorkbook(new ByteArrayInputStream(decoded))) {

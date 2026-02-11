@@ -59,7 +59,7 @@ public class RelatorioUseCase {
             if(gerencia != null) {
                 String arquivo = gerarArquivo(relatorio);
 
-                mensagemUseCase.enviarRelatorio(arquivo, "Relatorio.xlsx", gerencia.getTelefone());
+                mensagemUseCase.enviarRelatorio(arquivo, "Relatorio.xlsx", gerencia.getTelefone(), usuario);
             }
         });
 

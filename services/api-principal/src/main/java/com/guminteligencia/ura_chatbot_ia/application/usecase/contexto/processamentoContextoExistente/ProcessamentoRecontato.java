@@ -28,13 +28,18 @@ public class ProcessamentoRecontato implements ProcessamentoContextoExistenteTyp
         log.info("Processando recontato. Resposta: {}, ConversaAgente: {}, Cliente: {}", resposta, conversaAgente, cliente);
         if(!conversaAgente.getRecontato()) {
             Vendedor vendedor = conversaAgente.getVendedor();
-            mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.MENSAGEM_RECONTATO_VENDEDOR, vendedor.getNome(), null), cliente.getTelefone(), false);
+            mensagemUseCase.enviarMensagem(
+                    mensagemBuilder.getMensagem(TipoMensagem.MENSAGEM_RECONTATO_VENDEDOR, vendedor.getNome(), null),
+                    cliente.getTelefone(),
+                    false,
+                    cliente.getUsuario()
+            );
             mensagemUseCase.enviarContato(vendedor, cliente);
 
             conversaAgente.setRecontato(true);
             conversaAgenteUseCase.salvar(conversaAgente);
         } else {
-            mensagemUseCase.enviarMensagem(resposta, conversaAgente.getCliente().getTelefone(), true);
+            mensagemUseCase.enviarMensagem(resposta, conversaAgente.getCliente().getTelefone(), true, cliente.getUsuario());
         }
         log.info("Processamente de recontato concluido com sucesso.");
     }

@@ -36,17 +36,19 @@ class ConversaInativaUseCaseExtraTest {
     @Mock private MensagemBuilder mensagemBuilder;
 
     private ConversaInativaUseCase useCase;
+    private Usuario usuario;
 
     @BeforeEach
     void setUp() {
         useCase = new ConversaInativaUseCase(
                 conversaAgenteUseCase, escolhaVendedorUseCase, crmUseCase, mensagemUseCase, mensagemBuilder, "dev"
         );
+        usuario = Usuario.builder().id(UUID.randomUUID()).build();
     }
 
     @Test
     void deveMarcarComoInativoG1EEnviarMensagemQuandoAindaEmAndamento() {
-        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5511").build();
+        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5511").usuario(usuario).build();
         ConversaAgente conversa = ConversaAgente.builder()
                 .cliente(cliente)
                 .status(StatusConversa.ATIVO)
@@ -61,14 +63,14 @@ class ConversaInativaUseCaseExtraTest {
         useCase.verificaAusenciaDeMensagem();
 
         assertEquals(StatusConversa.INATIVO_G1, conversa.getStatus());
-        verify(mensagemUseCase).enviarMensagem("ping", cliente.getTelefone(), false);
+        verify(mensagemUseCase).enviarMensagem("ping", cliente.getTelefone(), false, usuario);
         verify(conversaAgenteUseCase).salvar(conversa);
         verify(crmUseCase, never()).atualizarCrm(any(), any(), any());
     }
 
     @Test
     void deveMarcarComoInativoG2EChamarCrmQuandoFinalizada() {
-        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5522").usuario(Usuario.builder().id(UUID.randomUUID()).build()).build();
+        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5522").usuario(usuario).build();
         ConversaAgente conversa = ConversaAgente.builder()
                 .cliente(cliente)
                 .status(StatusConversa.ATIVO)
@@ -86,6 +88,6 @@ class ConversaInativaUseCaseExtraTest {
         assertEquals(vendedorPadrao, conversa.getVendedor());
         verify(crmUseCase).atualizarCrm(vendedorPadrao, cliente, conversa);
         verify(conversaAgenteUseCase).salvar(conversa);
-        verify(mensagemUseCase, never()).enviarMensagem(any(), any(), anyBoolean());
+        verify(mensagemUseCase, never()).enviarMensagem(any(), any(), anyBoolean(), any(Usuario.class));
     }
 }

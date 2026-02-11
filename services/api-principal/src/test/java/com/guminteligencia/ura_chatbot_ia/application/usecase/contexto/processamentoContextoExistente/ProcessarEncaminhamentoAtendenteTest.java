@@ -37,7 +37,8 @@ class ProcessarEncaminhamentoAtendenteTest {
     @Test
     void deveEncaminharParaAtendenteEAjustarConversa() {
         Vendedor vendedor = Vendedor.builder().id(10L).telefone("+5500").build();
-        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5511").usuario(Usuario.builder().id(UUID.randomUUID()).build()).build();
+        Usuario usuario = Usuario.builder().id(UUID.randomUUID()).build();
+        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5511").usuario(usuario).build();
         ConversaAgente conversa = ConversaAgente.builder()
                 .cliente(cliente)
                 .finalizada(false)
@@ -51,7 +52,7 @@ class ProcessarEncaminhamentoAtendenteTest {
         processador.processar("encaminhar:true", conversa, cliente);
 
         verify(mensagemUseCase).enviarContato(vendedor, conversa.getCliente());
-        verify(mensagemUseCase).enviarMensagem("msg", conversa.getCliente().getTelefone(), false);
+        verify(mensagemUseCase).enviarMensagem("msg", conversa.getCliente().getTelefone(), false, usuario);
         assertTrue(conversa.getFinalizada());
         assertTrue(conversa.getVendedor() == vendedor);
         assertTrue(conversa.getStatus() == StatusConversa.ATIVO);

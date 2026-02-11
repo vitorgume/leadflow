@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.util.retry.Retry;
+import reactor.util.retry.RetryBackoffSpec;
 
 import java.time.Duration;
 import java.util.Map;
@@ -22,15 +23,18 @@ public class AgenteDataProvider implements AgenteGateway {
 
     @Value("${agente.ura.uri}")
     private final String agenteUriApi;
+    private final RetryBackoffSpec retrySpec;
 
     private final String MENSAGEM_ERRO_ENVIAR_MENSAGEM_AGENTE = "Erro ao enviar mensagem para o agente.";
     private final String MENSAGEM_ERRO_ENVIAR_MENSAGEM_TRANSFORMAR_JSON = "Erro ao enviar mensagem para transformação em JSON.";
 
     public AgenteDataProvider(
-            WebClient webClient,
-            @Value("${agente.ura.uri}") String agenteUriApi
+            WebClient.Builder builder,// 2. Injeção da dependência global
+            @Value("${agente.ura.uri}") String agenteUriApi,
+            RetryBackoffSpec retrySpec
     ) {
-        this.webClient = webClient;
+        this.webClient = builder.build(); // O builder já vem com timeout configurado
+        this.retrySpec = retrySpec;
         this.agenteUriApi = agenteUriApi;
     }
 
@@ -54,13 +58,7 @@ public class AgenteDataProvider implements AgenteGateway {
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(String.class)
-                .retryWhen(
-                        Retry.backoff(3, Duration.ofSeconds(2))
-                                .filter(throwable -> {
-                                    log.warn("Tentando novamente após erro: {}", throwable.getMessage());
-                                    return true;
-                                })
-                )
+                .retryWhen(retrySpec)
                 .doOnError(e -> log.error("{} | Erro: {}", MENSAGEM_ERRO_ENVIAR_MENSAGEM_AGENTE, e.getMessage()))
                 .block();
     }
@@ -80,13 +78,7 @@ public class AgenteDataProvider implements AgenteGateway {
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(String.class)
-                .retryWhen(
-                        Retry.backoff(3, Duration.ofSeconds(2))
-                                .filter(throwable -> {
-                                    log.warn("Tentando novamente após erro: {}", throwable.getMessage());
-                                    return true;
-                                })
-                )
+                .retryWhen(retrySpec)
                 .doOnError(e -> log.error("{} | Erro: {}", MENSAGEM_ERRO_ENVIAR_MENSAGEM_TRANSFORMAR_JSON, e.getMessage()))
                 .block();
     }

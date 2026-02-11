@@ -43,7 +43,7 @@ class UsuarioUseCaseTest {
         usuarioTeste = new Usuario();
         usuarioTeste.setEmail("test@example.com");
         usuarioTeste.setSenha("password");
-        usuarioTeste.setConfiguracaoCrm(new ConfiguracaoCrm(null, null, null, null, null, null, "accessToken"));
+        usuarioTeste.setConfiguracaoCrm(new ConfiguracaoCrm(null, null, null, null, null, null, "accessToken", null));
         usuarioTeste.setWhatsappToken("whatsappToken");
         usuarioTeste.setWhatsappIdInstance("whatsappIdInstance");
         usuarioTeste.setAgenteApiKey("agenteApiKey");

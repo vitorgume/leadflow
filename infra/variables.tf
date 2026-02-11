@@ -114,26 +114,16 @@ variable "image_tag_api_principal" {
 # Segredos / Chaves (Secrets Manager)
 #############################
 # API do Agente (FastAPI)
-variable "OPENAI_API_KEY" {
-  type      = string
-  sensitive = true
+variable "APP_SECURITY_ENCRYPTION_KEY" {
+  description = "Chave de criptografia para a API Agente"
+  type        = string
+  sensitive   = true
 }
 
 #############################
 # API Principal (Java/Spring)
 #############################
 # URL do CRM (não sensível por padrão)
-variable "APP_CRM_URL" {
-  type    = string
-  default = ""
-}
-
-# Token de acesso ao CRM (sensível)
-variable "APP_CRM_ACESS_TOKEN" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
 
 # Chaves da API Principal (sensíveis)
 variable "API_PRINCIPAL_API_KEY" {
@@ -150,18 +140,6 @@ variable "API_PRINCIPAL_SECRET_KEY" {
 
 # Credenciais/segredos de WhatsApp (sensíveis)
 variable "WHASTAPP_CLIENT_TOKEN" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
-
-variable "WHASTAPP_INSTANCE_ID" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
-
-variable "WHASTAPP_TOKEN" {
   type      = string
   sensitive = true
   default   = ""
@@ -190,4 +168,6 @@ variable "create_services" {
   type        = bool
   default     = true
 }
+
+
 

@@ -5,7 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.pa
 import java.util.Optional;
 
 public interface IntegracaoKommoGateway {
-    Optional<Integer> consultaLeadPeloTelefone(String telefone, String acessToken);
+    Optional<Integer> consultaLeadPeloTelefone(String telefone, String acessToken, String crmUrl);
 
-    void atualizarCard(PayloadKommo payloadKommo, Integer idLead, String acessToken);
+    void atualizarCard(PayloadKommo payloadKommo, Integer idLead, String acessToken, String crmUrl);
 }

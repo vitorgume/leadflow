@@ -26,7 +26,14 @@ public class ProcessarEncaminhamentoAtendente implements ProcessamentoContextoEx
     public void processar(String resposta, ConversaAgente conversaAgente, Cliente cliente) {
         Vendedor vendedor = escolhaVendedorUseCase.escolherVendedor(cliente);
         mensagemUseCase.enviarContato(vendedor, cliente);
-        mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, null, null), cliente.getTelefone(), false);
+
+        mensagemUseCase.enviarMensagem(
+                mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, null, null),
+                cliente.getTelefone(),
+                false,
+                cliente.getUsuario()
+        );
+
         conversaAgente.setVendedor(vendedor);
         conversaAgente.setFinalizada(true);
         conversaAgente.setStatus(StatusConversa.ATIVO);

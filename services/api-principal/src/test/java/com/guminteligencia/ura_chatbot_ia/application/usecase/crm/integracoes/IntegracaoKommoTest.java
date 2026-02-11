@@ -93,6 +93,7 @@ class IntegracaoKommoTest {
                 .idTagInativo("200")
                 .idEtapaAtivos("10")
                 .idEtapaInativos("20")
+                .crmUrl("http://test.com")
                 // Mapeia "campo_local" -> ID 555 no CRM
                 .mapeamentoCampos(Map.of("segmento", "555", "regiao", "666"))
                 .build();
@@ -168,7 +169,7 @@ class IntegracaoKommoTest {
         when(criptografiaJCAUseCase.descriptografar("token-encriptado")).thenReturn("token-real");
 
         // Mock Lead Encontrado (ID 12345)
-        when(gateway.consultaLeadPeloTelefone("5511999999999", "token-real"))
+        when(gateway.consultaLeadPeloTelefone("5511999999999", "token-real", "http://test.com"))
                 .thenReturn(Optional.of(12345));
 
         // Act
@@ -176,7 +177,7 @@ class IntegracaoKommoTest {
 
         // Assert
         ArgumentCaptor<PayloadKommo> captor = ArgumentCaptor.forClass(PayloadKommo.class);
-        verify(gateway).atualizarCard(captor.capture(), eq(12345), eq("token-real"));
+        verify(gateway).atualizarCard(captor.capture(), eq(12345), eq("token-real"), eq("http://test.com"));
 
         PayloadKommo payload = captor.getValue();
 
@@ -218,14 +219,14 @@ class IntegracaoKommoTest {
 
         // Configurações básicas
         when(criptografiaJCAUseCase.descriptografar(any())).thenReturn("token");
-        when(gateway.consultaLeadPeloTelefone(any(), any())).thenReturn(Optional.of(1));
+        when(gateway.consultaLeadPeloTelefone(any(), any(), any())).thenReturn(Optional.of(1));
 
         // Act
         integracaoKommo.implementacao(vendedor, cliente, conversaMock);
 
         // Assert
         ArgumentCaptor<PayloadKommo> captor = ArgumentCaptor.forClass(PayloadKommo.class);
-        verify(gateway).atualizarCard(captor.capture(), any(), any());
+        verify(gateway).atualizarCard(captor.capture(), any(), any(), any());
         PayloadKommo payload = captor.getValue();
 
         // Status 1 -> Deve usar idEtapaInativos (20)
@@ -282,7 +283,7 @@ class IntegracaoKommoTest {
         when(criptografiaJCAUseCase.descriptografar(any())).thenReturn("token");
 
         // Simula lead não encontrado
-        when(gateway.consultaLeadPeloTelefone(any(), any())).thenReturn(Optional.empty());
+        when(gateway.consultaLeadPeloTelefone(any(), any(), any())).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(LeadNaoEncontradoException.class,

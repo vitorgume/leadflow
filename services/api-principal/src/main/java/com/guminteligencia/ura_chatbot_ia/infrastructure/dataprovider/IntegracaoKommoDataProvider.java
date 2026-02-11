@@ -6,81 +6,107 @@ import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.Contac
 import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ContactsResponse;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.RetryBackoffSpec;
 
+import java.net.URI;
 import java.util.Comparator;
 import java.util.Optional;
 
 @Component
 @Slf4j
 public class IntegracaoKommoDataProvider implements IntegracaoKommoGateway {
-    private static final String KOMMO_DRIVE_BASE = "https://drive-c.kommo.com";
 
     private final WebClient webClient;
+    private final RetryBackoffSpec retrySpec;
 
-    public IntegracaoKommoDataProvider(@Qualifier("kommoWebClient") WebClient webClient) {
-        this.webClient = webClient;
-    }
-
-    public static final String MENSAGEM_ERRO_CONSULTAR_LEAD_PELO_TELEFONE = "Erro ao consultar lead pelo seu telefone.";
+    public static final String MENSAGEM_ERRO_CONSULTAR_LEAD = "Erro ao consultar lead pelo telefone.";
     public static final String MENSAGEM_ERRO_ATUALIZAR_CARD = "Erro ao atualizar card.";
 
+    // Injetamos o Builder (já com timeout global) e o Retry Global
+    public IntegracaoKommoDataProvider(WebClient.Builder builder,
+                                       RetryBackoffSpec retrySpec) { // Use a variável correta do properties
+        this.retrySpec = retrySpec;
 
-    public Optional<Integer> consultaLeadPeloTelefone(String telefoneE164, String acessToken) {
-        String normalized = normalizeE164(telefoneE164);
-
-        Integer leadId;
-
-        try {
-            ContactsResponse contacts = webClient.get()
-                    .uri(uri -> uri.path("/contacts")
-                            .queryParam("query", normalized)
-                            .queryParam("with", "leads")
-                            .queryParam("limit", 50)
-                            .build())
-                    .headers(h -> h.setBearerAuth(acessToken))
-                    .retrieve()
-                    .bodyToMono(ContactsResponse.class)
-                    .block();
-
-            if (contacts == null || contacts.getEmbedded() == null || contacts.getEmbedded().getContacts() == null) {
-                return Optional.empty();
-            }
-
-            var contato = contacts.getEmbedded().getContacts().stream()
-                    .filter(c -> c.getEmbedded() != null && c.getEmbedded().getLeads() != null && !c.getEmbedded().getLeads().isEmpty())
-                    .max(Comparator.comparing(ContactDto::getUpdatedAt, Comparator.nullsFirst(Long::compareTo)))
-                    .orElse(null);
-
-            if (contato == null) return Optional.empty();
-
-            leadId = contato.getEmbedded().getLeads().get(0).getId();
-        } catch (Exception ex) {
-            log.error(MENSAGEM_ERRO_CONSULTAR_LEAD_PELO_TELEFONE, ex);
-            throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_LEAD_PELO_TELEFONE, ex.getCause());
-        }
-
-        return Optional.ofNullable(leadId);
+        this.webClient = builder
+                .defaultHeader(HttpHeaders.ACCEPT, "application/hal+json") // Header específico do Kommo
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .filter(kommoErrorFilter()) // Filtro de erro específico do Kommo
+                .build();
     }
 
     @Override
-    public void atualizarCard(PayloadKommo body, Integer idLead, String acessToken) {
+    public Optional<Integer> consultaLeadPeloTelefone(String telefoneE164, String acessToken, String crmUrl) {
+        String normalized = normalizeE164(telefoneE164);
+
         try {
+            URI uriCompleta = UriComponentsBuilder.fromUriString(crmUrl)
+                    .path("/contacts")
+                    .queryParam("query", normalized)
+                    .queryParam("with", "leads")
+                    .queryParam("limit", 50)
+                    .build()
+                    .toUri();
+
+            ContactsResponse contacts = webClient.get()
+                    .uri(uriCompleta)
+                    .headers(h -> h.setBearerAuth(acessToken))
+                    .retrieve()
+                    .bodyToMono(ContactsResponse.class)
+                    .retryWhen(retrySpec) // Usa a política de retry global
+                    .block(); // Bloqueia para manter contrato síncrono
+
+            return extrairLeadIdDoContato(contacts);
+
+        } catch (Exception ex) {
+            log.error(MENSAGEM_ERRO_CONSULTAR_LEAD, ex);
+            // Lança a exceção de negócio mantendo a causa original
+            throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_LEAD, ex);
+        }
+    }
+
+    @Override
+    public void atualizarCard(PayloadKommo body, Integer idLead, String acessToken, String crmUrl) {
+        try {
+            URI uriCompleta = UriComponentsBuilder.fromUriString(crmUrl)
+                    .path("/leads/{id}")
+                    .buildAndExpand(idLead)
+                    .toUri();
+
             webClient.patch()
-                    .uri(uri -> uri.path("/leads/{id}").build(idLead))
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .uri(uriCompleta)
                     .bodyValue(body)
                     .headers(h -> h.setBearerAuth(acessToken))
                     .retrieve()
                     .toBodilessEntity()
+                    .retryWhen(retrySpec)
                     .block();
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_ATUALIZAR_CARD, ex);
-            throw new DataProviderException(MENSAGEM_ERRO_ATUALIZAR_CARD, ex.getCause());
+            throw new DataProviderException(MENSAGEM_ERRO_ATUALIZAR_CARD, ex);
         }
+    }
+
+    // --- Métodos Auxiliares ---
+
+    private Optional<Integer> extrairLeadIdDoContato(ContactsResponse contacts) {
+        if (contacts == null || contacts.getEmbedded() == null || contacts.getEmbedded().getContacts() == null) {
+            return Optional.empty();
+        }
+
+        return contacts.getEmbedded().getContacts().stream()
+                // Filtra contatos que tenham leads atrelados
+                .filter(c -> c.getEmbedded() != null && c.getEmbedded().getLeads() != null && !c.getEmbedded().getLeads().isEmpty())
+                // Pega o contato mais recentemente atualizado
+                .max(Comparator.comparing(ContactDto::getUpdatedAt, Comparator.nullsFirst(Long::compareTo)))
+                // Pega o ID do primeiro lead desse contato
+                .map(c -> c.getEmbedded().getLeads().get(0).getId());
     }
 
     private static String normalizeE164(String fone) {
@@ -88,5 +114,21 @@ public class IntegracaoKommoDataProvider implements IntegracaoKommoGateway {
         f = f.replaceAll("[^\\d+]", "");
         if (!f.startsWith("+")) f = "+" + f;
         return f;
+    }
+
+    // Filtro específico para tratar erros do Kommo (vinda da antiga KommoConfig)
+    private ExchangeFilterFunction kommoErrorFilter() {
+        return ExchangeFilterFunction.ofResponseProcessor(res -> {
+            if (res.statusCode().isError()) {
+                // Se for 204 (No Content), às vezes o Kommo retorna isso em buscas vazias, não é erro
+                if (res.statusCode().value() == 204) {
+                    return Mono.just(res);
+                }
+                return res.bodyToMono(String.class)
+                        .defaultIfEmpty("Sem corpo de erro")
+                        .flatMap(body -> Mono.error(new RuntimeException("Kommo API Error [" + res.statusCode() + "]: " + body)));
+            }
+            return Mono.just(res);
+        });
     }
 }

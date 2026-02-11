@@ -7,7 +7,9 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensa
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,10 +37,17 @@ class ProcessamentoRecontatoTest {
     @InjectMocks
     private ProcessamentoRecontato processamento;
 
+    private Usuario usuario;
+
+    @BeforeEach
+    void setUp() {
+        usuario = Usuario.builder().id(UUID.randomUUID()).build();
+    }
+
     @Test
     void deveEnviarContatoEAjustarConversaQuandoNaoFoiRecontato() {
         Vendedor vendedor = Vendedor.builder().id(1L).nome("Vendedor").telefone("+5511").build();
-        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5522").build();
+        Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5522").usuario(usuario).build();
         ConversaAgente conversa = ConversaAgente.builder()
                 .cliente(cliente)
                 .vendedor(vendedor)
@@ -51,7 +60,7 @@ class ProcessamentoRecontatoTest {
 
         processamento.processar("resposta", conversa, cliente);
 
-        verify(mensagemUseCase).enviarMensagem("mensagem-recontato", cliente.getTelefone(), false);
+        verify(mensagemUseCase).enviarMensagem(eq("mensagem-recontato"), eq(cliente.getTelefone()), eq(false), any(Usuario.class));
         verify(mensagemUseCase).enviarContato(vendedor, cliente);
         verify(conversaAgenteUseCase).salvar(conversa);
         assertTrue(conversa.getRecontato());
@@ -59,7 +68,7 @@ class ProcessamentoRecontatoTest {
 
     @Test
     void deveResponderDiretoQuandoJaFoiRecontato() {
-        Cliente cliente = Cliente.builder().telefone("+5533").id(UUID.randomUUID()).build();
+        Cliente cliente = Cliente.builder().telefone("+5533").id(UUID.randomUUID()).usuario(usuario).build();
         ConversaAgente conversa = ConversaAgente.builder()
                 .cliente(cliente)
                 .recontato(true)
@@ -68,7 +77,7 @@ class ProcessamentoRecontatoTest {
 
         processamento.processar("texto usuario", conversa, cliente);
 
-        verify(mensagemUseCase).enviarMensagem("texto usuario", cliente.getTelefone(), true);
+        verify(mensagemUseCase).enviarMensagem(eq("texto usuario"), eq(cliente.getTelefone()), eq(true), any(Usuario.class));
         verify(conversaAgenteUseCase, never()).salvar(any());
         verify(mensagemBuilder, never()).getMensagem(any(), any(), any());
     }

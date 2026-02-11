@@ -1,0 +1,1 @@
+ALTER TABLE usuarios ADD COLUMN crm_url VARCHAR(255);
