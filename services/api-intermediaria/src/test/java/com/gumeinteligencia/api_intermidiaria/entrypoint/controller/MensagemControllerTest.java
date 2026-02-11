@@ -13,12 +13,12 @@ import com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.TextoDto
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.ContextoMapper;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.CLienteRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ContextoRepository;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ConversaAgenteRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,6 +81,9 @@ class MensagemControllerTest {
 
     @MockitoBean
     private ValidadorMensagemUseCase validadorMensagemUseCase;
+
+    @MockitoBean
+    private ConversaAgenteRepository conversaAgenteRepository;
 
     @MockitoBean
     private CLienteRepository cLienteRepository;

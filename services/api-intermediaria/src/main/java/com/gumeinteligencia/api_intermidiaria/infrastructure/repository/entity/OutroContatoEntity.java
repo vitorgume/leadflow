@@ -8,6 +8,8 @@ import lombok.Setter;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
+
 import java.util.UUID;
 
 @DynamoDbBean
@@ -31,7 +33,7 @@ public class OutroContatoEntity {
     public String getNome() {
         return nome;
     }
-
+    @DynamoDbSecondaryPartitionKey(indexNames = "TelefoneIndex")
     public String getTelefone() {
         return telefone;
     }
