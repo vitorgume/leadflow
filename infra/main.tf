@@ -444,7 +444,7 @@ resource "aws_apprunner_service" "api_agente" {
 
   health_check_configuration {
     protocol             = "HTTP"
-    path                 = "/health"
+    path                 = "/healthz"
     interval             = 10
     timeout              = 5
     healthy_threshold    = 1
