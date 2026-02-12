@@ -481,7 +481,7 @@ resource "aws_apprunner_service" "api_principal" {
         port = tostring(var.api_principal_port)
 
         runtime_environment_variables = {
-          AGENTE_URL            = aws_apprunner_service.api_agente[0].service_url
+          AGENTE_URA_URI            = aws_apprunner_service.api_agente[0].service_url
           AWS_SQS_URL           = aws_sqs_queue.fifo.url
           SPRING_PROFILES_ACTIVE = "prod"
 
@@ -499,6 +499,7 @@ resource "aws_apprunner_service" "api_principal" {
 
           APP_SECURITY_ENCRYPTION_KEY = var.APP_SECURITY_ENCRYPTION_KEY
           URA_CHATBOT_IA_SECRET_KEY = var.URA_CHATBOT_IA_SECRET_KEY
+          URA_CHATBOT_IA_API_KEY = var.URA_CHATBOT_IA_API_KEY
         }
       }
     }

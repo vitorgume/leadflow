@@ -152,6 +152,12 @@ variable "WHASTAPP_CLIENT_TOKEN" {
   default   = ""
 }
 
+variable "URA_CHATBOT_IA_API_KEY" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
 #############################
 # Portas expostas pelos serviços
 #############################
