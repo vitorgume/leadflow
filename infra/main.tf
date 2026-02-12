@@ -498,6 +498,7 @@ resource "aws_apprunner_service" "api_principal" {
           WHASTAPP_CLIENT_TOKEN    = var.WHASTAPP_CLIENT_TOKEN
 
           APP_SECURITY_ENCRYPTION_KEY = var.APP_SECURITY_ENCRYPTION_KEY
+          URA_CHATBOT_IA_SECRET_KEY = var.URA_CHATBOT_IA_SECRET_KEY
         }
       }
     }

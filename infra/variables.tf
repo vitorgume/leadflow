@@ -126,6 +126,13 @@ variable "APP_SECURITY_ENCRYPTION_KEY" {
 # URL do CRM (não sensível por padrão)
 
 # Chaves da API Principal (sensíveis)
+variable "URA_CHATBOT_IA_SECRET_KEY" {
+  description = "Secret key para autenticação JWT"
+  type = string
+  sensitive = true
+  default = ""
+}
+
 variable "API_PRINCIPAL_API_KEY" {
   type      = string
   sensitive = true
