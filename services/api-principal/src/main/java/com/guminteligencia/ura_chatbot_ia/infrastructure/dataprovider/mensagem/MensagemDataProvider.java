@@ -15,12 +15,6 @@ public class MensagemDataProvider implements MensagemGateway {
 
     private final WebClientExecutor executor;
 
-    @Value("${app.ura.whatsapp.token}")
-    private final String token;
-
-    @Value("${app.ura.whatsapp.id-instance}")
-    private final String idInstance;
-
     @Value("${app.ura.whatsapp.client-token}")
     private final String clienteToken;
 
@@ -29,20 +23,16 @@ public class MensagemDataProvider implements MensagemGateway {
 
     public MensagemDataProvider(
             WebClientExecutor executor,
-            @Value("${app.ura.whatsapp.token}") String token,
-            @Value("${app.ura.whatsapp.id-instance}") String idInstance,
             @Value("${app.ura.whatsapp.client-token}") String clienteToken,
             @Value("${spring.profiles.active}") String profile
     ) {
         this.executor = executor;
-        this.token = token;
-        this.idInstance = idInstance;
         this.clienteToken = clienteToken;
         this.profile = profile;
     }
 
     @Override
-    public void enviar(String resposta, String telefone) {
+    public void enviar(String resposta, String telefone, String idInstance, String token) {
         MensagemRequestWhatsAppDto body = MensagemRequestWhatsAppDto.builder()
                 .phone(telefone)
                 .message(resposta)
@@ -60,7 +50,7 @@ public class MensagemDataProvider implements MensagemGateway {
     }
 
     @Override
-    public void enviarContato(String telefone, Cliente cliente) {
+    public void enviarContato(String telefone, Cliente cliente, String idInstance, String token) {
         String nomeCliente = cliente.getNome() != null ? cliente.getNome() : "Nome não informado";
 
         ContatoRequestDto body = ContatoRequestDto.builder()
@@ -81,14 +71,14 @@ public class MensagemDataProvider implements MensagemGateway {
     }
 
     @Override
-    public void enviarRelatorio(String arquivo, String fileName, String telefone) {
+    public void enviarRelatorio(String arquivo, String fileName, String telefone, String idInstance, String token) {
         String base64ComPrefixo = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + arquivo;
         DocumentoRequestDto body = new DocumentoRequestDto(telefone, base64ComPrefixo, fileName);
 
         if(profile.equals("prod")) {
             Map<String, String> headers = Map.of("Client-Token", clienteToken);
 
-            String uri = String.format("/instances/%s/token/%s/send-document/xlsx", idInstance, token);
+            String uri = String.format("https://api.z-api.io/instances/%s/token/%s/send-document/xlsx", idInstance, token);
 
             executor.post(uri, body, headers, "Erro ao enviar relatório.");
         } else {

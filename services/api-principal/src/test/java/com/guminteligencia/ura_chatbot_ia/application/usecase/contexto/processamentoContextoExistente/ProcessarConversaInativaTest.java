@@ -5,16 +5,17 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemU
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
-import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
-import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
-import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
+import com.guminteligencia.ura_chatbot_ia.domain.*;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,11 +36,18 @@ class ProcessarConversaInativaTest {
 
     @InjectMocks
     private ProcessarConversaInativa processador;
+    private Usuario usuario;
+
+    @BeforeEach
+    void setUp() {
+        usuario = Usuario.builder().id(UUID.randomUUID()).build();
+    }
 
     @Test
     void deveProcessarFluxoCompletoComSucesso() {
         ConversaAgente conversa = mock(ConversaAgente.class);
         Cliente cliente = mock(Cliente.class);
+        when(cliente.getUsuario()).thenReturn(usuario);
         Vendedor vendedor = mock(Vendedor.class);
 
         when(cliente.getTelefone()).thenReturn("+5511999999999");
@@ -55,7 +63,7 @@ class ProcessarConversaInativaTest {
         inOrder.verify(escolhaVendedorUseCase).escolherVendedor(cliente);
         inOrder.verify(conversa).setVendedor(vendedor);
         inOrder.verify(mensagemBuilder).getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, "Vendedor Teste", cliente);
-        inOrder.verify(mensagemUseCase).enviarMensagem("mensagem-g1-direcionamento", "+5511999999999", true);
+        inOrder.verify(mensagemUseCase).enviarMensagem(eq("mensagem-g1-direcionamento"), eq("+5511999999999"), eq(true), any(Usuario.class));
         inOrder.verify(mensagemUseCase).enviarContato(vendedor, cliente);
         inOrder.verify(crmUseCase).atualizarCrm(vendedor, cliente, conversa);
     }
@@ -64,6 +72,7 @@ class ProcessarConversaInativaTest {
     void devePropagarErroQuandoEnviarMensagemFalha() {
         ConversaAgente conversa = mock(ConversaAgente.class);
         Cliente cliente = mock(Cliente.class);
+        when(cliente.getUsuario()).thenReturn(usuario);
         Vendedor vendedor = mock(Vendedor.class);
 
         when(cliente.getTelefone()).thenReturn("+5544999999999");
@@ -71,7 +80,7 @@ class ProcessarConversaInativaTest {
         when(escolhaVendedorUseCase.escolherVendedor(cliente)).thenReturn(vendedor);
         when(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, "Joao", cliente)).thenReturn("msg");
         doThrow(new RuntimeException("erro-envio"))
-                .when(mensagemUseCase).enviarMensagem("msg", "+5544999999999", true);
+                .when(mensagemUseCase).enviarMensagem(eq("msg"), eq("+5544999999999"), eq(true), any(Usuario.class));
 
         try {
             processador.processar("resp", conversa, cliente);
@@ -87,6 +96,7 @@ class ProcessarConversaInativaTest {
     void deveContinuarMesmoSeEnviarContatoFalhar() {
         ConversaAgente conversa = mock(ConversaAgente.class);
         Cliente cliente = mock(Cliente.class);
+        when(cliente.getUsuario()).thenReturn(usuario);
         Vendedor vendedor = mock(Vendedor.class);
 
         when(cliente.getTelefone()).thenReturn("+5577999999999");
@@ -99,7 +109,7 @@ class ProcessarConversaInativaTest {
 
         processador.processar("resp", conversa, cliente);
 
-        verify(mensagemUseCase).enviarMensagem("msg-ok", "+5577999999999", true);
+        verify(mensagemUseCase).enviarMensagem(eq("msg-ok"), eq("+5577999999999"), eq(true), any(Usuario.class));
         verify(mensagemUseCase).enviarContato(vendedor, cliente);
         verify(crmUseCase).atualizarCrm(vendedor, cliente, conversa);
     }

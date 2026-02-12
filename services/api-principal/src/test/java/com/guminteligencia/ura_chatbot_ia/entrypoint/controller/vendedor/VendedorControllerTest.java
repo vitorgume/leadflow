@@ -31,7 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(
         properties = {
-                "spring.task.scheduling.enabled=false"
+                "spring.task.scheduling.enabled=false",
+                "spring.jpa.hibernate.ddl-auto=create-drop"
         }
 )
 @AutoConfigureMockMvc(addFilters = false)
@@ -87,7 +88,7 @@ class VendedorControllerTest {
                 .agenteApiKey("api-key-teste")
                 .build();
     }
-//
+
     @Test
     void cadastrarQuandoSucessoRetornaCreated() throws Exception {
         given(repository.findByTelefone("99999999"))

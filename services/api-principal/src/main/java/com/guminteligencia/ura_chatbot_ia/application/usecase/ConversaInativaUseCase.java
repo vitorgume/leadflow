@@ -79,7 +79,14 @@ public class ConversaInativaUseCase {
 
                 if(!conversa.getFinalizada() && !conversa.getStatus().getCodigo().equals(0)) {
                     conversa.setStatus(StatusConversa.INATIVO_G1);
-                    mensagemUseCase.enviarMensagem(mensagemBuilder.getMensagem(TipoMensagem.RECONTATO_INATIVO_G1, null, conversa.getCliente()), conversa.getCliente().getTelefone(), false);
+
+                    mensagemUseCase.enviarMensagem(
+                            mensagemBuilder.getMensagem(TipoMensagem.RECONTATO_INATIVO_G1, null, conversa.getCliente()),
+                            conversa.getCliente().getTelefone(),
+                            false,
+                            conversa.getCliente().getUsuario()
+                    );
+
                     conversa.setDataUltimaMensagem(LocalDateTime.now());
                 } else {
                     conversa.setStatus(StatusConversa.INATIVO_G2);

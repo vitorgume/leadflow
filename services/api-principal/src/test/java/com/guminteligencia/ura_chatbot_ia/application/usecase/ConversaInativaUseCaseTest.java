@@ -5,7 +5,6 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemU
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
@@ -40,6 +39,7 @@ class ConversaInativaUseCaseTest {
     private CrmUseCase crmUseCase;
 
     private ConversaInativaUseCase useCase;
+    private Usuario usuario;
 
     @BeforeEach
     void setUp() {
@@ -51,6 +51,7 @@ class ConversaInativaUseCaseTest {
                 mensagemBuilder,
                 "dev"
         );
+        usuario = Usuario.builder().id(UUID.randomUUID()).build();
     }
 
     @Test
@@ -79,6 +80,7 @@ class ConversaInativaUseCaseTest {
                     .id(UUID.randomUUID())
                     .nome("teste")
                     .telefone("+55999999999")
+                    .usuario(usuario)
                     .build();
             when(conv.getCliente()).thenReturn(cliente);
             when(conversaAgenteUseCase.listarNaoFinalizados()).thenReturn(List.of(conv));
@@ -89,7 +91,7 @@ class ConversaInativaUseCaseTest {
 
             verify(conv).setStatus(StatusConversa.INATIVO_G1);
             verify(mensagemBuilder).getMensagem(eq(TipoMensagem.RECONTATO_INATIVO_G1), isNull(), eq(cliente));
-            verify(mensagemUseCase).enviarMensagem("msg-recontato-g1", cliente.getTelefone(), false);
+            verify(mensagemUseCase).enviarMensagem("msg-recontato-g1", cliente.getTelefone(), false, usuario);
             verify(conv).setDataUltimaMensagem(now);
             verify(conversaAgenteUseCase).salvar(conv);
             verifyNoInteractions(escolhaVendedorUseCase, crmUseCase);

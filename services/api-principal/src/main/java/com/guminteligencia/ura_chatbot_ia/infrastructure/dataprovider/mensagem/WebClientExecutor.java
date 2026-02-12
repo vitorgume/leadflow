@@ -15,12 +15,17 @@ import reactor.util.retry.RetryBackoffSpec;
 import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class WebClientExecutor {
 
     private final WebClient webClient;
     private final RetryBackoffSpec retrySpec;
+
+    // 1. INJEÇÃO CORRETA: Recebe o Builder e o Retry Global
+    public WebClientExecutor(WebClient.Builder builder, RetryBackoffSpec retrySpec) {
+        this.webClient = builder.build();
+        this.retrySpec = retrySpec;
+    }
 
     public String post(String uri, Object body, Map<String, String> headers, String errorMessage) {
         return execute(uri, body, headers, errorMessage, HttpMethod.POST);
@@ -28,41 +33,47 @@ public class WebClientExecutor {
 
     public String execute(String uri, Object body, Map<String, String> headers, String errorMessage, HttpMethod method) {
         try {
-            WebClient.RequestBodyUriSpec base = webClient.method(method);
+            // 2. Criação do Spec inicial (com URL e Método)
+            WebClient.RequestBodySpec spec = webClient.method(method).uri(uri);
 
-            WebClient.RequestHeadersSpec<?> req = base
-                    .uri(uri)
-                    // garante Content-Type se não vier no bean
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .headers(h -> headers.forEach(h::add));
-
-            if (method == HttpMethod.POST || method == HttpMethod.PUT || method == HttpMethod.PATCH) {
-                req = ((WebClient.RequestBodySpec) req).bodyValue(body);
+            // 3. Configuração dos Headers
+            spec.contentType(MediaType.APPLICATION_JSON); // Default
+            if (headers != null) {
+                headers.forEach(spec::header);
             }
 
-            String response = req
-                    .retrieve()
+            // 4. Definição do Body (se houver e o método permitir)
+            WebClient.RequestHeadersSpec<?> headersSpec = spec;
+            if (body != null && (method == HttpMethod.POST || method == HttpMethod.PUT || method == HttpMethod.PATCH)) {
+                headersSpec = spec.bodyValue(body);
+            }
+
+            // 5. Execução
+            return headersSpec.retrieve()
                     .onStatus(HttpStatusCode::isError, resp ->
                             resp.bodyToMono(String.class)
                                     .defaultIfEmpty("<empty-body>")
                                     .flatMap(bodyStr -> {
-                                        String msg = "%s | HTTP %d | Body: %s"
-                                                .formatted(errorMessage, resp.statusCode().value(), bodyStr);
+                                        String msg = String.format("%s | HTTP %d | Body: %s",
+                                                errorMessage, resp.statusCode().value(), bodyStr);
                                         log.error(msg);
                                         return Mono.error(new DataProviderException(msg, null));
                                     })
                     )
                     .bodyToMono(String.class)
                     .retryWhen(retrySpec)
-                    .doOnSuccess(r -> log.info("Response recebido: {}", r))
+                    .doOnSuccess(r -> log.info("Response recebido da URI: {}", uri)) // Log menos verboso para segurança
                     .block();
 
-            return response;
-
         } catch (Exception e) {
-            // Inclui a mensagem original (com status/body se veio do onStatus)
-            String msg = "%s | cause=%s".formatted(errorMessage, e.getMessage());
+            // Mantém a lógica de captura original para formatar a exceção
+            String msg = String.format("%s | cause=%s", errorMessage, e.getMessage());
             log.error(msg, e);
+
+            // Se a causa já for DataProviderException (do onStatus), relança ela mesma ou a causa raiz
+            if (e instanceof DataProviderException) {
+                throw (DataProviderException) e;
+            }
             throw new DataProviderException(msg, e);
         }
     }

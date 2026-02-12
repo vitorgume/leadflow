@@ -41,4 +41,7 @@ public class ConfiguracaoCrmEntity {
 
     @Column(name = "acess_token", columnDefinition = "TEXT")
     private String acessToken;
+
+    @Column(name = "crm_url")
+    private String crmUrl;
 }

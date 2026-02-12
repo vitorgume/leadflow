@@ -45,7 +45,7 @@ public class IntegracaoKommo implements CrmIntegracaoType {
             
             String acessToken = criptografiaJCAUseCase.descriptografar(configuracaoCrm.getAcessToken());
 
-            Integer idLead = this.consultaLeadPeloTelefone(cliente.getTelefone(), acessToken);
+            Integer idLead = this.consultaLeadPeloTelefone(cliente.getTelefone(), acessToken, configuracaoCrm.getCrmUrl());
 
             Map<String, String> mapeamento = configuracaoCrm.getMapeamentoCampos();
 
@@ -90,7 +90,7 @@ public class IntegracaoKommo implements CrmIntegracaoType {
             } catch (Exception ignore) {
             }
 
-            gateway.atualizarCard(payloadKommo, idLead, acessToken);
+            gateway.atualizarCard(payloadKommo, idLead, acessToken, configuracaoCrm.getCrmUrl());
 
             log.info("Atualização do crm concluída com sucesso. Card: {}, Id do lead: {}", payloadKommo, idLead);
         } else {
@@ -118,9 +118,9 @@ public class IntegracaoKommo implements CrmIntegracaoType {
                 .build();
     }
 
-    private Integer consultaLeadPeloTelefone(String telefone, String acessToken) {
+    private Integer consultaLeadPeloTelefone(String telefone, String acessToken, String crmUrl) {
         log.info("Consultando lead pelo telefone. Telefone: {}", telefone);
-        Optional<Integer> lead = gateway.consultaLeadPeloTelefone(telefone, acessToken);
+        Optional<Integer> lead = gateway.consultaLeadPeloTelefone(telefone, acessToken, crmUrl);
 
         if(lead.isEmpty()) {
             throw new LeadNaoEncontradoException();

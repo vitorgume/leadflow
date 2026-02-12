@@ -387,6 +387,7 @@ resource "aws_apprunner_service" "api_intermediaria" {
   }
 
   health_check_configuration {
+    protocol             = "HTTP"
     path                 = "/actuator/health"
     interval             = 10
     timeout              = 5
@@ -425,7 +426,7 @@ resource "aws_apprunner_service" "api_agente" {
 
         runtime_environment_variables = {
           DATABASE_URL   = local.sqlalchemy_url
-          OPENAI_API_KEY = var.OPENAI_API_KEY
+          APP_SECURITY_ENCRYPTION_KEY = var.APP_SECURITY_ENCRYPTION_KEY
         }
       }
     }
@@ -442,7 +443,8 @@ resource "aws_apprunner_service" "api_agente" {
   }
 
   health_check_configuration {
-    path                 = "/health"
+    protocol             = "HTTP"
+    path                 = "/healthz"
     interval             = 10
     timeout              = 5
     healthy_threshold    = 1
@@ -479,8 +481,7 @@ resource "aws_apprunner_service" "api_principal" {
         port = tostring(var.api_principal_port)
 
         runtime_environment_variables = {
-          AGENTE_URL            = aws_apprunner_service.api_agente[0].service_url
-          APP_CRM_URL           = var.APP_CRM_URL
+          AGENTE_URA_URI            = aws_apprunner_service.api_agente[0].service_url
           AWS_SQS_URL           = aws_sqs_queue.fifo.url
           SPRING_PROFILES_ACTIVE = "prod"
 
@@ -495,11 +496,10 @@ resource "aws_apprunner_service" "api_principal" {
 
           # WhatsApp
           WHASTAPP_CLIENT_TOKEN    = var.WHASTAPP_CLIENT_TOKEN
-          WHASTAPP_INSTANCE_ID     = var.WHASTAPP_INSTANCE_ID
-          WHASTAPP_TOKEN           = var.WHASTAPP_TOKEN
 
-          # CRM
-          APP_CRM_ACESS_TOKEN      = var.APP_CRM_ACESS_TOKEN
+          APP_SECURITY_ENCRYPTION_KEY = var.APP_SECURITY_ENCRYPTION_KEY
+          URA_CHATBOT_IA_SECRET_KEY = var.URA_CHATBOT_IA_SECRET_KEY
+          URA_CHATBOT_IA_API_KEY = var.URA_CHATBOT_IA_API_KEY
         }
       }
     }
@@ -516,6 +516,7 @@ resource "aws_apprunner_service" "api_principal" {
   }
 
   health_check_configuration {
+    protocol             = "HTTP"
     path                 = "/actuator/health"
     interval             = 10
     timeout              = 5

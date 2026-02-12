@@ -1,15 +1,19 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem;
 
 import com.guminteligencia.ura_chatbot_ia.application.gateways.MensagemGateway;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.CriptografiaJCAUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -20,22 +24,35 @@ class MensagemUseCaseExtendedTest {
     private MensagemGateway gateway;
     @Mock
     private MensagemBuilder mensagemBuilder;
+    @Mock
+    private CriptografiaJCAUseCase criptografiaJCAUseCase;
 
     @InjectMocks
     private MensagemUseCase useCase;
 
+    private Usuario usuario;
+
+    @BeforeEach
+    void setUp() {
+        usuario = Usuario.builder()
+                .whatsappIdInstance("instance")
+                .whatsappToken("token")
+                .build();
+        when(criptografiaJCAUseCase.descriptografar(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+    }
+
     @Test
     void deveNormalizarMensagemRemovendoQuebrasEEspaços() {
         String mensagemComQuebras = "\"Oi\\n\\r\\nTudo bem?\"";
-        useCase.enviarMensagem(mensagemComQuebras, "+5511", true);
+        useCase.enviarMensagem(mensagemComQuebras, "+5511", true, usuario);
 
-        verify(gateway).enviar(eq("Oi Tudo bem?"), eq("+5511"));
+        verify(gateway).enviar(eq("Oi Tudo bem?"), eq("+5511"), eq("instance"), eq("token"));
     }
 
     @Test
     void deveEnviarContatoParaVendedorMesmoQuandoGatewayFalhar() {
         Vendedor vendedor = Vendedor.builder().telefone("+5522").build();
-        Cliente cliente = Cliente.builder().telefone("+5533").build();
+        Cliente cliente = Cliente.builder().telefone("+5533").usuario(usuario).build();
 
         when(mensagemBuilder.getMensagem(TipoMensagem.DADOS_CONTATO_VENDEDOR, null, cliente))
                 .thenReturn("dados");
@@ -43,12 +60,12 @@ class MensagemUseCaseExtendedTest {
                 .thenReturn("sep");
 
         doThrow(new RuntimeException("erro enviar contato"))
-                .when(gateway).enviarContato(vendedor.getTelefone(), cliente);
+                .when(gateway).enviarContato(vendedor.getTelefone(), cliente, "instance", "token");
 
         useCase.enviarContato(vendedor, cliente);
 
-        verify(gateway).enviarContato(vendedor.getTelefone(), cliente);
-        verify(gateway).enviar("dados", vendedor.getTelefone());
-        verify(gateway).enviar("sep", vendedor.getTelefone());
+        verify(gateway).enviarContato(vendedor.getTelefone(), cliente, "instance", "token");
+        verify(gateway).enviar("dados", vendedor.getTelefone(), "instance", "token");
+        verify(gateway).enviar("sep", vendedor.getTelefone(), "instance", "token");
     }
 }

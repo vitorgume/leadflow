@@ -3,11 +3,15 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.contexto.processa
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,6 +34,12 @@ class ProcessarContextoNaoFinalizadoNaoQualificadoTest {
 
     private final String resposta = "alguma mensagem";
     private final String telefone = "+5511999887766";
+    private Usuario usuario;
+
+    @BeforeEach
+    void setUp() {
+        usuario = Usuario.builder().id(UUID.randomUUID()).build();
+    }
 
     @Test
     void deveRetornarTrueQuandoConversaNaoFinalizada() {
@@ -53,6 +63,7 @@ class ProcessarContextoNaoFinalizadoNaoQualificadoTest {
 
     @Test
     void deveProcessarFluxoCompleto() {
+        when(cliente.getUsuario()).thenReturn(usuario);
         when(conversaAgente.getCliente()).thenReturn(cliente);
         when(cliente.getTelefone()).thenReturn(telefone);
 
@@ -60,13 +71,14 @@ class ProcessarContextoNaoFinalizadoNaoQualificadoTest {
 
         verify(conversaAgente).getCliente();
         verify(cliente).getTelefone();
-        verify(mensagemUseCase).enviarMensagem(resposta, telefone, false);
+        verify(mensagemUseCase).enviarMensagem(resposta, telefone, false, usuario);
 
         verifyNoMoreInteractions(conversaAgente, cliente, mensagemUseCase);
     }
 
     @Test
     void deveProcessarFluxoCompletoComTelefoneNull() {
+        when(cliente.getUsuario()).thenReturn(usuario);
         when(conversaAgente.getCliente()).thenReturn(cliente);
         when(cliente.getTelefone()).thenReturn(null);
 
@@ -74,7 +86,7 @@ class ProcessarContextoNaoFinalizadoNaoQualificadoTest {
 
         verify(conversaAgente).getCliente();
         verify(cliente).getTelefone();
-        verify(mensagemUseCase).enviarMensagem(resposta, (String) null, false);
+        verify(mensagemUseCase).enviarMensagem(resposta, (String) null, false, usuario);
         verifyNoMoreInteractions(mensagemUseCase);
     }
 }

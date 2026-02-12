@@ -20,5 +20,5 @@ public class ConfiguracaoCrm {
     private String idEtapaInativos;
     private String idEtapaAtivos;
     private String acessToken;
-
+    private String crmUrl;
 }

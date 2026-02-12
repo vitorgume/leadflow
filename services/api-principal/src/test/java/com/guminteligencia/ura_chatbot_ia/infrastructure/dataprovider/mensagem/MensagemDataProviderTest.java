@@ -24,10 +24,8 @@ public class MensagemDataProviderTest {
     @Mock
     WebClientExecutor executor;
 
-    @InjectMocks
     MensagemDataProvider prodProvider;
 
-    @InjectMocks
     MensagemDataProvider devProvider;
 
     final String token = "TK123";
@@ -37,16 +35,16 @@ public class MensagemDataProviderTest {
     @BeforeEach
     void setup() {
         prodProvider = new MensagemDataProvider(
-                executor, token, idInstance, clienteToken, "prod"
+                executor, clienteToken, "prod"
         );
         devProvider = new MensagemDataProvider(
-                executor, token, idInstance, clienteToken, "dev"
+                executor, clienteToken, "dev"
         );
     }
 
     @Test
     void deveEnviarEmProdChamarExecutorComParametoCorreto() {
-        prodProvider.enviar("oi mundo", "+55999999999");
+        prodProvider.enviar("oi mundo", "+55999999999", idInstance, token);
 
         ArgumentCaptor<String> uriCap = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<MensagemRequestWhatsAppDto> bodyCap = ArgumentCaptor.forClass(MensagemRequestWhatsAppDto.class);
@@ -71,14 +69,14 @@ public class MensagemDataProviderTest {
 
     @Test
     void deveEnviarEmDevNaoDeveChamarExecutor() {
-        devProvider.enviar("oi", "+55111111111");
+        devProvider.enviar("oi", "+55111111111", idInstance, token);
         verifyNoInteractions(executor);
     }
 
     @Test
     void deveEnviarContatoEmProdDeveChamarExecutorComParametrosCorretos() {
         Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+55999999999").build();
-        prodProvider.enviarContato("+55333333333", cliente);
+        prodProvider.enviarContato("+55333333333", cliente, idInstance, token);
 
         ArgumentCaptor<String> uriCap = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<ContatoRequestDto> bodyCap = ArgumentCaptor.forClass(ContatoRequestDto.class);
@@ -103,14 +101,14 @@ public class MensagemDataProviderTest {
 
     @Test
     void deveEnviarContatoEmDevNaoDeveChamarExecutor() {
-        devProvider.enviarContato("+55444444444", Cliente.builder().id(UUID.randomUUID()).telefone("+55666666666").build());
+        devProvider.enviarContato("+55444444444", Cliente.builder().id(UUID.randomUUID()).telefone("+55666666666").build(), idInstance, token);
         verifyNoInteractions(executor);
     }
 
     @Test
     void deveEnviarRelatorioEmProdDeveChamarExecutorComParametrosCorretoss() {
         String fakeBase64 = "R0lGODlhAQABAIAAAAUEBA==";
-        prodProvider.enviarRelatorio(fakeBase64, "rel.xlsx", "+55777777777");
+        prodProvider.enviarRelatorio(fakeBase64, "rel.xlsx", "+55777777777", idInstance, token);
 
         ArgumentCaptor<String> uriCap = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<DocumentoRequestDto> bodyCap = ArgumentCaptor.forClass(DocumentoRequestDto.class);
@@ -121,7 +119,7 @@ public class MensagemDataProviderTest {
                 .post(uriCap.capture(), bodyCap.capture(), headersCap.capture(), errCap.capture());
 
         String expectedUri =
-                "/instances/" + idInstance +
+                "https://api.z-api.io/instances/" + idInstance +
                         "/token/" + token + "/send-document/xlsx";
         assertEquals(expectedUri, uriCap.getValue());
 
@@ -136,7 +134,7 @@ public class MensagemDataProviderTest {
 
     @Test
     void deveEnviarRelatorioEmDevNaoDeveChamarExecutor() {
-        devProvider.enviarRelatorio("AAA", "x.xlsx", "+55888888888");
+        devProvider.enviarRelatorio("AAA", "x.xlsx", "+55888888888", idInstance, token);
         verifyNoInteractions(executor);
     }
 

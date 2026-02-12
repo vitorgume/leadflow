@@ -7,7 +7,6 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.MensagemU
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensagem;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.mensagens.MensagemBuilder;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.EscolhaVendedorUseCase;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor.VendedorUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.*;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import org.junit.jupiter.api.Test;
@@ -29,8 +28,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ProcessarClienteQualificadoTest {
 
-    @Mock
-    private VendedorUseCase vendedorUseCase;
     @Mock
     private ClienteUseCase clienteUseCase;
     @Mock
@@ -117,7 +114,7 @@ class ProcessarClienteQualificadoTest {
         assertEquals("Joao", built.getNome());
 
         verify(escolhaVendedorUseCase).escolherVendedor(cliente);
-        verify(mensagemUseCase).enviarMensagem("msg-dir", cliente.getTelefone(), false);
+        verify(mensagemUseCase).enviarMensagem("msg-dir", cliente.getTelefone(), false, usuarioDomain);
         verify(mensagemUseCase).enviarContato(vendedor, cliente);
         verify(crmUseCase).atualizarCrm(vendedor, cliente, conversaAgente);
         verify(conversaAgente).setVendedor(vendedor);
@@ -147,6 +144,6 @@ class ProcessarClienteQualificadoTest {
                 () -> processarClienteQualificado.processar(resposta, conversaAgente, cliente)
         );
 
-        verifyNoInteractions(clienteUseCase, vendedorUseCase, mensagemUseCase, mensagemBuilder);
+        verifyNoInteractions(clienteUseCase, mensagemUseCase, mensagemBuilder, crmUseCase);
     }
 }

@@ -114,28 +114,25 @@ variable "image_tag_api_principal" {
 # Segredos / Chaves (Secrets Manager)
 #############################
 # API do Agente (FastAPI)
-variable "OPENAI_API_KEY" {
-  type      = string
-  sensitive = true
+variable "APP_SECURITY_ENCRYPTION_KEY" {
+  description = "Chave de criptografia para a API Agente"
+  type        = string
+  sensitive   = true
 }
 
 #############################
 # API Principal (Java/Spring)
 #############################
 # URL do CRM (não sensível por padrão)
-variable "APP_CRM_URL" {
-  type    = string
+
+# Chaves da API Principal (sensíveis)
+variable "URA_CHATBOT_IA_SECRET_KEY" {
+  description = "Secret key para autenticação JWT"
+  type = string
+  sensitive = true
   default = ""
 }
 
-# Token de acesso ao CRM (sensível)
-variable "APP_CRM_ACESS_TOKEN" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
-
-# Chaves da API Principal (sensíveis)
 variable "API_PRINCIPAL_API_KEY" {
   type      = string
   sensitive = true
@@ -155,13 +152,7 @@ variable "WHASTAPP_CLIENT_TOKEN" {
   default   = ""
 }
 
-variable "WHASTAPP_INSTANCE_ID" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
-
-variable "WHASTAPP_TOKEN" {
+variable "URA_CHATBOT_IA_API_KEY" {
   type      = string
   sensitive = true
   default   = ""
@@ -172,7 +163,7 @@ variable "WHASTAPP_TOKEN" {
 #############################
 variable "api_intermediaria_port" {
   type    = number
-  default = 8080
+  default = 8081
 }
 
 variable "api_agente_port" {
@@ -190,4 +181,6 @@ variable "create_services" {
   type        = bool
   default     = true
 }
+
+
 

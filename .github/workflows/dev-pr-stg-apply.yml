@@ -23,7 +23,8 @@ env:
   # --- naming / imagens ---
   ECR_REGISTRY: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-  TAG_PREFIX: pr-${{ github.event.pull_request.number }}
+
+  TAG_PREFIX: pr-${{ github.event.pull_request.number || 'manual-test' }}
   IMAGE_TAG_INTER:  pr-${{ github.event.pull_request.number }}-inter
   IMAGE_TAG_AGENT:  pr-${{ github.event.pull_request.number }}-agent
   IMAGE_TAG_PRINC:  pr-${{ github.event.pull_request.number }}-principal
@@ -34,11 +35,11 @@ env:
   TF_STATE_LOCK_TABLE: ${{ vars.TF_STATE_LOCK_TABLE }}  
 
   # --- NAME PREFIX por PR ---
-  NAME_PREFIX: ura-chatbot-ia-pr-${{ github.event.pull_request.number }}
+  NAME_PREFIX: ura-chatbot-ia-pr-${{ github.event.pull_request.number || 'manual' }}
 
   # --- TF_VAR_* ---
   TF_VAR_region: ${{ vars.AWS_REGION }}
-  TF_VAR_name_prefix: ura-chatbot-ia-pr-${{ github.event.pull_request.number }}
+  TF_VAR_name_prefix: ura-chatbot-ia-pr-${{ github.event.pull_request.number || 'manual' }}
   TF_VAR_account_id: ${{ vars.AWS_ACCOUNT_ID }}
   TF_VAR_ecr_repository: ${{ vars.ECR_REPOSITORY }}
   TF_VAR_image_tag_api_intermediaria: pr-${{ github.event.pull_request.number }}-inter
@@ -47,18 +48,13 @@ env:
   TF_VAR_rds_db_name: app_stg
 
   # 👇 ajuste aqui, alinhando com o variables.tf e com seus SECRETS do GitHub
-  TF_VAR_APP_CRM_ACESS_TOKEN:        ${{ secrets.APP_CRM_ACESS_TOKEN_STG }}
   TF_VAR_API_PRINCIPAL_API_KEY:      ${{ secrets.API_PRINCIPAL_API_KEY_STG }}
   TF_VAR_API_PRINCIPAL_SECRET_KEY:   ${{ secrets.API_PRINCIPAL_SECRET_KEY_STG }}
   TF_VAR_WHASTAPP_CLIENT_TOKEN:      ${{ secrets.WHASTAPP_CLIENT_TOKEN_STG }}
-  TF_VAR_WHASTAPP_INSTANCE_ID:       ${{ secrets.WHASTAPP_INSTANCE_ID_STG }}
-  TF_VAR_WHASTAPP_TOKEN:             ${{ secrets.WHASTAPP_TOKEN_STG }}
 
-  TF_VAR_OPENAI_API_KEY:             ${{ secrets.OPENAI_API_KEY_STG }}
-
-  
-  
-  TF_VAR_APP_CRM_URL: ${{ vars.APP_CRM_URL }}
+  TF_VAR_APP_SECURITY_ENCRYPTION_KEY:    ${{ secrets.APP_SECURITY_ENCRYPTION_KEY_STG }}
+  TF_VAR_URA_CHATBOT_IA_SECRET_KEY:      ${{ secrets.API_PRINCIPAL_SECRET_KEY_STG }}
+  TF_VAR_URA_CHATBOT_IA_API_KEY:         ${{ secrets.API_PRINCIPAL_API_KEY_STG }}
   
 
   # --- diretórios ---
@@ -186,20 +182,26 @@ jobs:
       - name: Install tools (jq)
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Read DB creds from Secrets Manager
+      - name: Get DB creds from Terraform Output
+        working-directory: ${{ env.INFRA_DIR }}
         run: |
-          SECRET_JSON=$(aws secretsmanager get-secret-value \
-            --secret-id "/${{ env.NAME_PREFIX }}/db-app-creds" \
-            --query SecretString --output text)
-          echo "FLYWAY_URL=$(echo "$SECRET_JSON" | jq -r .jdbc_url)" >> $GITHUB_ENV
-          echo "FLYWAY_USER=$(echo "$SECRET_JSON" | jq -r .username)" >> $GITHUB_ENV
-          echo "FLYWAY_PASSWORD=$(echo "$SECRET_JSON" | jq -r .password)" >> $GITHUB_ENV
+          # Pega os valores brutos (-raw) do output do Terraform
+          DB_ENDPOINT=$(terraform output -raw rds_mysql_endpoint)
+          DB_USER=$(terraform output -raw rds_username)
+          DB_PASS=$(terraform output -raw rds_password)
+          
+          # Monta a URL JDBC para o Flyway
+          echo "FLYWAY_URL=jdbc:mysql://${DB_ENDPOINT}/${{ env.TF_VAR_rds_db_name }}" >> $GITHUB_ENV
+          echo "FLYWAY_USER=${DB_USER}" >> $GITHUB_ENV
+          
+          # Mascara a senha no log do GitHub Actions por segurança
+          echo "::add-mask::${DB_PASS}"
+          echo "FLYWAY_PASSWORD=${DB_PASS}" >> $GITHUB_ENV
 
       - name: Run Flyway migrate (Docker)
-        working-directory: ${{ env.MIGRATIONS_DIR }}/..
         run: |
           docker run --rm \
-            -v "$PWD/sql:/flyway/sql" \
+            -v "${{ github.workspace }}/migrations/flyway:/flyway/sql" \
             flyway/flyway:latest \
             -url="${FLYWAY_URL}" \
             -user="${FLYWAY_USER}" \

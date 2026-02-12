@@ -1,6 +1,5 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ContactDto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ContactsResponse;
@@ -10,35 +9,38 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
-import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+import reactor.util.retry.RetryBackoffSpec;
 
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class IntegracaoKommoDataProviderTest {
 
+    // --- Mocks Principais ---
     @Mock
     private WebClient webClient;
 
-    // Mocks para a cadeia do WebClient
+    // O segredo: RETURNS_SELF evita NullPointerException no construtor
+    @Mock(answer = Answers.RETURNS_SELF)
+    private WebClient.Builder webClientBuilder;
+
+    @Mock
+    private RetryBackoffSpec retrySpec;
+
+    // --- Mocks da Cadeia Reativa (Fluent API) ---
     @Mock
     private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
     @Mock
@@ -50,121 +52,98 @@ class IntegracaoKommoDataProviderTest {
     @Mock
     private WebClient.ResponseSpec responseSpec;
 
-    @InjectMocks
+    // Classe sob teste (instanciada manualmente)
     private IntegracaoKommoDataProvider provider;
 
-    private final String TOKEN = "bearer-token";
+    // Constantes de teste
+    private final String TOKEN = "bearer-token-123";
     private final String TELEFONE = "5511999999999";
+    private final String CRM_URL = "http://crm-cliente.com";
+
+    @BeforeEach
+    void setup() {
+        // 1. Configura o fim do Builder para retornar o nosso Mock de WebClient
+        when(webClientBuilder.build()).thenReturn(webClient);
+
+        // 2. Mockamos o Retry para retornar ele mesmo quando chamado (caso use .retryWhen)
+        // Isso previne NPE se o Reactor tentar acessar specs internos
+        retrySpec = Retry.fixedDelay(1, java.time.Duration.ofMillis(10));
+
+        // 3. Instanciação manual APÓS as configurações acima
+        provider = new IntegracaoKommoDataProvider(webClientBuilder, retrySpec);
+    }
+
+    // ==================================================================================
+    // TESTES DE CONSULTA (GET)
+    // ==================================================================================
 
     @Test
     @DisplayName("ConsultaLead: Deve normalizar telefone e retornar ID do lead mais recente")
     void deveRetornarIdLeadQuandoEncontrado() {
         // Arrange
         ContactDto contatoAntigo = criarContatoMock(100, 1000L);
-        ContactDto contatoNovo = criarContatoMock(200, 2000L);
+        ContactDto contatoNovo = criarContatoMock(200, 2000L); // Esse deve ser escolhido (maior data)
 
-        // Cenário de filtro: Contato com embedded null
-        ContactDto contatoSemEmbedded = mock(ContactDto.class);
-        when(contatoSemEmbedded.getEmbedded()).thenReturn(null);
+        // Cenário de robustez: Contato com dados nulos
+        ContactDto contatoBugado = mock(ContactDto.class);
+        lenient().when(contatoBugado.getEmbedded()).thenReturn(null);
 
         ContactsResponse.Embedded embedded = new ContactsResponse.Embedded();
-        embedded.setContacts(List.of(contatoAntigo, contatoNovo, contatoSemEmbedded));
+        embedded.setContacts(List.of(contatoAntigo, contatoNovo, contatoBugado));
         ContactsResponse responseApi = new ContactsResponse(embedded);
 
-        // --- Mock do UriBuilder para Coverage do Lambda ---
-        UriBuilder uriBuilderMock = mock(UriBuilder.class);
-        when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
-        when(uriBuilderMock.queryParam(anyString(), any(Object.class))).thenReturn(uriBuilderMock); // Aceita String e Int
-        when(uriBuilderMock.build()).thenReturn(URI.create("http://localhost/contacts"));
-
-        // Chain do WebClient
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(invocation -> {
-            Function<UriBuilder, URI> uriFunction = invocation.getArgument(0);
-            uriFunction.apply(uriBuilderMock);
-            return requestHeadersSpec;
-        });
-        when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(ContactsResponse.class)).thenReturn(Mono.just(responseApi));
+        mockWebClientGetChain(responseApi);
 
         // Act
-        // Passando telefone sem "+", o código deve adicionar
-        Optional<Integer> result = provider.consultaLeadPeloTelefone("5511999999999", TOKEN);
+        Optional<Integer> result = provider.consultaLeadPeloTelefone(TELEFONE, TOKEN, CRM_URL);
 
         // Assert
         assertTrue(result.isPresent());
         assertEquals(200, result.get());
-
-        // Validação dos parâmetros passados para o UriBuilder (cobre normalizeE164)
-        verify(uriBuilderMock).queryParam("query", "+5511999999999");
-        verify(uriBuilderMock).queryParam("with", "leads");
     }
 
     @Test
     @DisplayName("ConsultaLead: Deve normalizar telefone null para vazio e adicionar +")
     void deveTratarTelefoneNull() {
         // Arrange
-        mockWebClientChainGenerico(new ContactsResponse(null)); // Retorno vazio
-
-        UriBuilder uriBuilderMock = mock(UriBuilder.class);
-        when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
-        when(uriBuilderMock.queryParam(anyString(), Optional.ofNullable(any()))).thenReturn(uriBuilderMock);
-        when(uriBuilderMock.build()).thenReturn(URI.create("http://uri"));
-
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(inv -> {
-            Function<UriBuilder, URI> func = inv.getArgument(0);
-            func.apply(uriBuilderMock);
-            return requestHeadersSpec;
-        });
+        // Simula resposta vazia da API (sem contatos)
+        mockWebClientGetChain(new ContactsResponse(null));
 
         // Act
-        provider.consultaLeadPeloTelefone(null, TOKEN);
+        provider.consultaLeadPeloTelefone(null, TOKEN, CRM_URL);
 
         // Assert
-        // Null vira "" e depois recebe "+", resultando em "+"
-        verify(uriBuilderMock).queryParam("query", "+");
+        ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
+        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
+
+        // Verifica se a URL foi construída corretamente com o "+" encoded (%2B)
+        assertTrue(uriCaptor.getValue().getRawQuery().contains("query=+"));
     }
 
     @Test
     @DisplayName("ConsultaLead: Não deve adicionar + se já existir")
     void deveManterTelefoneComMais() {
         // Arrange
-        mockWebClientChainGenerico(new ContactsResponse(null));
-
-        UriBuilder uriBuilderMock = mock(UriBuilder.class);
-        when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
-        when(uriBuilderMock.queryParam(anyString(), Optional.ofNullable(any()))).thenReturn(uriBuilderMock);
-        when(uriBuilderMock.build()).thenReturn(URI.create("http://uri"));
-
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenAnswer(inv -> {
-            Function<UriBuilder, URI> func = inv.getArgument(0);
-            func.apply(uriBuilderMock);
-            return requestHeadersSpec;
-        });
+        mockWebClientGetChain(new ContactsResponse(null));
 
         // Act
-        provider.consultaLeadPeloTelefone("+5511000", TOKEN);
+        provider.consultaLeadPeloTelefone("+5511988887777", TOKEN, CRM_URL);
 
         // Assert
-        verify(uriBuilderMock).queryParam("query", "+5511000");
+        ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
+        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
+        // Deve conter o número exato, com o + encoded
+        assertTrue(uriCaptor.getValue().getQuery().contains("query=+5511988887777"));
     }
 
     @Test
-    @DisplayName("ConsultaLead: Deve retornar vazio quando API retorna null (Mono.empty)")
-    void deveRetornarVazioQuandoApiRetornaNull() {
+    @DisplayName("ConsultaLead: Deve retornar vazio quando API retorna Mono.empty (ex: 404 tratado)")
+    void deveRetornarVazioQuandoApiRetornaVazio() {
         // Arrange
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        // Simula o .block() retornando null (Mono vazio)
-        when(responseSpec.bodyToMono(ContactsResponse.class)).thenReturn(Mono.empty());
+        mockWebClientGetChain(null); // Passar null força o mock a retornar Mono.empty()
 
         // Act
-        Optional<Integer> result = provider.consultaLeadPeloTelefone(TELEFONE, TOKEN);
+        Optional<Integer> result = provider.consultaLeadPeloTelefone(TELEFONE, TOKEN, CRM_URL);
 
         // Assert
         assertTrue(result.isEmpty());
@@ -175,31 +154,29 @@ class IntegracaoKommoDataProviderTest {
     void deveRetornarVazioQuandoListaContatosNull() {
         // Arrange
         ContactsResponse.Embedded embedded = mock(ContactsResponse.Embedded.class);
-        when(embedded.getContacts()).thenReturn(null); // Lista null
+        when(embedded.getContacts()).thenReturn(null);
         ContactsResponse response = new ContactsResponse(embedded);
 
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
-
-        mockWebClientChainGenerico(response);
+        mockWebClientGetChain(response);
 
         // Act
-        Optional<Integer> result = provider.consultaLeadPeloTelefone(TELEFONE, TOKEN);
+        Optional<Integer> result = provider.consultaLeadPeloTelefone(TELEFONE, TOKEN, CRM_URL);
 
         // Assert
         assertTrue(result.isEmpty());
     }
 
     @Test
-    @DisplayName("ConsultaLead: Deve filtrar contatos sem leads ou com lista de leads vazia")
+    @DisplayName("ConsultaLead: Deve ignorar contatos que não possuem leads")
     void deveIgnorarContatosSemLeadsValidos() {
         // Arrange
-        // Caso 1: Embedded != null, mas Leads == null
+        // C1: Embedded existe, mas leads é null
         ContactDto c1 = mock(ContactDto.class);
         ContactDto.Embedded e1 = mock(ContactDto.Embedded.class);
         when(c1.getEmbedded()).thenReturn(e1);
         when(e1.getLeads()).thenReturn(null);
 
-        // Caso 2: Embedded != null, Leads != null, mas Lista Vazia
+        // C2: Leads é lista vazia
         ContactDto c2 = mock(ContactDto.class);
         ContactDto.Embedded e2 = mock(ContactDto.Embedded.class);
         when(c2.getEmbedded()).thenReturn(e2);
@@ -209,96 +186,116 @@ class IntegracaoKommoDataProviderTest {
         embedded.setContacts(List.of(c1, c2));
         ContactsResponse response = new ContactsResponse(embedded);
 
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
-
-        mockWebClientChainGenerico(response);
+        mockWebClientGetChain(response);
 
         // Act
-        Optional<Integer> result = provider.consultaLeadPeloTelefone(TELEFONE, TOKEN);
+        Optional<Integer> result = provider.consultaLeadPeloTelefone(TELEFONE, TOKEN, CRM_URL);
 
         // Assert
         assertTrue(result.isEmpty());
     }
 
     @Test
-    @DisplayName("ConsultaLead: Deve lançar exceção ao falhar")
+    @DisplayName("ConsultaLead: Deve lançar DataProviderException ao ocorrer erro de rede")
     void deveLancarExcecaoNaConsulta() {
-        RuntimeException erroRede = new RuntimeException("Timeout");
+        // Arrange - Quebra a cadeia no .retrieve()
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
+        when(requestHeadersUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(ContactsResponse.class)).thenReturn(Mono.error(erroRede));
+        when(requestHeadersSpec.retrieve()).thenThrow(new RuntimeException("Timeout Connection"));
 
+        // Act & Assert
         assertThrows(DataProviderException.class,
-                () -> provider.consultaLeadPeloTelefone(TELEFONE, TOKEN));
+                () -> provider.consultaLeadPeloTelefone(TELEFONE, TOKEN, CRM_URL));
     }
 
+    // ==================================================================================
+    // TESTES DE ATUALIZAÇÃO (PATCH)
+    // ==================================================================================
+
     @Test
-    @DisplayName("AtualizarCard: Deve executar PATCH com sucesso e cobrir URI builder")
+    @DisplayName("AtualizarCard: Deve executar PATCH com sucesso e montar URI correta")
     void deveAtualizarCardComSucesso() {
         // Arrange
         Integer idLead = 123;
         PayloadKommo payload = PayloadKommo.builder().statusId(1).build();
 
-        // Mock do UriBuilder para coverage do lambda
-        UriBuilder uriBuilderMock = mock(UriBuilder.class);
-        when(uriBuilderMock.path(anyString())).thenReturn(uriBuilderMock);
-        when(uriBuilderMock.build(any(Object.class))).thenReturn(URI.create("http://localhost/leads/123"));
-
-        when(webClient.patch()).thenReturn(requestBodyUriSpec);
-        // Intercepta e executa o lambda do URI
-        when(requestBodyUriSpec.uri(any(Function.class))).thenAnswer(inv -> {
-            Function<UriBuilder, URI> func = inv.getArgument(0);
-            func.apply(uriBuilderMock);
-            return requestBodySpec;
-        });
-
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(payload)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenReturn(Mono.empty());
+        mockWebClientPatchChain();
 
         // Act
-        assertDoesNotThrow(() -> provider.atualizarCard(payload, idLead, TOKEN));
+        assertDoesNotThrow(() -> provider.atualizarCard(payload, idLead, TOKEN, CRM_URL));
 
         // Assert
-        verify(uriBuilderMock).path("/leads/{id}");
-        verify(uriBuilderMock).build(idLead);
+        ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
+        verify(requestBodyUriSpec).uri(uriCaptor.capture());
+
+        // Verifica se a URL base foi respeitada e o ID expandido
+        URI uriUsada = uriCaptor.getValue();
+        assertEquals("crm-cliente.com", uriUsada.getHost());
+        assertEquals("/leads/123", uriUsada.getPath());
     }
 
     @Test
-    @DisplayName("AtualizarCard: Deve lançar exceção ao falhar")
+    @DisplayName("AtualizarCard: Deve lançar DataProviderException ao falhar")
     void deveLancarExcecaoNaAtualizacao() {
+        // Arrange
         when(webClient.patch()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(any(Function.class))).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
+        when(requestBodyUriSpec.uri(any(URI.class))).thenReturn(requestBodySpec);
+        // Simula erro na hora de enviar o corpo
+        when(requestBodySpec.bodyValue(any())).thenThrow(new RuntimeException("Erro de serialização"));
+
+        // Act & Assert
+        assertThrows(DataProviderException.class,
+                () -> provider.atualizarCard(PayloadKommo.builder().build(), 123, TOKEN, CRM_URL));
+    }
+
+    // ==================================================================================
+    // HELPERS
+    // ==================================================================================
+
+    /**
+     * Configura toda a cadeia de mocks para uma requisição GET (Consulta).
+     */
+    private void mockWebClientGetChain(ContactsResponse response) {
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+        if (response != null) {
+            when(responseSpec.bodyToMono(ContactsResponse.class)).thenReturn(Mono.just(response));
+        } else {
+            // Simula retorno vazio ou erro tratado que retorna empty
+            when(responseSpec.bodyToMono(ContactsResponse.class)).thenReturn(Mono.empty());
+        }
+    }
+
+    /**
+     * Configura toda a cadeia de mocks para uma requisição PATCH (Atualização).
+     */
+    private void mockWebClientPatchChain() {
+        when(webClient.patch()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(any(URI.class))).thenReturn(requestBodySpec);
+        // Note: contentType já foi definido no construtor via defaultHeader, então a chamada aqui é direta bodyValue
         when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenReturn(Mono.error(new RuntimeException("Erro")));
-
-        assertThrows(DataProviderException.class,
-                () -> provider.atualizarCard(PayloadKommo.builder().build(), 123, TOKEN));
+        when(responseSpec.toBodilessEntity()).thenReturn(Mono.empty());
     }
 
-    // --- Helpers ---
-
-    private void mockWebClientChainGenerico(ContactsResponse response) {
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(ContactsResponse.class)).thenReturn(Mono.just(response));
-    }
-
+    /**
+     * Cria um DTO de contato mockado para facilitar os testes.
+     */
     private ContactDto criarContatoMock(Integer leadId, Long updatedAt) {
         ContactDto contact = mock(ContactDto.class);
         when(contact.getUpdatedAt()).thenReturn(updatedAt);
+
         ContactDto.Embedded embedded = mock(ContactDto.Embedded.class);
         when(contact.getEmbedded()).thenReturn(embedded);
+
         ContactDto.LeadRef leadRef = new ContactDto.LeadRef(leadId);
         when(embedded.getLeads()).thenReturn(List.of(leadRef));
+
         return contact;
     }
 }

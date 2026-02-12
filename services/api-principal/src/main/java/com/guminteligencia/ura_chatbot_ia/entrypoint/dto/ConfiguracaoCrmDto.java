@@ -35,4 +35,7 @@ public class ConfiguracaoCrmDto {
 
     @JsonProperty("acess_token")
     private String acessToken;
+
+    @JsonProperty("crm_url")
+    private String crmUrl;
 }

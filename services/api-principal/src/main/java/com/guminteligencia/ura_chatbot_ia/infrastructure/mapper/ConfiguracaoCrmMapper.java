@@ -14,6 +14,7 @@ public class ConfiguracaoCrmMapper {
                 .idEtapaInativos(entity.getIdEtapaInativos())
                 .idEtapaAtivos(entity.getIdEtapaAtivos())
                 .acessToken(entity.getAcessToken())
+                .crmUrl(entity.getCrmUrl())
                 .build();
     }
 
@@ -26,6 +27,7 @@ public class ConfiguracaoCrmMapper {
                 .idEtapaInativos(domain.getIdEtapaInativos())
                 .idEtapaAtivos(domain.getIdEtapaAtivos())
                 .acessToken(domain.getAcessToken())
+                .crmUrl(domain.getCrmUrl())
                 .build();
     }
 }
