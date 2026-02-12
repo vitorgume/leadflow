@@ -99,45 +99,8 @@ data "aws_subnets" "default" {
   }
 }
 
-# Lê cada subnet para obter availability_zone_id
-data "aws_subnet" "default_by_id" {
-  for_each = toset(data.aws_subnets.default.ids)
-  id       = each.value
-}
-
-# ========= Filtros para VPC Connector (App Runner) =========
-variable "apprunner_az_blocklist" {
-  type        = list(string)
-  description = "AZ IDs bloqueadas para App Runner VPC Connector"
-  default     = ["use1-az3"] # a do erro atual
-}
-
-variable "apprunner_subnet_id_blocklist" {
-  type        = list(string)
-  description = "Subnet IDs a bloquear no VPC Connector"
-  default     = []  # ex.: ["subnet-0123abcd", "subnet-0456efgh"]
-}
-
-locals {
-  # Subnets válidas: exclui AZs bloqueadas e subnets bloqueadas
-  apprunner_subnet_ids = [
-    for s in data.aws_subnet.default_by_id :
-    s.id
-    if !contains(var.apprunner_az_blocklist, s.availability_zone_id)
-    && !contains(var.apprunner_subnet_id_blocklist, s.id)
-  ]
-
-  # (opcional) AZs distintas após o filtro, útil p/ sanity-check
-  apprunner_subnet_az_ids = distinct([
-    for s in data.aws_subnet.default_by_id :
-    s.availability_zone_id
-    if !contains(var.apprunner_az_blocklist, s.availability_zone_id)
-    && !contains(var.apprunner_subnet_id_blocklist, s.id)
-  ])
-}
-
 # =========================
-# RDS MySQL (staging)
+# RDS MySQL (staging - PÚBLICO)
 # =========================
 resource "aws_db_subnet_group" "this" {
   name       = "${var.name_prefix}-mysql-subnets"
@@ -150,15 +113,13 @@ resource "aws_security_group" "mysql" {
   description = "Allow MySQL inbound"
   vpc_id      = data.aws_vpc.default.id
 
-  dynamic "ingress" {
-    for_each = var.mysql_allowed_cidrs
-    content {
-      description = "MySQL from allowed CIDR"
-      from_port   = 3306
-      to_port     = 3306
-      protocol    = "tcp"
-      cidr_blocks = [ingress.value]
-    }
+  # Em Staging público, liberamos para 0.0.0.0/0 para o App Runner conectar via internet
+  ingress {
+    description = "MySQL public access for App Runner"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] 
   }
 
   egress {
@@ -170,33 +131,6 @@ resource "aws_security_group" "mysql" {
   }
 
   tags = local.labels
-}
-
-# SG usado pelo VPC Connector do App Runner (egress liberado)
-resource "aws_security_group" "apprunner_connector_sg" {
-  name        = "${var.name_prefix}-apprunner-connector-sg"
-  description = "SG do VPC Connector do App Runner"
-  vpc_id      = data.aws_vpc.default.id
-  tags        = local.labels
-
-  egress {
-    description = "All egress"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# Permite MySQL (3306) do SG do VPC Connector -> SG do RDS
-resource "aws_security_group_rule" "mysql_from_apprunner" {
-  type                     = "ingress"
-  description              = "Permite MySQL (3306) a partir do VPC Connector do App Runner"
-  from_port                = 3306
-  to_port                  = 3306
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.mysql.id
-  source_security_group_id = aws_security_group.apprunner_connector_sg.id
 }
 
 resource "random_password" "rds_appuser" {
@@ -216,7 +150,10 @@ resource "aws_db_instance" "mysql" {
   password               = random_password.rds_appuser.result
   db_subnet_group_name   = aws_db_subnet_group.this.name
   vpc_security_group_ids = [aws_security_group.mysql.id]
-  publicly_accessible    = var.rds_publicly_accessible
+  
+  # ALTERADO: Forçado para true para garantir acesso via internet
+  publicly_accessible    = true 
+  
   skip_final_snapshot    = true
   deletion_protection    = false
   tags                   = local.labels
@@ -301,7 +238,6 @@ data "aws_iam_policy_document" "apprunner_policy" {
     resources = ["*"]
   }
 
-  # (Opcional) pulls no ECR durante runtime (normalmente não necessário)
   statement {
     actions = [
       "ecr:GetAuthorizationToken",
@@ -321,23 +257,6 @@ resource "aws_iam_policy" "apprunner_policy" {
 resource "aws_iam_role_policy_attachment" "apprunner_instance_attach" {
   role       = aws_iam_role.apprunner_instance_role.name
   policy_arn = aws_iam_policy.apprunner_policy.arn
-}
-
-# =========================
-# VPC Connector do App Runner
-# =========================
-resource "aws_apprunner_vpc_connector" "this" {
-  vpc_connector_name = "${var.name_prefix}-apprunner-vpc"
-  subnets            = local.apprunner_subnet_ids
-  security_groups    = [aws_security_group.apprunner_connector_sg.id]
-  tags               = local.labels
-
-  lifecycle {
-    precondition {
-      condition     = length(local.apprunner_subnet_ids) > 0
-      error_message = "Nenhuma subnet válida para o VPC Connector (ajuste apprunner_az_blocklist/apprunner_subnet_id_blocklist)."
-    }
-  }
 }
 
 # =========================
@@ -395,13 +314,6 @@ resource "aws_apprunner_service" "api_intermediaria" {
     unhealthy_threshold  = 5
   }
 
-  network_configuration {
-    egress_configuration {
-      egress_type       = "VPC"
-      vpc_connector_arn = aws_apprunner_vpc_connector.this.arn
-    }
-  }
-
   tags = local.labels
 }
 
@@ -425,7 +337,7 @@ resource "aws_apprunner_service" "api_agente" {
         port = tostring(var.api_agente_port)
 
         runtime_environment_variables = {
-          DATABASE_URL   = local.sqlalchemy_url
+          DATABASE_URL                = local.sqlalchemy_url
           APP_SECURITY_ENCRYPTION_KEY = var.APP_SECURITY_ENCRYPTION_KEY
         }
       }
@@ -451,13 +363,6 @@ resource "aws_apprunner_service" "api_agente" {
     unhealthy_threshold  = 5
   }
 
-  network_configuration {
-    egress_configuration {
-      egress_type       = "VPC"
-      vpc_connector_arn = aws_apprunner_vpc_connector.this.arn
-    }
-  }
-
   tags = local.labels
 }
 
@@ -481,7 +386,7 @@ resource "aws_apprunner_service" "api_principal" {
         port = tostring(var.api_principal_port)
 
         runtime_environment_variables = {
-          AGENTE_URA_URI            = aws_apprunner_service.api_agente[0].service_url
+          AGENTE_URA_URI       = aws_apprunner_service.api_agente[0].service_url
           AWS_SQS_URL           = aws_sqs_queue.fifo.url
           SPRING_PROFILES_ACTIVE = "prod"
 
@@ -522,13 +427,6 @@ resource "aws_apprunner_service" "api_principal" {
     timeout              = 5
     healthy_threshold    = 1
     unhealthy_threshold  = 5
-  }
-
-  network_configuration {
-    egress_configuration {
-      egress_type       = "VPC"
-      vpc_connector_arn = aws_apprunner_vpc_connector.this.arn
-    }
   }
 
   tags = local.labels
