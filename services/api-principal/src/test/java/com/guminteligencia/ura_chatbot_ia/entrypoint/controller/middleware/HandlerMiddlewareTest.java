@@ -120,7 +120,7 @@ class HandlerMiddlewareTest {
 
         @GetMapping("/integracaoExistenteNaoIdentificada")
         public void integracaoExistenteNaoIdentificada() {
-            throw new IntegracaoExistenteNaoIdentificada();
+            throw new IntegracaoExistenteNaoIdentificadaException();
         }
 
         @GetMapping("/leadNaoEncontrado")

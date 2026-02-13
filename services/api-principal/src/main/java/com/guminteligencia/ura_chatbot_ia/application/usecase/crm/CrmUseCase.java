@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.crm;
 
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.IntegracaoExistenteNaoIdentificadaException;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.CrmIntegracaoFactory;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.CrmIntegracaoType;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
@@ -17,8 +18,12 @@ public class CrmUseCase {
     private final CrmIntegracaoFactory crmIntegracaoFactory;
 
     public void atualizarCrm(Vendedor vendedor, Cliente cliente, ConversaAgente conversaAgente) {
-        CrmIntegracaoType integracao = crmIntegracaoFactory.create(cliente.getUsuario().getConfiguracaoCrm().getCrmType());
-        integracao.implementacao(vendedor, cliente, conversaAgente);
+        try {
+            CrmIntegracaoType integracao = crmIntegracaoFactory.create(cliente.getUsuario().getConfiguracaoCrm().getCrmType());
+            integracao.implementacao(vendedor, cliente, conversaAgente);
+        } catch (IntegracaoExistenteNaoIdentificadaException ex) {
+            log.warn("Usuário: {} não tem nenhuma integração com CRM configurado", cliente.getUsuario());
+        }
     }
 
 }

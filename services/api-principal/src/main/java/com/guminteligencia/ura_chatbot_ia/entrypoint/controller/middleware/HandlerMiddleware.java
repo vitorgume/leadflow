@@ -160,7 +160,7 @@ public class HandlerMiddleware {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.comErro(erroDto));
     }
 
-    @ExceptionHandler(IntegracaoExistenteNaoIdentificada.class)
+    @ExceptionHandler(IntegracaoExistenteNaoIdentificadaException.class)
     public ResponseEntity<ResponseDto> exceptionHandlerIntegracaoExistenteNaoIdentificada(Exception exception) {
         ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
                 .mensagens(mensagens(exception.getMessage()))
