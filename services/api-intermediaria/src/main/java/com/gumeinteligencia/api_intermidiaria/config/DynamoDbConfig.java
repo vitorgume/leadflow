@@ -41,7 +41,7 @@ public class DynamoDbConfig {
     @Bean
     public DynamoDbTable<ContextoEntity> contextoTable(
             DynamoDbEnhancedClient enhancedClient,
-            @Value("${app.dynamo.contexto-table:${DYNAMO_CONTEXTO_TABLE:contexto_entity_leadflow}}")
+            @Value("${app.dynamo.contexto-table:${DYNAMO_CONTEXTO_TABLE:contexto_entity}}")
             String tableName
     ) {
         System.out.println(">>> [DYNAMO] Tabela de CONTEXTO configurada: " + tableName);
@@ -52,7 +52,7 @@ public class DynamoDbConfig {
     @Bean
     public DynamoDbTable<OutroContatoEntity> outroContatoTable(
             DynamoDbEnhancedClient enhancedClient,
-            @Value("${app.dynamo.outro-contato-table:${DYNAMO_OUTRO_CONTATO_TABLE:outro_contato_entity_leadflow}}")
+            @Value("${app.dynamo.outro-contato-table:${DYNAMO_OUTRO_CONTATO_TABLE:outro_contato_entity}}")
             String tableName
     ) {
         System.out.println(">>> [DYNAMO] Tabela de OUTRO_CONTATO configurada: " + tableName);

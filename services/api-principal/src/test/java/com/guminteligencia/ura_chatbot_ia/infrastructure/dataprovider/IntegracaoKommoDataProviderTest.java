@@ -1,6 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider;
 
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.crm.IntegracaoKommoDataProvider;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ContactDto;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.ContactsResponse;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;

@@ -2,7 +2,7 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes;
 
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguraCrmUsuarioNaoConfiguradaException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.LeadNaoEncontradoException;
-import com.guminteligencia.ura_chatbot_ia.application.gateways.IntegracaoKommoGateway;
+import com.guminteligencia.ura_chatbot_ia.application.gateways.crm.IntegracaoKommoGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.CriptografiaJCAUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
 import com.guminteligencia.ura_chatbot_ia.domain.*;

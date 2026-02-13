@@ -36,7 +36,7 @@ public class ContextoDataProvider implements ContextoGateway {
         expressionValues.put(":telefone", AttributeValue.builder().s(telefone).build());
 
         QueryRequest queryRequest = QueryRequest.builder()
-                .tableName("contexto_entity_leadflow")
+                .tableName("contexto_entity")
                 .indexName("TelefoneIndex")
                 .keyConditionExpression("telefone = :telefone")
                 .expressionAttributeValues(expressionValues)
