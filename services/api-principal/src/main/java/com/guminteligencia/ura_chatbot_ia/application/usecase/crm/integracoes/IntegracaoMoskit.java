@@ -38,7 +38,7 @@ public class IntegracaoMoskit implements CrmIntegracaoType {
     @Override
     public void implementacao(Vendedor vendedor, Cliente cliente, ConversaAgente conversaAgente) {
 
-        if (profile.equals("dev")) {
+        if (profile.equals("prod") || profile.equals("homo")) {
             log.info("Atualizando crm. Vendedor: {}, Cliente: {}, Conversa: {}", vendedor, cliente, conversaAgente);
 
             ConfiguracaoCrm configuracaoCrm = cliente.getUsuario().getConfiguracaoCrm();

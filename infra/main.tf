@@ -284,7 +284,7 @@ resource "aws_apprunner_service" "api_intermediaria" {
 
         runtime_environment_variables = {
           AWS_SQS_URL            = aws_sqs_queue.fifo.url
-          SPRING_PROFILES_ACTIVE = "prod"
+          SPRING_PROFILES_ACTIVE = "homo"
 
           # banco direto, sem Secrets Manager
           URL_BD      = local.jdbc_url
@@ -388,7 +388,7 @@ resource "aws_apprunner_service" "api_principal" {
         runtime_environment_variables = {
           AGENTE_URA_URI       = aws_apprunner_service.api_agente[0].service_url
           AWS_SQS_URL           = aws_sqs_queue.fifo.url
-          SPRING_PROFILES_ACTIVE = "prod"
+          SPRING_PROFILES_ACTIVE = "homo"
 
           # banco
           URL_BD      = local.jdbc_url

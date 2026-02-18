@@ -58,11 +58,11 @@ public class ConversaInativaUseCase {
                 .filter(conversa -> {
                             if(conversa.getDataUltimaMensagem() != null) {
                                 if (conversa.getStatus().getCodigo().equals(3)) {
-                                    return profile.equals("prod")
+                                    return profile.equals("prod") || profile.equals("homo")
                                             ? conversa.getDataUltimaMensagem().plusHours(1).plusMinutes(30).isBefore(agora)
                                             : conversa.getDataUltimaMensagem().plusSeconds(10).isBefore(agora);
                                 } else {
-                                    return profile.equals("prod")
+                                    return profile.equals("prod") || profile.equals("homo")
                                             ? conversa.getDataUltimaMensagem().plusHours(12).isBefore(agora)
                                             : conversa.getDataUltimaMensagem().plusSeconds(20).isBefore(agora);
                                 }
