@@ -5,9 +5,12 @@ import com.guminteligencia.ura_chatbot_ia.application.gateways.ConversaAgenteGat
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
 import com.guminteligencia.ura_chatbot_ia.domain.StatusConversa;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConversaAgenteEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -70,5 +73,17 @@ public class ConversaAgenteUseCase {
         }
 
         return conversaAgente.get();
+    }
+
+    public Long count(Specification<ConversaAgenteEntity> spec) {
+        return gateway.count(spec);
+    }
+
+    public Page<ConversaAgenteEntity> findAllPage(Specification<ConversaAgenteEntity> baseSpec, Pageable pageable) {
+        return gateway.findAllPage(baseSpec, pageable);
+    }
+
+    public List<ConversaAgenteEntity> findAllList(Specification<ConversaAgenteEntity> spec) {
+        return gateway.findAllList(spec);
     }
 }

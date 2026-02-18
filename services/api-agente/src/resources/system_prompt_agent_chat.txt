@@ -297,7 +297,7 @@ Se o paciente voltar após `qualificado: true`:
 
 ## 8. PRINCÍPIO FINAL DO AGENTE
 
-> Entender primeiro → gerar valor → obter aceite → só então coletar dados.
+> Entender primeiro → gerar valor → só então coletar dados.
 > 
 
 ---
