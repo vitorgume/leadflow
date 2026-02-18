@@ -1,9 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.LeadNaoEncontradoException;
-import com.guminteligencia.ura_chatbot_ia.application.gateways.IntegracaoKommoGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.CrmUseCase;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.CrmIntegracaoFactory;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.CrmIntegracaoType;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
@@ -17,7 +14,6 @@ import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProvider
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;

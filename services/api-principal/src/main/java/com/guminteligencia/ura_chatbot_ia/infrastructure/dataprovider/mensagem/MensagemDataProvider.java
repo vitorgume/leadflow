@@ -1,7 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.mensagem;
 
 import com.guminteligencia.ura_chatbot_ia.application.gateways.MensagemGateway;
-import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.ContatoRequestDto;
+import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.ContatoRequestDto;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.DocumentoRequestDto;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.MensagemRequestWhatsAppDto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;

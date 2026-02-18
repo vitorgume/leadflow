@@ -18,7 +18,7 @@ public class OutroContatoRepository {
     private final DynamoDbTable<OutroContatoEntity> outroContatoTable;
 
     public OutroContatoRepository(DynamoDbEnhancedClient dynamoDbEnhancedClient) {
-        this.outroContatoTable = dynamoDbEnhancedClient.table("outro_contato_entity_leadflow", TableSchema.fromBean(OutroContatoEntity.class));
+        this.outroContatoTable = dynamoDbEnhancedClient.table("outro_contato_entity", TableSchema.fromBean(OutroContatoEntity.class));
     }
 
     public OutroContatoEntity salvar(OutroContatoEntity outroContato) {

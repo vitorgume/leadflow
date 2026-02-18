@@ -3,7 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguraCrmUsuarioNaoConfiguradaException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.LeadNaoEncontradoException;
-import com.guminteligencia.ura_chatbot_ia.application.gateways.IntegracaoKommoGateway;
+import com.guminteligencia.ura_chatbot_ia.application.gateways.crm.IntegracaoKommoGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.CriptografiaJCAUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.CustomFieldDto;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.CustomFieldValueDto;
@@ -34,7 +34,7 @@ public class IntegracaoKommo implements CrmIntegracaoType {
     @Override
     public void implementacao(Vendedor vendedor, Cliente cliente, ConversaAgente conversaAgente) {
 
-        if(profile.equals("prod")) {
+        if(profile.equals("prod") || profile.equals("homo")) {
             log.info("Atualizando crm. Vendedor: {}, Cliente: {}, Conversa: {}", vendedor, cliente, conversaAgente);
 
             ConfiguracaoCrm configuracaoCrm = cliente.getUsuario().getConfiguracaoCrm();

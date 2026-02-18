@@ -1,4 +1,4 @@
-package com.guminteligencia.ura_chatbot_ia.application.gateways;
+package com.guminteligencia.ura_chatbot_ia.application.gateways.crm;
 
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo.PayloadKommo;
 

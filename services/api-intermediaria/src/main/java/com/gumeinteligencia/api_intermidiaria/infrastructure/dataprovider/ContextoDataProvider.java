@@ -11,6 +11,7 @@ import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.Contexto
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -30,13 +31,16 @@ public class ContextoDataProvider implements ContextoGateway {
     private final String MENSAGEM_ERRO_CONSULTAR_CONTEXTO_PELO_TELEFONE_E_ATIVO = "Erro ao consultar contexto pelo seu telefone e ativo.";
     private final String MENSAGEM_ERRO_SALVAR_CONTEXTO = "Erro ao salvar contexto.";
 
+    @Value("app.dynamo.contexto-table")
+    private final String tableName;
+
     @Override
     public Optional<Contexto> consultarPorTelefone(String telefone) {
         Map<String, AttributeValue> expressionValues = new HashMap<>();
         expressionValues.put(":telefone", AttributeValue.builder().s(telefone).build());
 
         QueryRequest queryRequest = QueryRequest.builder()
-                .tableName("contexto_entity_leadflow")
+                .tableName(tableName)
                 .indexName("TelefoneIndex")
                 .keyConditionExpression("telefone = :telefone")
                 .expressionAttributeValues(expressionValues)

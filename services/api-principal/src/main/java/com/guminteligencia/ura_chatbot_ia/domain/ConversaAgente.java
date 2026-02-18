@@ -11,6 +11,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
 public class ConversaAgente {
         private UUID id;
         private Cliente cliente;

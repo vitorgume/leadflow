@@ -1,4 +1,4 @@
-package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.kommo;
+package com.guminteligencia.ura_chatbot_ia.application.usecase.dto;
 
 import lombok.*;
 
