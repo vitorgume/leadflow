@@ -35,32 +35,41 @@ public class EscolhaVendedorUseCase {
     public Vendedor escolherVendedor(Cliente cliente) {
         List<Vendedor> vendedores = vendedorUseCase.listarPorUsuario(cliente.getUsuario().getId());
 
-        if(vendedores.size() == 1) {
+        if (vendedores != null && vendedores.size() == 1) {
             return vendedores.get(0);
         }
 
-        List<ConfiguracaoEscolhaVendedor> configuracoes = new ArrayList<>(configuracaoEscolhaVendedorUseCase.listarPorUsuario(cliente.getUsuario().getId()));
-        configuracoes.sort(Comparator.comparing(ConfiguracaoEscolhaVendedor::getPrioridade, Comparator.nullsLast(Integer::compareTo)));
+        List<ConfiguracaoEscolhaVendedor> configsResult = configuracaoEscolhaVendedorUseCase.listarPorUsuario(cliente.getUsuario().getId());
+        List<ConfiguracaoEscolhaVendedor> configuracoes = (configsResult != null) ? new ArrayList<>(configsResult) : new ArrayList<>();
 
-        for (ConfiguracaoEscolhaVendedor configuracao : configuracoes) {
-            if (avaliarCondicoes(cliente, configuracao.getCondicoes())) {
+        if (!configuracoes.isEmpty()) {
+            configuracoes.sort(Comparator.comparing(ConfiguracaoEscolhaVendedor::getPrioridade, Comparator.nullsLast(Integer::compareTo)));
 
-                if(configuracao.getVendedores().size() == 1) {
-                    log.info("Vendedor {} escolhido para o cliente {} com base na configuração {}",
-                            configuracao.getVendedores().get(0).getNome(), cliente.getNome(), configuracao.getId());
+            for (ConfiguracaoEscolhaVendedor configuracao : configuracoes) {
+                if (avaliarCondicoes(cliente, configuracao.getCondicoes())) {
 
-                    return configuracao.getVendedores().get(0);
-                } else if (configuracao.getVendedores().size() > 1) {
-                    Vendedor vendedor = this.roletaVendedores(configuracao.getVendedores());
-                    log.info("Vendedor {} escolhido para o cliente {} com base na configuração {}",
-                            vendedor.getNome(), cliente.getNome(), configuracao.getId());
+                    if (configuracao.getVendedores().size() == 1) {
+                        log.info("Vendedor {} escolhido para o cliente {} com base na configuração {}",
+                                configuracao.getVendedores().get(0).getNome(), cliente.getNome(), configuracao.getId());
 
-                    return vendedor;
-                } else {
-                    return this.roletaVendedores(vendedores);
+                        return configuracao.getVendedores().get(0);
+                    } else if (configuracao.getVendedores().size() > 1) {
+                        Vendedor vendedor = this.roletaVendedores(configuracao.getVendedores());
+                        log.info("Vendedor {} escolhido para o cliente {} com base na configuração {}",
+                                vendedor.getNome(), cliente.getNome(), configuracao.getId());
+
+                        return vendedor;
+                    } else {
+                        return this.roletaVendedores(vendedores);
+                    }
+
                 }
-
             }
+        }
+
+        if (vendedores != null && !vendedores.isEmpty()) {
+            log.info("Fazendo roleta de vendedores para o cliente {} pois nenhuma configuração foi encontrada ou coincidiu", cliente.getNome());
+            return this.roletaVendedores(vendedores);
         }
 
         log.warn("Nenhum vendedor foi escolhido para o cliente {}. Nenhuma configuração correspondeu.", cliente.getNome());

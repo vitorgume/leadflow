@@ -209,10 +209,38 @@ class EscolhaVendedorUseCaseTest {
     }
 
     @Test
-    @DisplayName("Cenário 4: Nenhuma configuração atende -> Deve lançar exceção")
-    void deveLancarExcecaoSeNenhumaConfigAtender() {
+    @DisplayName("Cenário 4: Nenhuma configuração atende -> Deve fazer roleta com vendedores da conta")
+    void deveFazerRoletaSeNenhumaConfigAtender() {
         // Arrange
-        when(vendedorUseCase.listarPorUsuario(ID_USUARIO)).thenReturn(List.of(new Vendedor(), new Vendedor()));
+        Vendedor v1 = new Vendedor(); v1.setNome("V1"); v1.setInativo(false);
+        Vendedor v2 = new Vendedor(); v2.setNome("V2"); v2.setInativo(false);
+        when(vendedorUseCase.listarPorUsuario(ID_USUARIO)).thenReturn(List.of(v1, v2));
+
+        // Configura uma condição que retorna FALSE
+        ConfiguracaoEscolhaVendedor config = new ConfiguracaoEscolhaVendedor();
+        config.setPrioridade(1);
+        Condicao c1 = new Condicao();
+        c1.setOperadorLogico(OperadorLogico.EQUAL);
+        config.setCondicoes(List.of(c1));
+
+        when(configuracaoUseCase.listarPorUsuario(ID_USUARIO)).thenReturn(List.of(config));
+
+        when(condicaoComposite.escolher(any())).thenReturn(condicaoStrategy);
+        when(condicaoStrategy.executar(any(), any())).thenReturn(false); // Condição falha
+
+        // Act
+        Vendedor resultado = useCase.escolherVendedor(cliente);
+
+        // Assert
+        assertNotNull(resultado);
+        assertTrue(resultado.getNome().equals("V1") || resultado.getNome().equals("V2"));
+    }
+
+    @Test
+    @DisplayName("Cenário 5: Nenhuma configuração atende e não há vendedores -> Deve lançar exceção")
+    void deveLancarExcecaoSeNenhumaConfigAtenderENaoHouverVendedores() {
+        // Arrange
+        when(vendedorUseCase.listarPorUsuario(ID_USUARIO)).thenReturn(List.of());
 
         // Configura uma condição que retorna FALSE
         ConfiguracaoEscolhaVendedor config = new ConfiguracaoEscolhaVendedor();
@@ -228,6 +256,38 @@ class EscolhaVendedorUseCaseTest {
 
         // Act & Assert
         assertThrows(VendedorNaoEscolhidoException.class, () -> useCase.escolherVendedor(cliente));
+    }
+
+    @Test
+    @DisplayName("Cenário 6: Lista de configurações é nula -> Deve fazer roleta com vendedores")
+    void deveFazerRoletaSeConfiguracoesForNulo() {
+        // Arrange
+        Vendedor v1 = new Vendedor(); v1.setNome("V1"); v1.setInativo(false);
+        Vendedor v2 = new Vendedor(); v2.setNome("V2"); v2.setInativo(false);
+        when(vendedorUseCase.listarPorUsuario(ID_USUARIO)).thenReturn(List.of(v1, v2));
+        when(configuracaoUseCase.listarPorUsuario(ID_USUARIO)).thenReturn(null);
+
+        // Act
+        Vendedor resultado = useCase.escolherVendedor(cliente);
+
+        // Assert
+        assertNotNull(resultado);
+    }
+
+    @Test
+    @DisplayName("Cenário 7: Lista de configurações é vazia -> Deve fazer roleta com vendedores")
+    void deveFazerRoletaSeConfiguracoesForVazio() {
+        // Arrange
+        Vendedor v1 = new Vendedor(); v1.setNome("V1"); v1.setInativo(false);
+        Vendedor v2 = new Vendedor(); v2.setNome("V2"); v2.setInativo(false);
+        when(vendedorUseCase.listarPorUsuario(ID_USUARIO)).thenReturn(List.of(v1, v2));
+        when(configuracaoUseCase.listarPorUsuario(ID_USUARIO)).thenReturn(List.of());
+
+        // Act
+        Vendedor resultado = useCase.escolherVendedor(cliente);
+
+        // Assert
+        assertNotNull(resultado);
     }
 
     @Test
