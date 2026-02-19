@@ -19,7 +19,6 @@ public class ProcessarMensagemUseCase {
         log.info("Processando nova mensagem. Mensagem: {}", mensagem);
 
         if (validadorMensagem.deveIngorar(mensagem)) {
-            log.info("Mensagem ignorada. Motivo: Validacao");
             return;
         }
 
