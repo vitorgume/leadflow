@@ -42,6 +42,9 @@ public class UsuarioEntity {
     @Column(name = "mensagem_recontato_g1")
     private String mensagemRecontatoG1;
 
+    @Column(name = "mensagem_encaminhamento")
+    private String mensagemEncaminhamento;
+
     @Column(name = "whatsapp_token")
     private String whatsappToken;
 

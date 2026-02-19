@@ -4,12 +4,23 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.mensagem.TipoMensa
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class MensagemRedirecionamentoRecontato implements MensagemType {
 
     @Override
     public String getMensagem(String nomeVendedor, Cliente cliente) {
-        return "Perfeito, estou te redirecionando para nossas atendentes que logo entrará em contato. Muito obrigado ! Até...";
+        String mensagem = cliente.getUsuario().getMensagemEncaminhamento();
+
+        mensagem = mensagem.replaceAll("\\{nome_cliente\\}", cliente.getNome());
+        mensagem = mensagem.replaceAll("\\{nome_vendedor\\}", nomeVendedor);
+
+        for (Map.Entry<String, Object> dado : cliente.getAtributosQualificacao().entrySet()) {
+            mensagem = mensagem.replaceAll("\\{" + dado.getKey() + "\\}", dado.getValue().toString());
+        }
+
+        return mensagem;
     }
 
     @Override

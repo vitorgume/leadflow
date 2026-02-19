@@ -1,0 +1,1 @@
+ALTER TABLE usuarios ADD COLUMN mensagem_encaminhamento TEXT;

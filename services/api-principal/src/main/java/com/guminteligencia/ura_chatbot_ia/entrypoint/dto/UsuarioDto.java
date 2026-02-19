@@ -35,6 +35,9 @@ public class UsuarioDto {
     @JsonProperty("mensagem_recontato_g1")
     private String mensagemRecontatoG1;
 
+    @JsonProperty("mensagem_encaminhamento")
+    private String mensagemEncaminhamento;
+
     @JsonProperty("whatsapp_token")
     private String whatsappToken;
 
