@@ -95,10 +95,10 @@ class IntegracaoMoskitTest {
     }
 
     @Test
-    @DisplayName("implementacao: Deve executar fluxo completo quando profile for 'dev'")
-    void implementacao_ProfileDev_Sucesso() {
+    @DisplayName("implementacao: Deve executar fluxo completo quando profile for 'prod'")
+    void implementacao_ProfileProd_Sucesso() {
         // Arrange
-        ReflectionTestUtils.setField(integracaoMoskit, "profile", "dev");
+        ReflectionTestUtils.setField(integracaoMoskit, "profile", "prod");
 
         when(criptografiaJCAUseCase.descriptografar(TOKEN_CRIPTOGRAFADO)).thenReturn(TOKEN_REAL);
         when(gateway.criarContato(any(), eq(TOKEN_REAL), eq(CRM_URL))).thenReturn(555); // ID do contato criado
@@ -135,9 +135,9 @@ class IntegracaoMoskitTest {
 
     @Test
     @DisplayName("implementacao: Deve usar etapa de ATIVOS quando status conversa for diferente de 1")
-    void implementacao_ProfileDev_EtapaAtivos() {
+    void implementacao_ProfileProd_EtapaAtivos() {
         // Arrange
-        ReflectionTestUtils.setField(integracaoMoskit, "profile", "dev");
+        ReflectionTestUtils.setField(integracaoMoskit, "profile", "prod");
         conversaAgente.setStatus(StatusConversa.ATIVO); // Status diferente de 1
 
         when(criptografiaJCAUseCase.descriptografar(TOKEN_CRIPTOGRAFADO)).thenReturn(TOKEN_REAL);
@@ -155,9 +155,9 @@ class IntegracaoMoskitTest {
 
     @Test
     @DisplayName("implementacao: Deve lançar exceção se configuração CRM for nula")
-    void implementacao_ProfileDev_SemConfiguracao() {
+    void implementacao_ProfileProd_SemConfiguracao() {
         // Arrange
-        ReflectionTestUtils.setField(integracaoMoskit, "profile", "dev");
+        ReflectionTestUtils.setField(integracaoMoskit, "profile", "prod");
         cliente.getUsuario().setConfiguracaoCrm(null);
 
         // Act & Assert
@@ -169,9 +169,9 @@ class IntegracaoMoskitTest {
 
     @Test
     @DisplayName("implementacao: Deve lançar exceção se mapeamento de campos for nulo")
-    void implementacao_ProfileDev_SemMapeamento() {
+    void implementacao_ProfileProd_SemMapeamento() {
         // Arrange
-        ReflectionTestUtils.setField(integracaoMoskit, "profile", "dev");
+        ReflectionTestUtils.setField(integracaoMoskit, "profile", "prod");
         cliente.getUsuario().getConfiguracaoCrm().setMapeamentoCampos(null);
 
         // Act & Assert
@@ -183,9 +183,9 @@ class IntegracaoMoskitTest {
 
     @Test
     @DisplayName("implementacao: Não deve fazer nada se profile NÃO for 'dev'")
-    void implementacao_ProfileProd() {
+    void implementacao_ProfileDev() {
         // Arrange
-        ReflectionTestUtils.setField(integracaoMoskit, "profile", "prod");
+        ReflectionTestUtils.setField(integracaoMoskit, "profile", "dev");
 
         // Act
         integracaoMoskit.implementacao(vendedor, cliente, conversaAgente);
