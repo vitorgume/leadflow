@@ -54,7 +54,7 @@ public class ProcessamentoMensagemUseCase {
             List<Contexto> contextosRecebidos = recebidas.stream()
                     .map(avisoContexto -> {
                         try {
-                            var contexto = contextoUseCase.consultarPeloId(avisoContexto.getIdContexto());
+                            Contexto contexto = contextoUseCase.consultarPeloId(avisoContexto.getIdContexto());
                             contextoUseCase.deletar(contexto.getId());
                             contexto.setMensagemFila(avisoContexto.getMensagemFila());
                             return contexto;
@@ -67,7 +67,7 @@ public class ProcessamentoMensagemUseCase {
                     .filter(Objects::nonNull)
                     .toList();
 
-            log.info("Recebidas da SQS: {}", recebidas.size());
+            log.info("Recebidas da SQS: Size: {}, Lista: {}", recebidas.size(), recebidas);
 
             var processaveis = contextosRecebidos.stream()
                     .filter(contextoValidadorComposite::permitirProcessar)
