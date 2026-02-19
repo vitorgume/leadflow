@@ -6,6 +6,7 @@ on:
     paths:
       - "services/api-agente/**"
       - ".github/workflows/prod-api-agente-build-push.yml"
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

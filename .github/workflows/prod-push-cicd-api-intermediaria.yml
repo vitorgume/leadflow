@@ -6,6 +6,7 @@ on:
     paths:
       - "services/api-intermediaria/**"
       - ".github/workflows/prod-api-intermediaria-build-push.yml"
+  workflow_dispatch:
 
 permissions:
   id-token: write

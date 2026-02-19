@@ -6,6 +6,7 @@ on:
     paths:
       - "services/api-principal/**"
       - ".github/workflows/prod-api-principal-build-push.yml"
+  workflow_dispatch:
 
 permissions:
   id-token: write
