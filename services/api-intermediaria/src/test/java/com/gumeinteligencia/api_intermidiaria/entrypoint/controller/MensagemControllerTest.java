@@ -37,20 +37,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(properties = {
-        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration",
-        "ura.url=teste",
-        "aws.sqs.url=teste",
-        "spring.datasource.url=teste",
-        "spring.datasource.username=teste",
-        "spring.datasource.password=teste",
-        "ura.api.key=teste",
-        "ura.url=teste",
-        "experimentos.chatbot.percentual=30",
-        "aws.sqs.delay=0",
-        "management.endpoints.web.exposure.include=health,info",
-        "management.endpoint.health.probes.enabled=true"
-})
+@SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class MensagemControllerTest {

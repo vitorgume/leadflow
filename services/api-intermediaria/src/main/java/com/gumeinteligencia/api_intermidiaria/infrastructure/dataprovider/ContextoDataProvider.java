@@ -32,7 +32,7 @@ public class ContextoDataProvider implements ContextoGateway {
     private final String MENSAGEM_ERRO_SALVAR_CONTEXTO = "Erro ao salvar contexto.";
 
     @Value("app.dynamo.contexto-table")
-    private final String tableName;
+    private String tableName;
 
     @Override
     public Optional<Contexto> consultarPorTelefone(String telefone) {

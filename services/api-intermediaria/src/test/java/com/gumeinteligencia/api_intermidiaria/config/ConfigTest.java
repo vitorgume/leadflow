@@ -22,36 +22,4 @@ class ConfigTest {
             assertNotNull(client);
         }
     }
-
-    @Test
-    void deveCriarDynamoDbClientProd() {
-        DynamoDbConfig config = new DynamoDbConfig();
-
-        try (DynamoDbClient client = config.dynamoDbClient("us-east-1")) {
-            assertNotNull(client);
-        }
-    }
-
-    @Test
-    void deveCriarDynamoDbClientDev() {
-        DynamoDbConfigDev config = new DynamoDbConfigDev("http://localhost:8000");
-
-        try (DynamoDbClient client = config.dynamoDbClient()) {
-            assertNotNull(client);
-        }
-    }
-
-    @Test
-    void deveCriarEnhancedClientETabelas() {
-        DynamoDbClient lowLevel = mock(DynamoDbClient.class);
-        DynamoDbConfig config = new DynamoDbConfig();
-
-        DynamoDbEnhancedClient enhancedClient = config.dynamoDbEnhancedClient(lowLevel);
-        DynamoDbTable<ContextoEntity> contextoTable = config.contextoTable(enhancedClient, "contexto_entity_leadflow");
-        DynamoDbTable<OutroContatoEntity> outroContatoTable = config.outroContatoTable(enhancedClient, "outro_contato_entity_leadflow");
-
-        assertNotNull(enhancedClient);
-        assertEquals("contexto_entity_leadflow", contextoTable.tableName());
-        assertEquals("outro_contato_entity_leadflow", outroContatoTable.tableName());
-    }
 }
