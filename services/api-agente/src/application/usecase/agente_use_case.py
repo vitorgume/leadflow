@@ -23,43 +23,47 @@ class AgenteUseCase:
         self.cliente_use_case = cliente_use_case
         self.usuario_use_case = usuario_use_case
 
-
     def processar(self, mensagem: Union[str, Mensagem], conversa: Conversa) -> str:
         logger.info("Processando mensagem para o agente. Mensagem: %s Conversa: %s", mensagem, conversa)
 
         cliente = self.cliente_use_case.consutlar_por_id(conversa.cliente_id)
         usuario = self.usuario_use_case.consultar_por_id(cliente.usuario_id)
 
+        # 1. Busca os prompts e bases
         prompt_usuario = self.prompt_usuario_usecase.consultar_prompt_usuario(cliente.usuario_id)
+        base_conhecimento = self.base_conhecimento_usuario_use_case.consultar_base_conhecimento_usuario(
+            cliente.usuario_id)
+
+        # 2. Constrói o System Prompt Unificado (Regras + Base)
+        conteudo_system = prompt_usuario.prompt if prompt_usuario else "Você é um assistente virtual."
+
+        if base_conhecimento and base_conhecimento.conteudo:
+            conteudo_system += f"\n\n### BASE DE CONHECIMENTO OBRIGATÓRIA ###\n{base_conhecimento.conteudo}"
+
+        # 3. Inicializa o histórico com o System no Topo (Index 0)
         historico = [
             {
                 "role": "system",
-                "content": prompt_usuario.prompt if prompt_usuario else ""
+                "content": conteudo_system
             }
         ]
 
+        # 4. Adiciona as mensagens antigas da conversa
         for m in conversa.mensagens:
             role = "user" if m.responsavel == "usuario" else "assistant"
             historico.append({"role": role, "content": m.conteudo})
 
+        # 5. Prepara a nova mensagem do usuário
         # Aceita mensagem como string simples ou objeto Mensagem (suporta mídias).
         if isinstance(mensagem, str):
             conteudo_usuario = mensagem
         else:
             conteudo_usuario, _ = self._preparar_conteudo_usuario(mensagem, usuario)
 
+        # 6. Adiciona a nova mensagem por último (Ação que a IA deve responder)
         historico.append({"role": "user", "content": conteudo_usuario})
 
-        base_conhecimento = self.base_conhecimento_usuario_use_case.consultar_base_conhecimento_usuario(cliente.usuario_id)
-
-        if base_conhecimento and base_conhecimento.conteudo:
-            base_conhecimento_system = {
-                "role": "system",
-                "content": f"BASE_DE_CONHECIMENTO:\n{base_conhecimento.conteudo}"
-            }
-
-            historico.append(base_conhecimento_system)
-
+        # 7. Envia para a OpenAI
         resposta = self.agente_data_provider.enviar_mensagem(historico, usuario.agente_api_key)
 
         logger.info("Mensagem processada pelo agente com sucesso. Resposta: %s", resposta)
