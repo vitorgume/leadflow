@@ -56,6 +56,7 @@ class ContextoDataProviderTest {
         contextoEntity = ContextoEntity.builder()
                 .id(UUID.randomUUID())
                 .telefone("45999999999")
+                .telefoneUsuario("4798989898989")
                 .status(StatusContexto.ATIVO)
                 .mensagens(List.of(mensagemContexto))
                 .build();
@@ -67,6 +68,7 @@ class ContextoDataProviderTest {
         Map<String, AttributeValue> itemMap = Map.of(
                 "id", AttributeValue.fromS(contextoEntity.getId().toString()),
                 "telefone", AttributeValue.fromS(contextoEntity.getTelefone()),
+                "telefoneUsuario", AttributeValue.fromS(contextoEntity.getTelefoneUsuario()),
                 "status", AttributeValue.fromS(contextoEntity.getStatus().name()),
                 "mensagens", mensagensAttr
         );
@@ -94,6 +96,7 @@ class ContextoDataProviderTest {
         Map<String, AttributeValue> itemMap = Map.of(
                 "id", AttributeValue.fromS(contextoEntity.getId().toString()),
                 "telefone", AttributeValue.fromS(contextoEntity.getTelefone()),
+                "telefoneUsuario", AttributeValue.fromS(contextoEntity.getTelefoneUsuario()),
                 "mensagens", mensagensAttr
         );
 
@@ -114,6 +117,7 @@ class ContextoDataProviderTest {
         Map<String, AttributeValue> itemMap = Map.of(
                 "id", AttributeValue.fromS(contextoEntity.getId().toString()),
                 "telefone", AttributeValue.fromS(contextoEntity.getTelefone()),
+                "telefoneUsuario", AttributeValue.fromS(contextoEntity.getTelefoneUsuario()),
                 "status", AttributeValue.fromS(contextoEntity.getStatus().name())
         );
 

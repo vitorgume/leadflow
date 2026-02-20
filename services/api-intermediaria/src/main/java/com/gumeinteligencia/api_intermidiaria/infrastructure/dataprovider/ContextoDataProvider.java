@@ -95,6 +95,7 @@ public class ContextoDataProvider implements ContextoGateway {
                 .telefone(item.get("telefone").s())
                 .mensagens(mensagens)
                 .status(status)
+                .telefoneUsuario(item.get("telefoneUsuario").s())
                 .build();
     }
 }
