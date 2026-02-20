@@ -9,7 +9,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-@ToString
 @NoArgsConstructor
 public class Usuario {
     private UUID id;
@@ -26,4 +25,19 @@ public class Usuario {
     private String whatsappToken;
     private String whatsappIdInstance;
     private String agenteApiKey;
+
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", telefone='" + telefone + '\'' +
+                ", telefoneConectado='" + telefoneConectado + '\'' +
+                ", atributosQualificacao=" + atributosQualificacao +
+                ", configuracaoCrm=" + configuracaoCrm +
+                ", whatsappToken='" + whatsappToken + '\'' +
+                ", whatsappIdInstance='" + whatsappIdInstance + '\'' +
+                ", agenteApiKey='" + agenteApiKey + '\'' +
+                '}';
+    }
 }

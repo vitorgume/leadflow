@@ -8,7 +8,7 @@ Com base no texto fornecido, extraia as informações solicitadas e estruture o 
 
 ## Regras da solução
 1. Retorne APENAS o JSON puro. Não adicione markdown (```json), explicações ou texto extra.
-2. Se um campo obrigatório não for encontrado no texto, preencha com `null` (ou o valor padrão indicado na definição).
+2. **REGRA CRÍTICA: NUNCA retorne valores `null`.** Se um campo não for encontrado no texto ou a informação estiver ausente, preencha o valor obrigatoriamente com a string `"Não informado"`.
 3. Respeite estritamente os tipos de dados solicitados (número deve ser número, booleano deve ser true/false).
 
 ## Estrutura do JSON de Saída
