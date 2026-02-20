@@ -64,10 +64,16 @@ public class AgenteUseCase {
 
     private static Qualificacao parseJson(String json) {
         try {
-            JsonNode node = mapper.readTree(json);
+            // 1. Sanitização Bruta: removemos o markdown das bordas (se a IA colocar)
+            String jsonLimpo = limparMarkdownInjetado(json);
 
+            // 2. Agora sim, com o texto limpo, o Jackson consegue ler
+            JsonNode node = mapper.readTree(jsonLimpo);
+
+            // 3. Fallback: se a IA escapou o JSON como uma string gigante ("{\n...")
             if (node.isTextual()) {
-                node = mapper.readTree(node.asText());
+                String textoInterno = limparMarkdownInjetado(node.asText());
+                node = mapper.readTree(textoInterno);
             }
 
             return mapper.treeToValue(node, Qualificacao.class);
@@ -75,5 +81,25 @@ public class AgenteUseCase {
             log.error("Falha ao parsear. json='{}'", json, e);
             throw new RuntimeException("Erro ao tentar mapear JSON da IA", e);
         }
+    }
+
+    private static String limparMarkdownInjetado(String texto) {
+        if (texto == null) return "";
+
+        String textoLimpo = texto.trim();
+
+        // Remove o "```json" ou "```" do começo
+        if (textoLimpo.startsWith("```json")) {
+            textoLimpo = textoLimpo.substring(7);
+        } else if (textoLimpo.startsWith("```")) {
+            textoLimpo = textoLimpo.substring(3);
+        }
+
+        // Remove o "```" do final
+        if (textoLimpo.endsWith("```")) {
+            textoLimpo = textoLimpo.substring(0, textoLimpo.length() - 3);
+        }
+
+        return textoLimpo.trim();
     }
 }
