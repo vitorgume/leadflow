@@ -6,27 +6,92 @@ import type { DashboardFilters, DashboardDataDTO } from '../types/dashboard';
  * @param filters - The filter object to be sent as query parameters.
  * @returns A promise that resolves to the dashboard data.
  */
-export const getDashboardData = async (filters: DashboardFilters): Promise<DashboardDataDTO> => {
-  // Clean up the filters object, removing null or "Todos" values before sending
-  const params = new URLSearchParams();
-  
-  if (filters.year) params.append('year', String(filters.year));
-  if (filters.month) params.append('month', String(filters.month));
-  if (filters.day) params.append('day', String(filters.day));
-  if (filters.ddd) params.append('ddd', filters.ddd);
+export const getDashboardData = async (filters: DashboardFilters, idUsuario: string): Promise<DashboardDataDTO> => {
+  // 1. Monta os parâmetros que o Java espera no DashboardRequestDto
+  const params: Record<string, any> = {
+    idUsuario: idUsuario
+  };
+
+  if (filters.year) params.year = filters.year;
+  if (filters.month) params.month = filters.month;
+  if (filters.day) params.day = filters.day;
+  if (filters.ddd) params.ddd = filters.ddd;
   if (filters.status && filters.status !== 'Todos') {
-    params.append('status', filters.status);
+    params.status = filters.status;
   }
 
   try {
-    const response = await api.get('/dashboard', { params });
-    
-    // You might need to map the response from your Java backend to the DTO
-    // For now, we assume the backend returns data in the shape of DashboardDataDTO
-    return response.data;
+    // 2. Dispara TODAS as requisições simultaneamente (Alta performance)
+    const [
+      totalRes,
+      hojeRes,
+      taxaRes,
+      mediaRes,
+      porDiaRes,
+      porHoraRes,
+      listaRes
+    ] = await Promise.all([
+      api.get('/dashboard/total-contatos', { params }),
+      api.get(`/dashboard/contatos-hoje/${idUsuario}`), // Este usa PathVariable
+      api.get('/dashboard/taxa-resposta', { params }),
+      api.get('/dashboard/media-por-vendedor', { params }),
+      api.get('/dashboard/contatos-por-dia', { params }),
+      api.get('/dashboard/contatos-por-hora', { params }),
+      api.get('/dashboard/contatos-paginado', {
+        params: { ...params, page: 0, size: 10 }
+      })
+    ]);
+
+    // Função ninja para traduzir o DTO do Java para a Interface do React
+    // Função ninja V2: Traduz e ORDENA os dados!
+    const traduzirGrafico = (responseData: any) => {
+      if (!responseData || !responseData.items) return [];
+
+      return responseData.items
+        .map((item: any) => ({
+          name: String(item.label),
+          value: item.value || 0
+        }))
+        .sort((a: any, b: any) => {
+          const numA = parseInt(a.name.replace(/\D/g, ''), 10);
+          const numB = parseInt(b.name.replace(/\D/g, ''), 10);
+          return numA - numB;
+        });
+    };
+
+    // NOVA: Função ninja para traduzir a lista de contatos
+    const traduzirContatos = (responseData: any) => {
+      // 1. Agora procuramos no atributo 'contacts' (como definido no seu Java)
+      if (!responseData || !responseData.contacts) return [];
+
+      return responseData.contacts.map((item: any, index: number) => {
+        return {
+          id: item.id || `temp-id-${index}`,
+          nome: item.nome || 'Não informado',
+          telefone: item.telefone || 'Sem telefone',
+          horario: item.horario || '--:--',
+          // O Java já manda o enum exato, basta repassar!
+          status: item.status || 'ANDAMENTO'
+        };
+      });
+    };
+
+    // 3. Desempacota os DTOs do Java e monta o objeto
+    return {
+      summary: {
+        totalContacts: totalRes.data.value || 0,
+        contactsToday: hojeRes.data.value || 0,
+        responseRate: taxaRes.data.value || 0,
+        avgPerVendor: mediaRes.data.value || 0,
+      },
+      contactsByDay: traduzirGrafico(porDiaRes.data),
+      contactsByHour: traduzirGrafico(porHoraRes.data),
+
+      // Aplicamos o tradutor na lista paginada! 👇
+      detailedContacts: traduzirContatos(listaRes.data)
+    };
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
-    // You could re-throw the error or return a default structure
+    console.error("Erro ao buscar dados integrados do dashboard:", error);
     throw error;
   }
 };
@@ -62,9 +127,9 @@ export const getMockDashboardData = (filters: DashboardFilters): Promise<Dashboa
           { name: '18h', value: 32 },
         ],
         detailedContacts: [
-          { id: '1', nome: "João Victor (API)", telefone: "(11) 98765-4321", horario: "10:45", status: "Ativo" },
-          { id: '2', nome: "Maria Eduarda (API)", telefone: "(21) 91234-5678", horario: "11:20", status: "Finalizado" },
-          { id: '3', nome: "Ricardo Almeida (API)", telefone: "(31) 97766-5544", horario: "13:05", status: "Pendente" },
+          { id: '1', nome: "João Victor (API)", telefone: "(11) 98765-4321", horario: "10:45", status: 'ATIVO' },
+          { id: '2', nome: "Maria Eduarda (API)", telefone: "(21) 91234-5678", horario: "11:20", status: 'ATIVO' },
+          { id: '3', nome: "Ricardo Almeida (API)", telefone: "(31) 97766-5544", horario: "13:05", status: 'INATIVO_G1' },
         ]
       });
     }, 800); // Simulate network delay

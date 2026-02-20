@@ -1,6 +1,6 @@
 import React from 'react';
 import { Filter, Search } from 'lucide-react';
-import { DashboardFilters } from '../types/dashboard';
+import type { DashboardFilters } from '../types/dashboard';
 
 interface FilterBarProps {
   filters: DashboardFilters;
@@ -8,12 +8,12 @@ interface FilterBarProps {
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({ filters, onFilterChange }) => {
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    onFilterChange({ 
-      ...filters, 
-      [name]: value 
+    onFilterChange({
+      ...filters,
+      [name]: value
     });
   };
 
@@ -22,7 +22,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ filters, onFilterChange }) => {
       {/* Mês */}
       <div className="w-32">
         <label className="block text-xs font-semibold text-slate-500 uppercase mb-2">Mês</label>
-        <select 
+        <select
           name="month"
           value={filters.month || ''}
           onChange={handleInputChange}
@@ -39,7 +39,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ filters, onFilterChange }) => {
       {/* Ano */}
       <div className="w-28">
         <label className="block text-xs font-semibold text-slate-500 uppercase mb-2">Ano</label>
-        <select 
+        <select
           name="year"
           value={filters.year || ''}
           onChange={handleInputChange}
@@ -52,17 +52,18 @@ const FilterBar: React.FC<FilterBarProps> = ({ filters, onFilterChange }) => {
       </div>
 
       {/* Status */}
-      <div className="w-40">
-        <label className="block text-xs font-semibold text-slate-500 uppercase mb-2">Status</label>
-        <select 
-          name="status"
+      <div className="flex flex-col">
+        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+        <select
           value={filters.status}
-          onChange={handleInputChange}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm bg-white cursor-pointer"
+          onChange={(e) => onFilterChange({ ...filters, status: e.target.value as any })}
+          className="bg-slate-50 border-0 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 block w-full p-2.5 font-medium transition-colors cursor-pointer"
         >
           <option value="Todos">Todos Status</option>
-          <option value="Ativo">Ativo</option>
-          <option value="Finalizado">Finalizado</option>
+          <option value="ATIVO">Conversa Ativa</option>
+          <option value="ANDAMENTO">Em Andamento</option>
+          <option value="INATIVO_G1">Inativo Grau 1</option>
+          <option value="INATIVO_G2">Inativo Grau 2</option>
         </select>
       </div>
     </div>

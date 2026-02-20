@@ -6,7 +6,7 @@ import ChartsSection from '../components/ChartsSection';
 import DetailedList from '../components/DetailedList';
 import { Users, LayoutDashboard, AlertCircle, Loader } from 'lucide-react';
 import type { DashboardDataDTO, DashboardFilters } from '../types/dashboard';
-import { getMockDashboardData } from '../services/dashboardService'; // Using mock for now
+import { getMockDashboardData, getDashboardData } from '../services/dashboardService'; // Using mock for now
 
 // Custom Hook for Dashboard Data Logic
 const useDashboardData = () => {
@@ -27,7 +27,7 @@ const useDashboardData = () => {
       setError(null);
       try {
         // Replace with getDashboardData(filters) for real API calls
-        const result = await getMockDashboardData(filters);
+        const result = await getDashboardData(filters, '02aed92f-e783-46c2-8b08-f4db9224f7b8');
         setData(result);
       } catch (err) {
         setError('Falha ao carregar os dados do dashboard.');

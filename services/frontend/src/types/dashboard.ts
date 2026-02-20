@@ -3,7 +3,8 @@ export interface DashboardFilters {
   month: number | null;
   year: number | null;
   ddd: string | null;
-  status: 'Todos' | 'Ativo' | 'Finalizado';
+  // Atualizado para bater com o Java
+  status: 'Todos' | 'INATIVO_G1' | 'INATIVO_G2' | 'ATIVO' | 'ANDAMENTO'; 
 }
 
 export interface Contact {
@@ -11,7 +12,8 @@ export interface Contact {
   nome: string;
   telefone: string;
   horario: string;
-  status: 'Ativo' | 'Finalizado' | 'Pendente';
+  // Atualizado para bater com o Java
+  status: 'INATIVO_G1' | 'INATIVO_G2' | 'ATIVO' | 'ANDAMENTO'; 
 }
 
 export interface ChartPoint {

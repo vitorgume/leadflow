@@ -1,21 +1,22 @@
 import React from 'react';
 import { MoreVertical } from 'lucide-react';
-import { Contact } from '../types/dashboard';
+import type { Contact } from '../types/dashboard';
 
 interface DetailedListProps {
   contacts: Contact[];
 }
 
 const getStatusBadge = (status: Contact['status']) => {
-  switch(status) {
-    case 'Ativo': 
-      return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-    case 'Finalizado': 
-      return 'bg-slate-100 text-slate-700 border-slate-200';
-    case 'Pendente': 
-      return 'bg-amber-100 text-amber-700 border-amber-200';
-    default: 
-      return 'bg-slate-100 text-slate-700 border-slate-200';
+  switch (status) {
+    case 'ATIVO':
+      return <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">Ativo</span>;
+    case 'ANDAMENTO':
+      return <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Em Andamento</span>;
+    case 'INATIVO_G1':
+    case 'INATIVO_G2':
+      return <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold">Inativo</span>;
+    default:
+      return <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">{status}</span>;
   }
 };
 
