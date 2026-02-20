@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 class AgenteDataProvider:
     mensagem_erro_enviar_mensagem_ia = "Erro ao enviar mensagem a IA."
-    modelo_chat = "gpt-4.1"
-    modelo_json = "gpt-4"
+    modelo_chat = "gpt-4o"
+    modelo_json = "gpt-4o"
 
     def enviar_mensagem(self, historico, api_key: str) -> str:
         try:
@@ -25,7 +25,7 @@ class AgenteDataProvider:
             response = client.chat.completions.create(
                 model=self.modelo_chat,
                 messages=historico,
-                temperature=0
+                temperature=0.7
             )
 
             content = response.choices[0].message.content
