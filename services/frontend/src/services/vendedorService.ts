@@ -1,6 +1,6 @@
 // src/services/vendedorService.ts
 import api from './api';
-import type { Vendedor, VendedorCreateDTO, VendedorUpdateDTO, ResponseDto, ErroDto } from '../types/vendedor';
+import type { Vendedor, VendedorCreateDTO, VendedorUpdateDTO, ResponseDto } from '../types/vendedor';
 
 const BASE_URL = '/vendedores';
 

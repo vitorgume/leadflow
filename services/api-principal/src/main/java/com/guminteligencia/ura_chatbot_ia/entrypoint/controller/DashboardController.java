@@ -1,5 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.entrypoint.controller;
 
+import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.ResponseDto;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.dashboard.*;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.DashboardUseCase;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.mapper.ChartDataResponseMapper;
@@ -22,59 +23,67 @@ public class DashboardController {
     private final DashboardUseCase dashboardUseCase;
 
     @GetMapping("/total-contatos")
-    public ResponseEntity<MetricResponseDto<Long>> getTotalContacts(
+    public ResponseEntity<ResponseDto<MetricResponseDto<Long>>> getTotalContacts(
             @ModelAttribute DashboardRequestDto request) {
         long totalContacts = dashboardUseCase.getTotalContacts(
                 request.getYear(), request.getMonth(), request.getDay(), request.getDdd(), request.getStatus(), request.getIdUsuario());
-        return ResponseEntity.ok(new MetricResponseDto<>(totalContacts));
+
+        ResponseDto<MetricResponseDto<Long>> response = new ResponseDto<>(new MetricResponseDto<>(totalContacts));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/contatos-hoje/{idUsuario}")
-    public ResponseEntity<MetricResponseDto<Long>> getContactsToday(@PathVariable("idUsuario") UUID idUsuario) {
+    public ResponseEntity<ResponseDto<MetricResponseDto<Long>>> getContactsToday(@PathVariable("idUsuario") UUID idUsuario) {
         long contactsToday = dashboardUseCase.getContactsToday(idUsuario);
-        return ResponseEntity.ok(new MetricResponseDto<>(contactsToday));
+        ResponseDto<MetricResponseDto<Long>> response = new ResponseDto<>(new MetricResponseDto<>(contactsToday));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/taxa-resposta")
-    public ResponseEntity<MetricResponseDto<Double>> getResponseRate(
+    public ResponseEntity<ResponseDto<MetricResponseDto<Double>>> getResponseRate(
             @ModelAttribute DashboardRequestDto request) {
         double responseRate = dashboardUseCase.getResponseRate(
                 request.getYear(), request.getMonth(), request.getDay(), request.getDdd(), request.getStatus(), request.getIdUsuario());
-        return ResponseEntity.ok(new MetricResponseDto<>(responseRate));
+        ResponseDto<MetricResponseDto<Double>> response = new ResponseDto<>(new MetricResponseDto<>(responseRate));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/media-por-vendedor")
-    public ResponseEntity<MetricResponseDto<Double>> getAveragePerSeller(
+    public ResponseEntity<ResponseDto<MetricResponseDto<Double>>> getAveragePerSeller(
             @ModelAttribute DashboardRequestDto request) {
         double average = dashboardUseCase.getAverageContactsPerSeller(
                 request.getYear(), request.getMonth(), request.getDay(), request.getDdd(), request.getStatus(), request.getIdUsuario());
-        return ResponseEntity.ok(new MetricResponseDto<>(average));
+        ResponseDto<MetricResponseDto<Double>> response = new ResponseDto<>(new MetricResponseDto<>(average));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/contatos-por-dia")
-    public ResponseEntity<ChartDataResponseDto> getContactsByDay(
+    public ResponseEntity<ResponseDto<ChartDataResponseDto>> getContactsByDay(
             @ModelAttribute DashboardRequestDto request) {
         ChartDataResponseDto chartData = ChartDataResponseMapper.paraDto(dashboardUseCase.getContactsByDay(
                 request.getYear(), request.getMonth(), request.getDdd(), request.getStatus(), request.getIdUsuario()));
-        return ResponseEntity.ok(chartData);
+        ResponseDto<ChartDataResponseDto> response = new ResponseDto<>(chartData);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/contatos-por-hora")
-    public ResponseEntity<ChartDataResponseDto> getContactsByHour(
+    public ResponseEntity<ResponseDto<ChartDataResponseDto>> getContactsByHour(
             @ModelAttribute DashboardRequestDto request) {
         ChartDataResponseDto chartData = ChartDataResponseMapper.paraDto(dashboardUseCase.getContactsByHour(
                 request.getYear(), request.getMonth(), request.getDay(), request.getDdd(), request.getStatus(), request.getIdUsuario()));
-        return ResponseEntity.ok(chartData);
+        ResponseDto<ChartDataResponseDto> response = new ResponseDto<>(chartData);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/contatos-paginado")
-    public ResponseEntity<ContactListResponseDto> getPaginatedContacts(
+    public ResponseEntity<ResponseDto<ContactListResponseDto>> getPaginatedContacts(
             @ModelAttribute DashboardRequestDto request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ContactDashboardDto> contactsPage = dashboardUseCase.getPaginatedContacts(
                 request.getYear(), request.getMonth(), request.getDay(), request.getDdd(), request.getStatus(), pageable, request.getIdUsuario()).map(ContactDashboardMapper::paraDto);
-        return ResponseEntity.ok(ContactListResponseDto.fromPage(contactsPage));
+        ResponseDto<ContactListResponseDto> response = new ResponseDto<>(ContactListResponseDto.fromPage(contactsPage));
+        return ResponseEntity.ok(response);
     }
 }
