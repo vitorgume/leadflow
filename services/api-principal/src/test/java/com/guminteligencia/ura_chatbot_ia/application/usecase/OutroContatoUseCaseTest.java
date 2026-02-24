@@ -160,14 +160,24 @@ class OutroContatoUseCaseTest {
 
     @Test
     void deveLancarExceptionQuandoAlterarGerenteJaExistente() {
-        outroContatoTeste.setTipoContato(TipoContato.GERENTE);
-        outroContatoTeste.setUsuario(Usuario.builder().id(UUID.randomUUID()).build());
+        // 1. Prepara os novos dados que o frontend está enviando (para o ID 1L)
+        OutroContato novosDados = OutroContato.builder()
+                .tipoContato(TipoContato.GERENTE)
+                .usuario(Usuario.builder().id(UUID.randomUUID()).build())
+                .build();
 
-        Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(Optional.of(outroContatoTeste));
+        // 2. Simula um contato que JÁ EXISTE no banco de dados com OUTRO ID (2L)
+        OutroContato contatoExistenteNoBanco = OutroContato.builder()
+                .id(2L) // ID diferente de 1L para cair na sua nova validação
+                .tipoContato(TipoContato.GERENTE)
+                .build();
+
+        Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class)))
+                .thenReturn(Optional.of(contatoExistenteNoBanco));
 
         OutroContatoTipoGerenciaJaCadastradoException exception = Assertions
                 .assertThrows(OutroContatoTipoGerenciaJaCadastradoException.class,
-                        () -> outroContatoUseCase.alterar(1L, outroContatoTeste)
+                        () -> outroContatoUseCase.alterar(1L, novosDados)
                 );
 
         assertEquals("Outro contato do tipo gerencia já cadastrado.", exception.getMessage());
@@ -175,14 +185,26 @@ class OutroContatoUseCaseTest {
 
     @Test
     void deveLancarExceptionQuandoAlterarTelefoneJaExistente() {
-        outroContatoTeste.setUsuario(Usuario.builder().id(UUID.randomUUID()).build());
-        outroContatoTeste.setTelefone("123456789");
-        Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(Optional.empty());
-        Mockito.when(gateway.consultarPorTelefone(Mockito.anyString())).thenReturn(Optional.of(outroContatoTeste));
+        // 1. Prepara os novos dados da requisição
+        OutroContato novosDados = OutroContato.builder()
+                .telefone("123456789")
+                .usuario(Usuario.builder().id(UUID.randomUUID()).build())
+                .build();
+
+        // 2. Simula o contato do banco que já é dono desse telefone, com um ID diferente (2L)
+        OutroContato contatoExistenteNoBanco = OutroContato.builder()
+                .id(2L) // ID diferente de 1L para ativar a exceção
+                .telefone("123456789")
+                .build();
+
+        Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class)))
+                .thenReturn(Optional.empty()); // Passa liso pela primeira validação de gerente
+        Mockito.when(gateway.consultarPorTelefone(Mockito.anyString()))
+                .thenReturn(Optional.of(contatoExistenteNoBanco));
 
         OutroContatoComMesmoTelefoneJaCadastradoExcetion exception = Assertions
                 .assertThrows(OutroContatoComMesmoTelefoneJaCadastradoExcetion.class,
-                        () -> outroContatoUseCase.alterar(1L, outroContatoTeste)
+                        () -> outroContatoUseCase.alterar(1L, novosDados)
                 );
 
         assertEquals("Outro contato com o mesmo telefone já cadastrado.", exception.getMessage());

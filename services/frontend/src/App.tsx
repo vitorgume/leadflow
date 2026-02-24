@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import { Vendedores } from './pages/Vendedores'; // Temporário, será criado a seguir
+import OutrosContatos from './pages/OutrosContatos';
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/vendedores" element={<Vendedores />} />
+        <Route path="/outros-contatos" element={<OutrosContatos/>}/>
       </Routes>
     </div>
   );

@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(http))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/actuator/health", "/actuator/health/**", "/actuator/info", "/healthz", "/usuarios/cadastro", "/vendedores", "/vendedores/**").permitAll()
+                        .requestMatchers("/login", "/actuator/health", "/actuator/health/**", "/actuator/info", "/healthz", "/usuarios/cadastro", "/outros-contatos", "/outros-contatos/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

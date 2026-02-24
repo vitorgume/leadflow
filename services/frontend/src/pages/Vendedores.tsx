@@ -6,9 +6,9 @@ import type { Vendedor, VendedorCreateDTO, VendedorUpdateDTO } from '../types/ve
 import { getVendedores, createVendedor, updateVendedor, deleteVendedor } from '../services/vendedorService';
 
 // Importando os componentes que extraímos!
-import LoadingSpinner from '../components/vendedores/LoadingSpinner';
-import ErrorMessage from '../components/vendedores/ErrorMessage';
-import DeleteConfirmationModal from '../components/vendedores/DeleteConfirmationModal';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ErrorMessage from '../components/ErrorMessage';
+import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import VendedorForm from '../components/vendedores/VendedorForm';
 
 export const Vendedores: React.FC = () => {

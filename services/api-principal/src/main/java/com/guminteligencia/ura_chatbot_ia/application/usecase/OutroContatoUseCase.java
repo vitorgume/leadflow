@@ -72,7 +72,7 @@ public class OutroContatoUseCase {
         Optional<OutroContato> outroContato = gateway.consultarPorTipo(novosDados.getTipoContato(), novosDados.getUsuario().getId());
 
         if(outroContato.isPresent()) {
-            if(outroContato.get().getTipoContato().equals(TipoContato.GERENTE)) {
+            if(outroContato.get().getTipoContato().equals(TipoContato.GERENTE) && !outroContato.get().getId().equals(idOutroContato)) {
                 throw new OutroContatoTipoGerenciaJaCadastradoException();
             }
         }
@@ -80,7 +80,8 @@ public class OutroContatoUseCase {
         outroContato = gateway.consultarPorTelefone(novosDados.getTelefone());
 
         if(outroContato.isPresent()) {
-            throw new OutroContatoComMesmoTelefoneJaCadastradoExcetion();
+            if(!outroContato.get().getId().equals(idOutroContato))
+                throw new OutroContatoComMesmoTelefoneJaCadastradoExcetion();
         }
 
         OutroContato outroContatoExistente = this.consultarPorId(idOutroContato);
