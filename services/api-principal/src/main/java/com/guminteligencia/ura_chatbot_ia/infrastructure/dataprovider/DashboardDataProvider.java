@@ -57,13 +57,6 @@ public class DashboardDataProvider implements DashboardDataGateway {
         return conversaAgenteDataProvider.count(spec);
     }
 
-    private ContactDashboard convertToContactDto(ConversaAgenteEntity conversaAgente) {
-        return new ContactDashboard(
-                conversaAgente.getCliente().getNome(),
-                conversaAgente.getCliente().getTelefone(),
-                conversaAgente.getStatus()
-        );
-    }
 
     @Override
     public List<ConversaAgente> getContactsByHour(Integer year, Integer month, Integer day, String ddd, StatusConversa status, UUID idUsuario) {
@@ -76,5 +69,13 @@ public class DashboardDataProvider implements DashboardDataGateway {
     public List<ConversaAgente> getContactsByDay(Integer year, Integer month, String ddd, StatusConversa status, UUID idUsuario) {
         Specification<ConversaAgenteEntity> spec = ConversaAgenteSpecification.filterBy(year, month, null, ddd, status, idUsuario);        List<ConversaAgenteEntity> conversations = conversaAgenteDataProvider.findAllList(spec);
         return conversations.stream().map(ConversaAgenteMapper::paraDomain).toList();
+    }
+
+    private ContactDashboard convertToContactDto(ConversaAgenteEntity conversaAgente) {
+        return new ContactDashboard(
+                conversaAgente.getCliente().getNome(),
+                conversaAgente.getCliente().getTelefone(),
+                conversaAgente.getStatus()
+        );
     }
 }

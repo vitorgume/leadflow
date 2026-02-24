@@ -4,11 +4,17 @@ import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConversaAgenteN
 import com.guminteligencia.ura_chatbot_ia.application.gateways.ConversaAgenteGateway;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
 import com.guminteligencia.ura_chatbot_ia.domain.ConversaAgente;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConversaAgenteEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -139,5 +145,53 @@ class ConversaAgenteUseCaseTest {
                 "Se não existir conversa para o id, deve lançar ConversaAgenteNaoEncontradoException"
         );
         verify(gateway).consultarPorId(conversaId);
+    }
+
+    @Test
+    void deveRetornarCountDelegandoAoGateway() {
+        // Arrange
+        Specification<ConversaAgenteEntity> spec = mock(Specification.class);
+        Long expectedCount = 99L;
+        when(gateway.count(spec)).thenReturn(expectedCount);
+
+        // Act
+        Long result = useCase.count(spec);
+
+        // Assert
+        assertEquals(expectedCount, result);
+        verify(gateway).count(spec);
+    }
+
+    @Test
+    void deveRetornarFindAllPageDelegandoAoGateway() {
+        // Arrange
+        Specification<ConversaAgenteEntity> spec = mock(Specification.class);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ConversaAgenteEntity> expectedPage = new PageImpl<>(List.of(new ConversaAgenteEntity()));
+
+        when(gateway.findAllPage(spec, pageable)).thenReturn(expectedPage);
+
+        // Act
+        Page<ConversaAgenteEntity> result = useCase.findAllPage(spec, pageable);
+
+        // Assert
+        assertSame(expectedPage, result);
+        verify(gateway).findAllPage(spec, pageable);
+    }
+
+    @Test
+    void deveRetornarFindAllListDelegandoAoGateway() {
+        // Arrange
+        Specification<ConversaAgenteEntity> spec = mock(Specification.class);
+        List<ConversaAgenteEntity> expectedList = List.of(new ConversaAgenteEntity());
+
+        when(gateway.findAllList(spec)).thenReturn(expectedList);
+
+        // Act
+        List<ConversaAgenteEntity> result = useCase.findAllList(spec);
+
+        // Assert
+        assertSame(expectedList, result);
+        verify(gateway).findAllList(spec);
     }
 }
