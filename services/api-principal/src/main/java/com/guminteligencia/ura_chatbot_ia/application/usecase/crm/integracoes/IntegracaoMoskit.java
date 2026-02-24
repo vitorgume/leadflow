@@ -65,9 +65,11 @@ public class IntegracaoMoskit implements CrmIntegracaoType {
 
                 String idCampoCrm = mapeamento.get(nomeCampoLocal);
 
-                if (idCampoCrm != null) {
-                    if (valorCampo != null) {
-                        entityCustomFields.add(new EntityCustomField(idCampoCrm, valorCampo.toString()));
+                if (idCampoCrm != null && valorCampo != null) {
+                    String valorString = valorCampo.toString().trim();
+                    
+                    if (!valorString.isEmpty()) {
+                        entityCustomFields.add(new EntityCustomField(idCampoCrm, valorString));
                     }
                 }
             }
