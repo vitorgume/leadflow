@@ -41,7 +41,7 @@ public class IntegracaoMoskit implements CrmIntegracaoType {
         if (profile.equals("prod") || profile.equals("homo")) {
             log.info("Atualizando crm. Vendedor: {}, Cliente: {}, Conversa: {}", vendedor, cliente, conversaAgente);
 
-            String nomeCliente = cliente.getNome().isBlank() ? "Nome não informado" : cliente.getNome();
+            String nomeCliente = cliente.getNome() == null ? "Nome não informado" : cliente.getNome();
 
             ConfiguracaoCrm configuracaoCrm = cliente.getUsuario().getConfiguracaoCrm();
 
@@ -104,7 +104,7 @@ public class IntegracaoMoskit implements CrmIntegracaoType {
 
     private Integer criarContato(Cliente cliente, Vendedor vendedor, String acessToken, String crmUrl) {
 
-        String nomeCliente = cliente.getNome().isBlank() ? "Nome não informado" : cliente.getNome();
+        String nomeCliente = cliente.getNome() == null ? "Nome não informado" : cliente.getNome();
 
         ContatoMoskitDto contatoMoskitDto = ContatoMoskitDto.builder()
                 .createdBy(Map.of("id", vendedor.getIdVendedorCrm()))
