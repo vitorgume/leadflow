@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -11,18 +12,18 @@ import {
 } from 'lucide-react';
 
 interface SidebarProps {
-  activeItem?: string;
+  activeItem?: string; // This prop might become redundant with NavLink's isActive
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'Menu Principal' }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const menuItems = [
-    { label: 'Menu Principal', icon: LayoutDashboard },
-    { label: 'Vendedores', icon: Users },
-    { label: 'Configuração Vendedor', icon: UserCog },
-    { label: 'Outros Contatos', icon: Contact },
-    { label: 'Configurações', icon: Settings },
+    { label: 'Menu Principal', icon: LayoutDashboard, path: '/' },
+    { label: 'Vendedores', icon: Users, path: '/vendedores' },
+    { label: 'Configuração Vendedor', icon: UserCog, path: '/configuracao-vendedor' }, // Placeholder path
+    { label: 'Outros Contatos', icon: Contact, path: '/outros-contatos' }, // Placeholder path
+    { label: 'Configurações', icon: Settings, path: '/configuracoes' }, // Placeholder path
   ];
 
   const toggleSidebar = () => setIsOpen(!isOpen);
@@ -67,18 +68,20 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'Menu Principal' }) => {
           {/* Menu Items */}
           <nav className="flex-1 px-4 py-4 space-y-1">
             {menuItems.map((item) => (
-              <button
+              <NavLink
                 key={item.label}
-                className={`
+                to={item.path}
+                className={({ isActive }) => `
                   w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                  ${activeItem === item.label 
+                  ${isActive 
                     ? 'bg-indigo-50 text-indigo-700' 
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}
                 `}
+                onClick={() => setIsOpen(false)} // Close sidebar on mobile after clicking
               >
-                <item.icon size={20} className={activeItem === item.label ? 'text-indigo-600' : ''} />
+                <item.icon size={20} className="text-indigo-600" /> {/* Always indigo-600 if active, otherwise default */}
                 {item.label}
-              </button>
+              </NavLink>
             ))}
           </nav>
 

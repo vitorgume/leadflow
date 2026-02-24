@@ -1,6 +1,6 @@
 import React from 'react';
 import { Filter, Search } from 'lucide-react';
-import type { DashboardFilters } from '../types/dashboard';
+import type { DashboardFilters } from '../../types/dashboard';
 
 interface FilterBarProps {
   filters: DashboardFilters;

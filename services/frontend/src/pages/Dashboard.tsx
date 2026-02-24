@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
-import FilterBar from '../components/FilterBar';
-import KPICard from '../components/KPICard';
-import ChartsSection from '../components/ChartsSection';
-import DetailedList from '../components/DetailedList';
+import FilterBar from '../components/dashboard/FilterBar';
+import KPICard from '../components/dashboard/KPICard';
+import ChartsSection from '../components/dashboard/ChartsSection';
+import DetailedList from '../components/dashboard/DetailedList';
 import { Users, LayoutDashboard, AlertCircle, Loader } from 'lucide-react';
 import type { DashboardDataDTO, DashboardFilters } from '../types/dashboard';
 import { getMockDashboardData, getDashboardData } from '../services/dashboardService'; // Using mock for now

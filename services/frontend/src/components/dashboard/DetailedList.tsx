@@ -1,6 +1,6 @@
 import React from 'react';
 import { MoreVertical } from 'lucide-react';
-import type { Contact } from '../types/dashboard';
+import type { Contact } from '../../types/dashboard';
 
 interface DetailedListProps {
   contacts: Contact[];

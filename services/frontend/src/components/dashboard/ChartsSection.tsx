@@ -3,7 +3,7 @@ import type { TooltipContentProps } from 'recharts';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
-import type { ChartPoint } from '../types/dashboard';
+import type { ChartPoint } from '../../types/dashboard';
 
 interface ChartsSectionProps {
   dailyData: ChartPoint[];
