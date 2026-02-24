@@ -27,7 +27,7 @@ const useDashboardData = () => {
       setError(null);
       try {
         // Replace with getDashboardData(filters) for real API calls
-        const result = await getDashboardData(filters, '02aed92f-e783-46c2-8b08-f4db9224f7b8');
+        const result = await getDashboardData(filters, '4736d2bb-ec07-4222-903c-78684b3f6872');
         setData(result);
       } catch (err) {
         setError('Falha ao carregar os dados do dashboard.');
