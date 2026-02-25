@@ -66,7 +66,7 @@ class DashboardControllerTest {
                         .param("idUsuario", ID_USUARIO.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.value").value(150));
+                .andExpect(jsonPath("$.dado.value").value(150));
     }
 
     @Test
@@ -78,7 +78,7 @@ class DashboardControllerTest {
         mockMvc.perform(get("/dashboard/contatos-hoje/{idUsuario}", ID_USUARIO)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.value").value(25));
+                .andExpect(jsonPath("$.dado.value").value(25));
     }
 
     @Test
@@ -94,7 +94,7 @@ class DashboardControllerTest {
                         .param("idUsuario", ID_USUARIO.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.value").value(0.85));
+                .andExpect(jsonPath("$.dado.value").value(0.85));
     }
 
     @Test
@@ -108,7 +108,7 @@ class DashboardControllerTest {
                         .param("idUsuario", ID_USUARIO.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.value").value(15.5));
+                .andExpect(jsonPath("$.dado.value").value(15.5));
     }
 
     @Test
@@ -129,8 +129,8 @@ class DashboardControllerTest {
                         .param("idUsuario", ID_USUARIO.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items[0].label").value("15"))
-                .andExpect(jsonPath("$.items[0].value").value(42));
+                .andExpect(jsonPath("$.dado.items[0].label").value("15"))
+                .andExpect(jsonPath("$.dado.items[0].value").value(42));
     }
 
     @Test
@@ -152,8 +152,8 @@ class DashboardControllerTest {
                         .param("idUsuario", ID_USUARIO.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items[0].label").value("14"))
-                .andExpect(jsonPath("$.items[0].value").value(10));
+                .andExpect(jsonPath("$.dado.items[0].label").value("14"))
+                .andExpect(jsonPath("$.dado.items[0].value").value(10));
     }
 
     @Test
@@ -177,10 +177,10 @@ class DashboardControllerTest {
                         .param("size", "10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.contacts[0].nome").value("João Silva"))
-                .andExpect(jsonPath("$.contacts[0].telefone").value("4499999999"))
-                .andExpect(jsonPath("$.contacts[0].status").value("ATIVO"))
-                .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.dado.contacts[0].nome").value("João Silva"))
+                .andExpect(jsonPath("$.dado.contacts[0].telefone").value("4499999999"))
+                .andExpect(jsonPath("$.dado.contacts[0].status").value("ATIVO"))
+                .andExpect(jsonPath("$.dado.totalPages").value(1))
+                .andExpect(jsonPath("$.dado.totalElements").value(1));
     }
 }

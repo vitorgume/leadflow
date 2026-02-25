@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity(name = "BaseConhecimento")
-@Table(name = "base_conhecimento_usuario")
+@Table(name = "base_conhecimento_usuarios")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -19,6 +19,7 @@ public class BaseConhecimentoEntity {
     private UUID id;
 
     @OneToOne
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id")
     private UsuarioEntity usuario;
 
     private String titulo;

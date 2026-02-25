@@ -58,7 +58,7 @@ class DashboardControllerUnitTest {
                         .param("idUsuario", ID_USUARIO.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.value").value(150));
+                .andExpect(jsonPath("$.dado.value").value(150));
     }
 
     @Test
@@ -69,7 +69,7 @@ class DashboardControllerUnitTest {
         mockMvc.perform(get("/dashboard/contatos-hoje/{idUsuario}", ID_USUARIO)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.value").value(25));
+                .andExpect(jsonPath("$.dado.value").value(25));
     }
 
     @Test
@@ -87,8 +87,8 @@ class DashboardControllerUnitTest {
                         .param("idUsuario", ID_USUARIO.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items[0].label").value("20"))
-                .andExpect(jsonPath("$.items[0].value").value(50));
+                .andExpect(jsonPath("$.dado.items[0].label").value("20"))
+                .andExpect(jsonPath("$.dado.items[0].value").value(50));
     }
 
     @Test
@@ -106,9 +106,9 @@ class DashboardControllerUnitTest {
                         .param("size", "10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.contacts[0].nome").value("João"))
-                .andExpect(jsonPath("$.contacts[0].telefone").value("4499999999"))
-                .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.dado.contacts[0].nome").value("João"))
+                .andExpect(jsonPath("$.dado.contacts[0].telefone").value("4499999999"))
+                .andExpect(jsonPath("$.dado.totalPages").value(1))
+                .andExpect(jsonPath("$.dado.totalElements").value(1));
     }
 }

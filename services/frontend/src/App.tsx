@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import { Vendedores } from './pages/Vendedores'; // Temporário, será criado a seguir
 import OutrosContatos from './pages/OutrosContatos';
+import ConfiguracaoIA from './pages/ConfiguracaoIA';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/vendedores" element={<Vendedores />} />
         <Route path="/outros-contatos" element={<OutrosContatos/>}/>
+        <Route path="/configuracao-ia" element={<ConfiguracaoIA/>} />
       </Routes>
     </div>
   );

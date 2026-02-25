@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity(name = "Prompt")
-@Table(name = "prompts_usuario")
+@Table(name = "prompts_usuarios")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -19,6 +19,7 @@ public class PromptEntity {
     private UUID id;
 
     @OneToOne
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id")
     private UsuarioEntity usuario;
 
     private String titulo;
