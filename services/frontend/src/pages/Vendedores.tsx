@@ -10,13 +10,14 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import VendedorForm from '../components/vendedores/VendedorForm';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Vendedores: React.FC = () => {
   const [vendedores, setVendedores] = useState<Vendedor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Form Modal States
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingVendedor, setEditingVendedor] = useState<Vendedor | null>(null);
@@ -26,19 +27,23 @@ export const Vendedores: React.FC = () => {
   const [vendedorToDelete, setVendedorToDelete] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const { user } = useAuth();
+
   const fetchVendedores = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getVendedores('e75fabfa-ece2-40c3-9a8e-f15e6109d867');
-      setVendedores(data);
+      if (user) {
+        const data = await getVendedores(user.id);
+        setVendedores(data);
+      }
     } catch (err) {
       setError('Falha ao carregar a lista de vendedores.');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchVendedores();
@@ -105,7 +110,7 @@ export const Vendedores: React.FC = () => {
 
       <main className="flex-1 lg:ml-64 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          
+
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600">
               <Users size={24} />
@@ -165,7 +170,7 @@ export const Vendedores: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           {vendedor.padrao && (
-                             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Sim</span>
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Sim</span>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{vendedor.id_vendedor_crm}</td>

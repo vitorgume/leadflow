@@ -16,11 +16,11 @@ interface SidebarProps {
   activeItem?: string; // This prop might become redundant with NavLink's isActive
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeItem = 'Menu Principal' }) => {
+const Sidebar: React.FC<SidebarProps> = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const menuItems = [
-    { label: 'Menu Principal', icon: LayoutDashboard, path: '/' },
+    { label: 'Menu Principal', icon: LayoutDashboard, path: '/dashboard' },
     { label: 'Vendedores', icon: Users, path: '/vendedores' },
     { label: 'Configuração Vendedor', icon: UserCog, path: '/configuracao-vendedor' }, // Placeholder path
     { label: 'Outros Contatos', icon: Contact, path: '/outros-contatos' },

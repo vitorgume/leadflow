@@ -8,35 +8,39 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import OutroContatoForm from '../components/outroContato/OutroContatoForm';
+import { useAuth } from '../contexts/AuthContext';
 
 export const OutrosContatos: React.FC = () => {
   const [contatos, setContatos] = useState<OutroContato[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Modais
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingContato, setEditingContato] = useState<OutroContato | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const [contatoToDelete, setContatoToDelete] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const { user } = useAuth();
 
   const fetchContatos = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // Usando o mesmo ID fixo de usuário
-      const data = await getOutrosContatos('e75fabfa-ece2-40c3-9a8e-f15e6109d867');
-      setContatos(data);
+      if (user) {
+        const data = await getOutrosContatos(user.id);
+        setContatos(data);
+      }
     } catch (err) {
       setError('Falha ao carregar a lista de contatos.');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchContatos();
@@ -94,7 +98,7 @@ export const OutrosContatos: React.FC = () => {
 
       <main className="flex-1 lg:ml-64 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          
+
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600">
               <Contact size={24} />

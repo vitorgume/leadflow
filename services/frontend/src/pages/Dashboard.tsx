@@ -7,6 +7,7 @@ import DetailedList from '../components/dashboard/DetailedList';
 import { Users, LayoutDashboard, AlertCircle, Loader } from 'lucide-react';
 import type { DashboardDataDTO, DashboardFilters } from '../types/dashboard';
 import { getDashboardData } from '../services/dashboardService'; // Using mock for now
+import { useAuth } from '../contexts/AuthContext';
 
 // Custom Hook for Dashboard Data Logic
 const useDashboardData = () => {
@@ -20,15 +21,19 @@ const useDashboardData = () => {
     ddd: null,
     status: 'Todos',
   });
+   const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Replace with getDashboardData(filters) for real API calls
-        const result = await getDashboardData(filters, '4736d2bb-ec07-4222-903c-78684b3f6872');
-        setData(result);
+
+        if (user) {
+          const result = await getDashboardData(filters, user.id);
+          setData(result);
+        }
+
       } catch (err) {
         setError('Falha ao carregar os dados do dashboard.');
         console.error(err);
@@ -38,7 +43,7 @@ const useDashboardData = () => {
     };
 
     fetchData();
-  }, [filters]);
+  }, [filters, user]);
 
   return { data, loading, error, filters, setFilters };
 };
@@ -68,7 +73,7 @@ const Dashboard: React.FC = () => {
 
       <main className="flex-1 lg:ml-64 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          
+
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600">
               <LayoutDashboard size={24} />
@@ -83,7 +88,7 @@ const Dashboard: React.FC = () => {
 
           {loading && <LoadingSpinner />}
           {error && <ErrorMessage message={error} />}
-          
+
           {data && !loading && !error && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -93,9 +98,9 @@ const Dashboard: React.FC = () => {
                 <KPICard label="Média por Vendedor" value={data.summary.avgPerVendor} icon={Users} />
               </div>
 
-              <ChartsSection 
-                dailyData={data.contactsByDay} 
-                hourlyData={data.contactsByHour} 
+              <ChartsSection
+                dailyData={data.contactsByDay}
+                hourlyData={data.contactsByHour}
               />
 
               <DetailedList contacts={data.detailedContacts} />
