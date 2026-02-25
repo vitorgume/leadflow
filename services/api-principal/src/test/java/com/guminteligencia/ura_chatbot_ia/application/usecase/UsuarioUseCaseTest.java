@@ -152,4 +152,62 @@ class UsuarioUseCaseTest {
 
         Assertions.assertEquals(usuarios, resultado);
     }
+
+    @Test
+    void deveAlterarUsuarioComSucesso() {
+        // Arrange
+        UUID id = UUID.randomUUID();
+
+        // Usamos spy para monitorar se o método setDados será chamado
+        Usuario usuarioExistente = Mockito.spy(new Usuario());
+        usuarioExistente.setId(id);
+
+        Usuario novosDados = new Usuario();
+        novosDados.setConfiguracaoCrm(new ConfiguracaoCrm(null, null, null, null, null, null, "novoTokenCrm", null));
+        novosDados.setWhatsappToken("novoTokenWpp");
+        novosDados.setWhatsappIdInstance("novaInstance");
+        novosDados.setAgenteApiKey("novaApiKey");
+
+        Mockito.when(gateway.consultarPorId(id)).thenReturn(Optional.of(usuarioExistente));
+
+        // Mockando os retornos da criptografia
+        Mockito.when(criptografiaJCAUseCase.criptografar("novoTokenCrm")).thenReturn("crmCriptografado");
+        Mockito.when(criptografiaJCAUseCase.criptografar("novoTokenWpp")).thenReturn("wppCriptografado");
+        Mockito.when(criptografiaJCAUseCase.criptografar("novaInstance")).thenReturn("instanceCriptografada");
+        Mockito.when(criptografiaJCAUseCase.criptografar("novaApiKey")).thenReturn("apiCriptografada");
+
+        Mockito.when(gateway.salvar(usuarioExistente)).thenReturn(usuarioExistente);
+
+        // Act
+        Usuario resultado = usuarioUseCase.alterar(id, novosDados);
+
+        // Assert
+        Assertions.assertNotNull(resultado);
+
+        // Garante que os valores foram sobrescritos pela versão criptografada ANTES do setDados
+        Assertions.assertEquals("crmCriptografado", novosDados.getConfiguracaoCrm().getAcessToken());
+        Assertions.assertEquals("wppCriptografado", novosDados.getWhatsappToken());
+        Assertions.assertEquals("instanceCriptografada", novosDados.getWhatsappIdInstance());
+        Assertions.assertEquals("apiCriptografada", novosDados.getAgenteApiKey());
+
+        // Garante que injetou os novos dados na entidade gerenciada e salvou
+        Mockito.verify(usuarioExistente).setDados(novosDados);
+        Mockito.verify(gateway).salvar(usuarioExistente);
+    }
+
+    @Test
+    void deveLancarExceptionAoAlterarUsuarioNaoExistente() {
+        // Arrange
+        UUID id = UUID.randomUUID();
+        Usuario novosDados = new Usuario();
+
+        Mockito.when(gateway.consultarPorId(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        Assertions.assertThrows(UsuarioNaoEncotradoException.class, () -> usuarioUseCase.alterar(id, novosDados));
+
+        // Garante que não tentou salvar nem criptografar nada
+        Mockito.verify(criptografiaJCAUseCase, Mockito.never()).criptografar(Mockito.anyString());
+        Mockito.verify(gateway, Mockito.never()).salvar(Mockito.any());
+    }
 }

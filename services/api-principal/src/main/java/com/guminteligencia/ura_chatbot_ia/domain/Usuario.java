@@ -25,4 +25,34 @@ public class Usuario {
     private String whatsappToken;
     private String whatsappIdInstance;
     private String agenteApiKey;
+
+    public void setWhatsappToken(String whatsappToken) {
+        if(whatsappToken != null)
+            this.whatsappToken = whatsappToken;
+    }
+
+    public void setWhatsappIdInstance(String whatsappIdInstance) {
+        if(whatsappIdInstance != null)
+            this.whatsappIdInstance = whatsappIdInstance;
+    }
+
+    public void setAgenteApiKey(String agenteApiKey) {
+        if(agenteApiKey != null)
+            this.agenteApiKey = agenteApiKey;
+    }
+
+    public void setDados(Usuario novosDados) {
+        this.nome = novosDados.getNome();
+        this.telefone = novosDados.getTelefone();
+        this.senha = novosDados.getSenha();
+        this.email = novosDados.getEmail();
+        this.telefoneConectado = novosDados.getTelefoneConectado();
+        this.atributosQualificacao = novosDados.getAtributosQualificacao();
+        this.configuracaoCrm = novosDados.getConfiguracaoCrm();
+        this.mensagemDirecionamentoVendedor = novosDados.getMensagemDirecionamentoVendedor();
+        this.mensagemRecontatoG1 = novosDados.getMensagemRecontatoG1();
+        this.whatsappToken = novosDados.getWhatsappToken();
+        this.whatsappIdInstance = novosDados.getWhatsappIdInstance();
+        this.agenteApiKey = novosDados.getAgenteApiKey();
+    }
 }

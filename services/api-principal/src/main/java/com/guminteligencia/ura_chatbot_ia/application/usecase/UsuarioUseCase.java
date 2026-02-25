@@ -31,7 +31,13 @@ public class UsuarioUseCase {
         }
 
         novoUsuario.setSenha(criptografiaUseCase.criptografar(novoUsuario.getSenha()));
-        novoUsuario.getConfiguracaoCrm().setAcessToken(criptografiaJCAUseCase.criptografar(novoUsuario.getConfiguracaoCrm().getAcessToken()));
+
+        if(novoUsuario.getConfiguracaoCrm() == null) {
+            novoUsuario.setConfiguracaoCrm(null);
+        } else {
+            novoUsuario.getConfiguracaoCrm().setAcessToken(criptografiaJCAUseCase.criptografar(novoUsuario.getConfiguracaoCrm().getAcessToken()));
+        }
+
         novoUsuario.setWhatsappToken(criptografiaJCAUseCase.criptografar(novoUsuario.getWhatsappToken()));
         novoUsuario.setWhatsappIdInstance(criptografiaJCAUseCase.criptografar(novoUsuario.getWhatsappIdInstance()));
         novoUsuario.setAgenteApiKey(criptografiaJCAUseCase.criptografar(novoUsuario.getAgenteApiKey()));
@@ -80,5 +86,18 @@ public class UsuarioUseCase {
 
     public List<Usuario> listar() {
         return gateway.listar();
+    }
+
+    public Usuario alterar(UUID id, Usuario novosDados) {
+        Usuario usuarioExistente = this.consultarPorId(id);
+
+        novosDados.getConfiguracaoCrm().setAcessToken(criptografiaJCAUseCase.criptografar(novosDados.getConfiguracaoCrm().getAcessToken()));
+        novosDados.setWhatsappToken(criptografiaJCAUseCase.criptografar(novosDados.getWhatsappToken()));
+        novosDados.setWhatsappIdInstance(criptografiaJCAUseCase.criptografar(novosDados.getWhatsappIdInstance()));
+        novosDados.setAgenteApiKey(criptografiaJCAUseCase.criptografar(novosDados.getAgenteApiKey()));
+
+        usuarioExistente.setDados(novosDados);
+
+        return gateway.salvar(usuarioExistente);
     }
 }

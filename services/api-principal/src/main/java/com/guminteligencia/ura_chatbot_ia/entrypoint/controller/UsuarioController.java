@@ -1,6 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.entrypoint.controller;
 
 import com.guminteligencia.ura_chatbot_ia.application.usecase.UsuarioUseCase;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.ResponseDto;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.UsuarioDto;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.mapper.UsuarioMapper;
@@ -28,6 +29,13 @@ public class UsuarioController {
                 .buildAndExpand(resultado.getId())
                 .toUri()
         ).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseDto<UsuarioDto>> alterar(@PathVariable("id") UUID idUsuario, @RequestBody UsuarioDto novosDados) {
+        UsuarioDto resultado = UsuarioMapper.paraDto(usuarioUseCase.alterar(idUsuario, UsuarioMapper.paraDomain(novosDados)));
+        ResponseDto<UsuarioDto> response = new ResponseDto<>(resultado);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("{id}")

@@ -11,6 +11,10 @@ public class CriptografiaJCAUseCase {
     private final CriptografiaJCAGateway gateway;
 
     public String criptografar(String chave) {
+        if(chave == null) {
+            return null;
+        }
+
         return gateway.criptografar(chave);
     }
 

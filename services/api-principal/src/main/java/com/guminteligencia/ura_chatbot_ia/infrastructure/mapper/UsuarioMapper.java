@@ -13,13 +13,13 @@ public class UsuarioMapper {
                 .senha(entity.getSenha())
                 .email(entity.getEmail())
                 .telefoneConectado(entity.getTelefoneConectado())
-                .atributosQualificacao(entity.getAtributosQualificacao())
-                .configuracaoCrm(ConfiguracaoCrmMapper.paraDomain(entity.getConfiguracaoCrm()))
-                .mensagemDirecionamentoVendedor(entity.getMensagemDirecionamentoVendedor())
-                .mensagemRecontatoG1(entity.getMensagemRecontatoG1())
-                .whatsappToken(entity.getWhatsappToken())
-                .whatsappIdInstance(entity.getWhatsappIdInstance())
-                .agenteApiKey(entity.getAgenteApiKey())
+                .atributosQualificacao(entity.getAtributosQualificacao() == null ? null : entity.getAtributosQualificacao())
+                .configuracaoCrm(ConfiguracaoCrmMapper.paraDomain(entity.getConfiguracaoCrm() == null ? null : entity.getConfiguracaoCrm()))
+                .mensagemDirecionamentoVendedor(entity.getMensagemDirecionamentoVendedor() == null ? null : entity.getMensagemDirecionamentoVendedor())
+                .mensagemRecontatoG1(entity.getMensagemRecontatoG1() == null ? null : entity.getMensagemRecontatoG1())
+                .whatsappToken(entity.getWhatsappToken() == null ? null : entity.getWhatsappToken())
+                .whatsappIdInstance(entity.getWhatsappIdInstance() == null ? null : entity.getWhatsappIdInstance())
+                .agenteApiKey(entity.getAgenteApiKey() == null ? null : entity.getAgenteApiKey())
                 .build();
     }
 
@@ -31,13 +31,13 @@ public class UsuarioMapper {
                 .senha(domain.getSenha())
                 .email(domain.getEmail())
                 .telefoneConectado(domain.getTelefoneConectado())
-                .atributosQualificacao(domain.getAtributosQualificacao())
-                .configuracaoCrm(ConfiguracaoCrmMapper.paraEntity(domain.getConfiguracaoCrm()))
-                .mensagemDirecionamentoVendedor(domain.getMensagemDirecionamentoVendedor())
-                .mensagemRecontatoG1(domain.getMensagemRecontatoG1())
-                .whatsappToken(domain.getWhatsappToken())
-                .whatsappIdInstance(domain.getWhatsappIdInstance())
-                .agenteApiKey(domain.getAgenteApiKey())
+                .atributosQualificacao(domain.getAtributosQualificacao() == null ? null : domain.getAtributosQualificacao())
+                .configuracaoCrm(ConfiguracaoCrmMapper.paraEntity(domain.getConfiguracaoCrm() == null ? null : domain.getConfiguracaoCrm()))
+                .mensagemDirecionamentoVendedor(domain.getMensagemDirecionamentoVendedor() == null ? null : domain.getMensagemDirecionamentoVendedor())
+                .mensagemRecontatoG1(domain.getMensagemRecontatoG1() == null ? null : domain.getMensagemRecontatoG1())
+                .whatsappToken(domain.getWhatsappToken() == null ? null : domain.getWhatsappToken())
+                .whatsappIdInstance(domain.getWhatsappIdInstance() == null ? null : domain.getWhatsappIdInstance())
+                .agenteApiKey(domain.getAgenteApiKey() == null ? null : domain.getAgenteApiKey())
                 .build();
     }
 }

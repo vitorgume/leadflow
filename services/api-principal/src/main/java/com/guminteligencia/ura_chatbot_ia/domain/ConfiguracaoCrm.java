@@ -20,6 +20,13 @@ public class ConfiguracaoCrm {
     private String idTagAtivo;
     private String idEtapaInativos;
     private String idEtapaAtivos;
+
+
     private String acessToken;
     private String crmUrl;
+
+    public void setAcessToken(String acessToken) {
+        if(acessToken != null)
+            this.acessToken = acessToken;
+    }
 }
