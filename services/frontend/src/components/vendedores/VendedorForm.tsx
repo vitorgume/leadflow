@@ -59,7 +59,7 @@ const VendedorForm: React.FC<VendedorFormProps> = ({ vendedor, onSave, onClose, 
               name="nome"
               value={formData.nome}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               required
             />
           </div>
@@ -71,7 +71,7 @@ const VendedorForm: React.FC<VendedorFormProps> = ({ vendedor, onSave, onClose, 
               name="telefone"
               value={formData.telefone}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               required
             />
           </div>
@@ -83,7 +83,7 @@ const VendedorForm: React.FC<VendedorFormProps> = ({ vendedor, onSave, onClose, 
               name="id_vendedor_crm"
               value={formData.id_vendedor_crm}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               required
             />
           </div>
@@ -94,7 +94,7 @@ const VendedorForm: React.FC<VendedorFormProps> = ({ vendedor, onSave, onClose, 
               name="inativo"
               checked={formData.inativo}
               onChange={handleChange}
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
             />
             <label htmlFor="inativo" className="text-sm font-medium text-slate-700">Inativo</label>
           </div>
@@ -105,7 +105,7 @@ const VendedorForm: React.FC<VendedorFormProps> = ({ vendedor, onSave, onClose, 
               name="padrao"
               checked={formData.padrao}
               onChange={handleChange}
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
             />
             <label htmlFor="padrao" className="text-sm font-medium text-slate-700">Padrão</label>
           </div>
@@ -120,7 +120,7 @@ const VendedorForm: React.FC<VendedorFormProps> = ({ vendedor, onSave, onClose, 
             </button>
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
               disabled={isSaving}
             >
               {isSaving ? (

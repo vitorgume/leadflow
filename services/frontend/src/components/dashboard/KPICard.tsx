@@ -13,8 +13,8 @@ const KPICard: React.FC<KPICardProps> = ({
   label, 
   value, 
   icon: Icon, 
-  colorClass = 'text-indigo-600', 
-  bgClass = 'bg-indigo-50' 
+  colorClass = 'text-blue-600', 
+  bgClass = 'bg-blue-50' 
 }) => {
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex items-start justify-between">

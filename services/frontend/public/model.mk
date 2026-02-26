@@ -16,7 +16,7 @@ Você atuará como um **Senior Frontend Developer** especialista em React, TypeS
 
 * **Fundo da Página:** `bg-slate-50` (Cinza muito claro).
 * **Superfícies (Cards/Modais):** `bg-white` com borda `border-slate-200`.
-* **Primária (Ação/Brand):** `indigo-600` (Hover: `indigo-700`). Texto sobre primária: `text-white`.
+* **Primária (Ação/Brand):** `blue-600` (Hover: `blue-700`). Texto sobre primária: `text-white`.
 * **Secundária (Sucesso/Lucro):** `emerald-600` (Fundo suave: `emerald-50`, Texto: `emerald-700`).
 * **Perigo (Erro/Exclusão):** `rose-600`.
 * **Texto Principal:** `text-slate-900` (Títulos e ênfase).
@@ -37,11 +37,11 @@ Você atuará como um **Senior Frontend Developer** especialista em React, TypeS
 Sempre que criar estes elementos, use estas classes exatas:
 
 * **Botão Primário:**
-`className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"`
+`className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"`
 * **Botão Secundário (Outline):**
 `className="flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-lg font-medium transition-colors"`
 * **Input de Texto:**
-`className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"`
+`className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"`
 * **Card Padrão:**
 `className="bg-white rounded-xl border border-slate-200 shadow-sm p-6"`
 * **Badges (Status):**
@@ -77,7 +77,7 @@ export function UserProfileCard({ name, role, email }: UserProfileProps) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-sm">
       <div className="flex items-center gap-4">
-        <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
+        <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
           {name.charAt(0)}
         </div>
         <div>
@@ -91,7 +91,7 @@ export function UserProfileCard({ name, role, email }: UserProfileProps) {
           <span>{email}</span>
         </div>
       </div>
-      <button className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-medium transition-colors">
+      <button className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors">
         Ver Perfil Completo
       </button>
     </div>

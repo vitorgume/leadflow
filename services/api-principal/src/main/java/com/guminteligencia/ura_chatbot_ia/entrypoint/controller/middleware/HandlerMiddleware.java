@@ -224,6 +224,42 @@ public class HandlerMiddleware {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
     }
 
+    // Base Conhecimento
+
+    @ExceptionHandler(BaseConhecimentoNaoEncontradoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerBaseConhecimentoNaoEncontradoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
+    }
+
+    @ExceptionHandler(LimiteDeUmBaseConhecimentoJaAtingidoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerLimiteDeUmBaseConhecimentoJaAtingidoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.comErro(erroDto));
+    }
+
+    // Prompt
+
+    @ExceptionHandler(PromptNaoEncontradoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerPromptNaoEncontradoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
+    }
+
+    @ExceptionHandler(LimiteDeUmPromptJaAtingidoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerLimiteDeUmPromptJaAtingidoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.comErro(erroDto));
+    }
+
     private List<String> mensagens(String mensagem) {
         return mensagem != null ? List.of(mensagem) : List.of("Erro interno inesperado.");
     }

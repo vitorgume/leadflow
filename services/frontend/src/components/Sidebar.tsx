@@ -36,10 +36,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
       {/* Mobile Header */}
       <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
-            LF
-          </div>
-          <span className="font-semibold text-slate-900">Leadflow</span>
+          <img src="/logo.svg" alt="Leadflow Logo" className="h-8 w-auto" />
         </div>
         <button onClick={toggleSidebar} className="p-2 text-slate-500 hover:bg-slate-50 rounded-lg">
           {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -60,10 +57,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 hidden lg:flex items-center gap-2">
-          <div className="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
-            LF
-          </div>
-          <span className="text-xl font-bold text-slate-900 tracking-tight">Leadflow</span>
+          <img src="/logo.svg" alt="Leadflow Logo" className="h-10 w-auto" />
         </div>
 
         <nav className="flex-1 px-4 pb-4 space-y-1 overflow-y-auto mt-4 lg:mt-0">
@@ -74,14 +68,14 @@ const Sidebar: React.FC<SidebarProps> = () => {
               className={({ isActive }) => `
                 flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
                 ${isActive 
-                  ? 'bg-indigo-50 text-indigo-700' 
+                  ? 'bg-blue-50 text-blue-700' 
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}
               `}
               onClick={() => setIsOpen(false)}
             >
               {({ isActive }) => (
                 <>
-                  <item.icon size={20} className={isActive ? 'text-indigo-600' : 'text-slate-400'} />
+                  <item.icon size={20} className={isActive ? 'text-blue-600' : 'text-slate-400'} />
                   {item.label}
                 </>
               )}

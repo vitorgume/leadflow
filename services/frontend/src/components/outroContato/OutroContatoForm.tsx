@@ -46,15 +46,15 @@ const OutroContatoForm: React.FC<OutroContatoFormProps> = ({ contato, onSave, on
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Nome</label>
-            <input type="text" name="nome" value={formData.nome} onChange={handleChange} required className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all" />
+            <input type="text" name="nome" value={formData.nome} onChange={handleChange} required className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Telefone</label>
-            <input type="text" name="telefone" value={formData.telefone} onChange={handleChange} required className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all" />
+            <input type="text" name="telefone" value={formData.telefone} onChange={handleChange} required className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Tipo de Contato</label>
-            <select name="tipo_contato" value={formData.tipo_contato} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white cursor-pointer">
+            <select name="tipo_contato" value={formData.tipo_contato} onChange={handleChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white cursor-pointer">
               <option value="PADRAO">Padrão</option>
               <option value="GERENTE">Gerente</option>
               <option value="CONSULTOR">Consultor</option>
@@ -62,14 +62,14 @@ const OutroContatoForm: React.FC<OutroContatoFormProps> = ({ contato, onSave, on
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Descrição</label>
-            <textarea name="descricao" value={formData.descricao} onChange={handleChange} rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all" />
+            <textarea name="descricao" value={formData.descricao} onChange={handleChange} rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" />
           </div>
           
           <div className="flex justify-end gap-3 pt-4">
             <button type="button" onClick={onClose} disabled={isSaving} className="flex items-center justify-center gap-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-lg font-medium transition-colors">
               Cancelar
             </button>
-            <button type="submit" disabled={isSaving} className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+            <button type="submit" disabled={isSaving} className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
               {isSaving ? <Loader size={20} className="animate-spin" /> : contato ? 'Salvar Alterações' : 'Adicionar Contato'}
             </button>
           </div>

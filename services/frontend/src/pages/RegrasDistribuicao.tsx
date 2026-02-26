@@ -31,6 +31,7 @@ export default function RegrasDistribuicao() {
   const [configuracoes, setConfiguracoes] = useState<ConfiguracaoEscolhaVendedorDTO[]>([]);
   const [vendedoresOptions, setVendedoresOptions] = useState<any[]>([]);
   const [camposQualificacao, setCamposQualificacao] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
   
   // Estados de Tela
   const [loading, setLoading] = useState(true);
@@ -49,6 +50,7 @@ export default function RegrasDistribuicao() {
   const fetchData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
+    setError(null); // Limpa erros antigos ao buscar
     try {
       const [configs, usuarioDb, vends] = await Promise.all([
         configVendedorService.listar(user.id),
@@ -59,12 +61,11 @@ export default function RegrasDistribuicao() {
       setConfiguracoes(configs || []);
       setVendedoresOptions(vends || []);
       
-      // Extrai as chaves do Map de atributos de qualificação do usuário (que vêm em snake_case do backend)
       if (usuarioDb?.atributos_qualificacao) {
         setCamposQualificacao(Object.keys(usuarioDb.atributos_qualificacao));
       }
-    } catch (error) {
-      console.error("Erro ao buscar dados", error);
+    } catch (err: any) {
+      setError(err.message || "Erro ao buscar dados. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -76,6 +77,7 @@ export default function RegrasDistribuicao() {
 
   // --- HANDLERS DO FORMULÁRIO ---
   const handleOpenForm = (config?: ConfiguracaoEscolhaVendedorDTO) => {
+    setError(null); // Limpa qualquer erro que estava na tela ao abrir o formulário
     if (config) {
       setFormData(config);
     } else {
@@ -103,7 +105,6 @@ export default function RegrasDistribuicao() {
   const handleAddCondicao = () => {
     setFormData(prev => {
       const novasCondicoes = [...prev.condicoes];
-      // Se já existe uma anterior, força ela a ter um conector
       if (novasCondicoes.length > 0) {
         novasCondicoes[novasCondicoes.length - 1].conector_logico = ConectorLogico.AND;
       }
@@ -116,7 +117,7 @@ export default function RegrasDistribuicao() {
     setFormData(prev => {
       const novas = prev.condicoes.filter((_, i) => i !== index);
       if (novas.length > 0) {
-        novas[novas.length - 1].conector_logico = null; // O último nunca tem conector
+        novas[novas.length - 1].conector_logico = null;
       }
       return { ...prev, condicoes: novas };
     });
@@ -132,13 +133,16 @@ export default function RegrasDistribuicao() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null); // Sempre limpe o erro antes de uma nova tentativa
+
     if (formData.vendedores.length === 0) {
-      alert("Selecione pelo menos um vendedor para esta regra.");
+      setError("Selecione pelo menos um vendedor para esta regra.");
       return;
     }
+    
     setIsSaving(true);
+    
     try {
-      // Garante que a última condição tenha conector NULL
       const payload = { ...formData };
       if (payload.condicoes.length > 0) {
         payload.condicoes[payload.condicoes.length - 1].conector_logico = null;
@@ -151,8 +155,9 @@ export default function RegrasDistribuicao() {
       }
       setIsFormOpen(false);
       fetchData();
-    } catch (error) {
-      console.error("Erro ao salvar", error);
+    } catch (err: any) {
+      // Aqui nós pegamos a mensagem mastigada do interceptor (err.message) e setamos na tela
+      setError(err.message || "Falha ao salvar a regra de distribuição.");
     } finally {
       setIsSaving(false);
     }
@@ -160,12 +165,15 @@ export default function RegrasDistribuicao() {
 
   const executeDelete = async () => {
     if (!configToDelete) return;
+    setError(null); // Limpa o erro
+    
     try {
       await configVendedorService.deletar(configToDelete);
       setConfigToDelete(null);
       fetchData();
-    } catch (error) {
-      console.error("Erro ao deletar", error);
+    } catch (err: any) {
+      setConfigToDelete(null); // Fecha o modal primeiro
+      setError(err.message || "Não foi possível excluir a regra."); // Mostra o erro na tela principal
     }
   };
 
@@ -178,7 +186,7 @@ export default function RegrasDistribuicao() {
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div className="flex items-center gap-3">
-              <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600">
+              <div className="bg-blue-100 p-2 rounded-xl text-blue-600">
                 <GitBranch size={24} />
               </div>
               <div>
@@ -190,7 +198,7 @@ export default function RegrasDistribuicao() {
             {!isFormOpen && (
               <button
                 onClick={() => handleOpenForm()}
-                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
               >
                 <Plus size={20} />
                 Nova Regra
@@ -198,8 +206,16 @@ export default function RegrasDistribuicao() {
             )}
           </div>
 
+          {/* CARD DE ERRO - Agora ele aparece lindamente aqui no topo se der erro! */}
+          {error && (
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-3 text-rose-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+              <AlertCircle className="shrink-0 mt-0.5" size={20} />
+              <p className="text-sm font-medium">{error}</p>
+            </div>
+          )}
+
           {loading ? (
-             <div className="flex items-center justify-center p-12 text-indigo-600">
+             <div className="flex items-center justify-center p-12 text-blue-600">
                <Loader2 className="animate-spin" size={32} />
              </div>
           ) : isFormOpen ? (
@@ -222,7 +238,7 @@ export default function RegrasDistribuicao() {
                     required
                     value={formData.prioridade}
                     onChange={(e) => setFormData({...formData, prioridade: parseInt(e.target.value)})}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                   />
                 </div>
 
@@ -236,10 +252,10 @@ export default function RegrasDistribuicao() {
                         <div 
                           key={vend.id}
                           onClick={() => handleToggleVendedor(vend.id)}
-                          className={`cursor-pointer border rounded-lg p-3 flex items-center justify-between transition-colors ${isSelected ? 'bg-indigo-50 border-indigo-300' : 'bg-white border-slate-200 hover:border-indigo-300'}`}
+                          className={`cursor-pointer border rounded-lg p-3 flex items-center justify-between transition-colors ${isSelected ? 'bg-blue-50 border-blue-300' : 'bg-white border-slate-200 hover:border-blue-300'}`}
                         >
-                          <span className={`text-sm font-medium ${isSelected ? 'text-indigo-800' : 'text-slate-700'}`}>{vend.nome}</span>
-                          {isSelected && <Check size={18} className="text-indigo-600" />}
+                          <span className={`text-sm font-medium ${isSelected ? 'text-blue-800' : 'text-slate-700'}`}>{vend.nome}</span>
+                          {isSelected && <Check size={18} className="text-blue-600" />}
                         </div>
                       );
                     })}
@@ -250,7 +266,7 @@ export default function RegrasDistribuicao() {
                 <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
                   <div className="flex justify-between items-center mb-4">
                     <label className="block text-sm font-bold text-slate-800">Condições (Gatilhos)</label>
-                    <button type="button" onClick={handleAddCondicao} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                    <button type="button" onClick={handleAddCondicao} className="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
                       <Plus size={16} /> Adicionar Condição
                     </button>
                   </div>
@@ -273,11 +289,10 @@ export default function RegrasDistribuicao() {
                               required
                               value={condicao.campo}
                               onChange={(e) => handleChangeCondicao(index, 'campo', e.target.value)}
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                             >
                               <option value="">Selecione...</option>
                               {camposQualificacao.map(campo => (
-                                /* O 'value' continua sendo o snake_case pro backend, mas o usuário lê humano */
                                 <option key={campo} value={campo}>{formatCampoToHuman(campo)}</option>
                               ))}
                             </select>
@@ -289,7 +304,7 @@ export default function RegrasDistribuicao() {
                               required
                               value={condicao.operador_logico}
                               onChange={(e) => handleChangeCondicao(index, 'operador_logico', e.target.value)}
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                             >
                               {Object.entries(OPERADORES_LABELS).map(([key, label]) => (
                                 <option key={key} value={key}>{label}</option>
@@ -305,7 +320,7 @@ export default function RegrasDistribuicao() {
                               value={condicao.valor}
                               onChange={(e) => handleChangeCondicao(index, 'valor', e.target.value)}
                               placeholder="Ex: Qualificado"
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                             />
                           </div>
 
@@ -328,7 +343,7 @@ export default function RegrasDistribuicao() {
                               <select 
                                 value={condicao.conector_logico || ConectorLogico.AND}
                                 onChange={(e) => handleChangeCondicao(index, 'conector_logico', e.target.value)}
-                                className="bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold rounded-full px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value={ConectorLogico.AND}>E (AND)</option>
                                 <option value={ConectorLogico.OR}>OU (OR)</option>
@@ -352,7 +367,7 @@ export default function RegrasDistribuicao() {
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-sm disabled:opacity-70"
+                    className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-sm disabled:opacity-70"
                   >
                     {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Settings2 size={18} />}
                     Salvar Regra
@@ -374,11 +389,11 @@ export default function RegrasDistribuicao() {
               ) : (
                 <div className="grid grid-cols-1 gap-4">
                   {configuracoes.map((config) => (
-                    <div key={config.id} className="border border-slate-200 rounded-xl p-5 hover:border-indigo-200 transition-colors flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div key={config.id} className="border border-slate-200 rounded-xl p-5 hover:border-blue-200 transition-colors flex flex-col md:flex-row justify-between md:items-center gap-4">
                       
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <span className="px-2.5 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-md">Prioridade: {config.prioridade}</span>
+                          <span className="px-2.5 py-0.5 bg-blue-100 text-blue-800 text-xs font-bold rounded-md">Prioridade: {config.prioridade}</span>
                           <span className="text-sm font-medium text-slate-600">
                             {config.vendedores.length} Vendedor(es) Vinculado(s)
                           </span>
@@ -388,8 +403,7 @@ export default function RegrasDistribuicao() {
                           {config.condicoes.map((cond, idx) => (
                             <React.Fragment key={cond.id || idx}>
                               <span className="px-2 py-1 bg-slate-100 rounded-md border border-slate-200">
-                                {/* Aqui nós passamos o campo original pela função tradutora antes de mostrar */}
-                                {formatCampoToHuman(cond.campo)} <strong className="text-indigo-600 mx-1">{OPERADORES_LABELS[cond.operador_logico as string]}</strong> '{cond.valor}'
+                                {formatCampoToHuman(cond.campo)} <strong className="text-blue-600 mx-1">{OPERADORES_LABELS[cond.operador_logico as string]}</strong> '{cond.valor}'
                               </span>
                               {cond.conector_logico && (
                                 <span className="text-xs font-bold text-slate-400 mx-1 uppercase">{cond.conector_logico}</span>
@@ -400,7 +414,7 @@ export default function RegrasDistribuicao() {
                       </div>
 
                       <div className="flex items-center justify-end gap-2 md:w-auto w-full md:border-l border-slate-100 md:pl-4">
-                        <button onClick={() => handleOpenForm(config)} className="p-2 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors">
+                        <button onClick={() => handleOpenForm(config)} className="p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
                           <Edit size={20} />
                         </button>
                         <button onClick={() => setConfigToDelete(config.id!)} className="p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-colors">

@@ -34,9 +34,8 @@ export const OutrosContatos: React.FC = () => {
         const data = await getOutrosContatos(user.id);
         setContatos(data);
       }
-    } catch (err) {
-      setError('Falha ao carregar a lista de contatos.');
-      console.error(err);
+    } catch (err: any) {
+      setError(err.message || 'Falha ao carregar a lista de contatos.');
     } finally {
       setLoading(false);
     }
@@ -52,6 +51,7 @@ export const OutrosContatos: React.FC = () => {
 
   const handleSaveContato = async (data: OutroContatoCreateDTO | OutroContatoUpdateDTO) => {
     setIsSaving(true);
+    setError(null); // Limpa erros anteriores antes de tentar salvar
     try {
       if (editingContato) {
         await updateOutroContato(editingContato.id, data as OutroContatoUpdateDTO);
@@ -60,9 +60,9 @@ export const OutrosContatos: React.FC = () => {
       }
       setIsFormOpen(false);
       fetchContatos();
-    } catch (err) {
-      setError('Falha ao salvar o contato.');
-      console.error(err);
+    } catch (err: any) {
+      // Captura a mensagem do backend interceptada pelo Axios
+      setError(err.message || 'Falha ao salvar o contato.');
     } finally {
       setIsSaving(false);
     }
@@ -71,13 +71,14 @@ export const OutrosContatos: React.FC = () => {
   const executeDelete = async () => {
     if (contatoToDelete === null) return;
     setIsDeleting(true);
+    setError(null);
     try {
       await deleteOutroContato(contatoToDelete);
       setContatoToDelete(null);
       fetchContatos();
-    } catch (err) {
-      setError('Falha ao deletar o contato.');
-      setContatoToDelete(null);
+    } catch (err: any) {
+      setError(err.message || 'Falha ao deletar o contato.');
+      setContatoToDelete(null); // Fecha o modal para o usuário ver o erro na tela
     } finally {
       setIsDeleting(false);
     }
@@ -86,7 +87,7 @@ export const OutrosContatos: React.FC = () => {
   // Cores dinâmicas para o Badge de Tipo de Contato
   const getTipoBadge = (tipo: string) => {
     switch (tipo) {
-      case 'GERENTE': return 'bg-indigo-100 text-indigo-800';
+      case 'GERENTE': return 'bg-blue-100 text-blue-800';
       case 'CONSULTOR': return 'bg-emerald-100 text-emerald-800';
       default: return 'bg-slate-100 text-slate-800';
     }
@@ -100,7 +101,7 @@ export const OutrosContatos: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
           <div className="flex items-center gap-3 mb-8">
-            <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600">
+            <div className="bg-blue-100 p-2 rounded-xl text-blue-600">
               <Contact size={24} />
             </div>
             <div>
@@ -115,66 +116,74 @@ export const OutrosContatos: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Buscar por nome ou telefone..."
-                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
               <button
-                onClick={() => { setEditingContato(null); setIsFormOpen(true); }}
-                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm w-full md:w-auto"
+                onClick={() => { setEditingContato(null); setIsFormOpen(true); setError(null); }}
+                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm w-full md:w-auto"
               >
                 <Plus size={20} />
                 Adicionar Contato
               </button>
             </div>
 
-            {loading && <LoadingSpinner />}
-            {error && <ErrorMessage message={error} />}
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                {/* O erro agora aparece acima da tabela, sem esconder os dados! */}
+                {error && (
+                  <div className="mb-6">
+                    <ErrorMessage message={error} />
+                  </div>
+                )}
 
-            {!loading && !error && (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nome</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Telefone</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tipo</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Descrição</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-slate-200">
-                    {filteredContatos.map((contato) => (
-                      <tr key={contato.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{contato.nome}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{contato.telefone}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getTipoBadge(contato.tipo_contato)}`}>
-                            {contato.tipo_contato}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 truncate max-w-xs" title={contato.descricao}>
-                          {contato.descricao || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button onClick={() => { setEditingContato(contato); setIsFormOpen(true); }} className="text-indigo-600 hover:text-indigo-900 mr-3 transition-colors" title="Editar">
-                            <Edit size={18} />
-                          </button>
-                          <button onClick={() => setContatoToDelete(contato.id)} className="text-rose-600 hover:text-rose-900 transition-colors" title="Deletar">
-                            <Trash2 size={18} />
-                          </button>
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-slate-200">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nome</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Telefone</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tipo</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Descrição</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Ações</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {!loading && !error && filteredContatos.length === 0 && (
-              <p className="text-center text-slate-500 mt-4 py-4">Nenhum contato encontrado.</p>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-slate-200">
+                      {filteredContatos.map((contato) => (
+                        <tr key={contato.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{contato.nome}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{contato.telefone}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getTipoBadge(contato.tipo_contato)}`}>
+                              {contato.tipo_contato}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 truncate max-w-xs" title={contato.descricao}>
+                            {contato.descricao || '-'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onClick={() => { setEditingContato(contato); setIsFormOpen(true); setError(null); }} className="text-blue-600 hover:text-blue-900 mr-3 transition-colors" title="Editar">
+                              <Edit size={18} />
+                            </button>
+                            <button onClick={() => setContatoToDelete(contato.id)} className="text-rose-600 hover:text-rose-900 transition-colors" title="Deletar">
+                              <Trash2 size={18} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  
+                  {filteredContatos.length === 0 && (
+                    <p className="text-center text-slate-500 mt-4 py-4">Nenhum contato encontrado.</p>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>

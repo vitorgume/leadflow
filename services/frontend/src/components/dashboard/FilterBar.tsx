@@ -26,7 +26,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ filters, onFilterChange }) => {
           name="month"
           value={filters.month || ''}
           onChange={handleInputChange}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm bg-white cursor-pointer"
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm bg-white cursor-pointer"
         >
           <option value="">Todos</option>
           <option value="1">Janeiro</option>
@@ -43,7 +43,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ filters, onFilterChange }) => {
           name="year"
           value={filters.year || ''}
           onChange={handleInputChange}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm bg-white cursor-pointer"
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm bg-white cursor-pointer"
         >
           <option value="2026">2026</option>
           <option value="2025">2025</option>
@@ -57,7 +57,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ filters, onFilterChange }) => {
         <select
           value={filters.status}
           onChange={(e) => onFilterChange({ ...filters, status: e.target.value as any })}
-          className="bg-slate-50 border-0 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 block w-full p-2.5 font-medium transition-colors cursor-pointer"
+          className="bg-slate-50 border-0 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 block w-full p-2.5 font-medium transition-colors cursor-pointer"
         >
           <option value="Todos">Todos Status</option>
           <option value="ATIVO">Conversa Ativa</option>

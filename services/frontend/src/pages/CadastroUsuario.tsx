@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { User, Phone, Mail, Lock, Smartphone, Loader, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Importando o hook de navegação
+import { useNavigate } from 'react-router-dom';
 import type { UsuarioCreateDTO } from '../types/usuario';
 import { cadastrarUsuario } from '../services/usuarioService';
 
 export default function CadastroUsuario() {
-  const navigate = useNavigate(); // Instanciando o hook
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<UsuarioCreateDTO>({
     nome: '',
@@ -34,7 +34,6 @@ export default function CadastroUsuario() {
       await cadastrarUsuario(formData);
       setSuccess(true);
       
-      // Limpa o formulário
       setFormData({
         nome: '',
         email: '',
@@ -43,13 +42,13 @@ export default function CadastroUsuario() {
         telefone_conectado: ''
       });
 
-      // Redireciona para a tela de login após 2 segundos
       setTimeout(() => {
-        navigate('/'); // Assumindo que a raiz '/' é a sua tela de login
+        navigate('/');
       }, 2000);
 
     } catch (err: any) {
-      setError(err.message || 'Ocorreu um erro ao cadastrar o usuário.');
+      // Captura a mensagem do backend interceptada pelo Axios
+      setError(err.message || 'Ocorreu um erro ao cadastrar o usuário. Verifique os dados e tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -59,27 +58,26 @@ export default function CadastroUsuario() {
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans text-slate-900">
       
       <div className="w-full max-w-md">
-        {/* Cabeçalho */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600 text-white shadow-md mb-4">
-            <User size={32} />
+          <div className="inline-flex items-center justify-center mb-4">
+            <img src="/logo.svg" alt="Leadflow Logo" className="h-16 w-auto" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Criar Nova Conta</h1>
           <p className="text-slate-500 text-sm mt-2 font-medium">Preencha os dados básicos para iniciar no Leadflow.</p>
         </div>
 
-        {/* Card do Formulário */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8">
           
+          {/* Alertas com Animação Suave */}
           {error && (
-            <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-3 text-rose-700">
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-3 text-rose-700 animate-in fade-in slide-in-from-top-2 duration-300">
               <AlertCircle className="shrink-0 mt-0.5" size={20} />
               <p className="text-sm font-medium">{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start gap-3 text-emerald-700">
+            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start gap-3 text-emerald-700 animate-in fade-in slide-in-from-top-2 duration-300">
               <CheckCircle2 className="shrink-0 mt-0.5" size={20} />
               <p className="text-sm font-medium">Usuário cadastrado com sucesso! Redirecionando para o login...</p>
             </div>
@@ -99,7 +97,7 @@ export default function CadastroUsuario() {
                   value={formData.nome}
                   onChange={handleChange}
                   placeholder="Ex: João da Silva"
-                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                 />
               </div>
             </div>
@@ -117,7 +115,7 @@ export default function CadastroUsuario() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="joao@empresa.com"
-                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                 />
               </div>
             </div>
@@ -135,7 +133,7 @@ export default function CadastroUsuario() {
                   value={formData.telefone}
                   onChange={handleChange}
                   placeholder="5511999999999"
-                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                 />
               </div>
             </div>
@@ -153,7 +151,7 @@ export default function CadastroUsuario() {
                   value={formData.telefone_conectado}
                   onChange={handleChange}
                   placeholder="5511888888888"
-                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                 />
               </div>
             </div>
@@ -171,15 +169,15 @@ export default function CadastroUsuario() {
                   value={formData.senha}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={isLoading || success} // Desabilita também se já estiver redirecionando
-              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm disabled:opacity-70 mt-6"
+              disabled={isLoading || success}
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm disabled:opacity-70 mt-6"
             >
               {isLoading ? (
                 <Loader size={20} className="animate-spin" />

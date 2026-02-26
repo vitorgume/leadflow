@@ -5,16 +5,16 @@ import KPICard from '../components/dashboard/KPICard';
 import ChartsSection from '../components/dashboard/ChartsSection';
 import DetailedList from '../components/dashboard/DetailedList';
 import { Users, LayoutDashboard, AlertCircle, Loader, AlertTriangle, Settings } from 'lucide-react';
-import { Link } from 'react-router-dom'; // Importação do Link para navegação
+import { Link } from 'react-router-dom';
 import type { DashboardDataDTO, DashboardFilters } from '../types/dashboard';
 import { getDashboardData } from '../services/dashboardService';
-import { usuarioConfigService } from '../services/usuarioConfigService'; // Serviço de configuração
+import { usuarioConfigService } from '../services/usuarioConfigService';
 import { useAuth } from '../contexts/AuthContext';
 
 // Custom Hook for Dashboard Data Logic
 const useDashboardData = () => {
   const [data, setData] = useState<DashboardDataDTO | null>(null);
-  const [isConfigured, setIsConfigured] = useState<boolean>(true); // Novo estado
+  const [isConfigured, setIsConfigured] = useState<boolean>(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<DashboardFilters>({
@@ -30,7 +30,7 @@ const useDashboardData = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError(null);
+      setError(null); // Limpa o erro ao tentar buscar novamente
       try {
         if (user) {
           // Busca os dados do Dashboard e as Configurações em paralelo
@@ -51,9 +51,9 @@ const useDashboardData = () => {
             setIsConfigured(temAtributos && temMensagem);
           }
         }
-      } catch (err) {
-        setError('Falha ao carregar os dados do dashboard.');
-        console.error(err);
+      } catch (err: any) {
+        // Captura a mensagem do backend interceptada pelo Axios, sem console.error!
+        setError(err.message || 'Falha ao carregar os dados do dashboard.');
       } finally {
         setLoading(false);
       }
@@ -67,7 +67,7 @@ const useDashboardData = () => {
 
 // Loading and Error States
 const LoadingSpinner: React.FC = () => (
-  <div className="flex items-center justify-center p-8 text-indigo-600">
+  <div className="flex items-center justify-center p-8 text-blue-600">
     <Loader className="animate-spin" size={32} />
     <span className="ml-4 text-lg font-medium text-slate-600">Carregando...</span>
   </div>
@@ -91,7 +91,7 @@ const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
           <div className="flex items-center gap-3 mb-8">
-            <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600">
+            <div className="bg-blue-100 p-2 rounded-xl text-blue-600">
               <LayoutDashboard size={24} />
             </div>
             <div>

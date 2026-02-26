@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Nossa paleta personalizada (opcional, mas recomendada para o código que te passei)
-        primary: { DEFAULT: '#4f46e5', hover: '#4338ca', light: '#e0e7ff' },
+        // Nossa paleta personalizada (azul do logo)
+        primary: { DEFAULT: '#2563EB', hover: '#1D4ED8', light: '#EFF6FF' },
         secondary: { DEFAULT: '#10b981', hover: '#059669' },
         background: '#f8fafc',
       }

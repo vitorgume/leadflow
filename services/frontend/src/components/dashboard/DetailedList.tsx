@@ -51,7 +51,7 @@ const DetailedList: React.FC<DetailedListProps> = ({ contacts }) => {
               <tr key={contact.id} className="hover:bg-slate-50 transition-colors group">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-700 font-bold text-sm border border-indigo-100">
+                    <div className="h-9 w-9 rounded-full bg-blue-50 flex items-center justify-center text-blue-700 font-bold text-sm border border-blue-100">
                       {contact.nome.charAt(0)}
                     </div>
                     <span className="text-sm font-medium text-slate-900">{contact.nome}</span>

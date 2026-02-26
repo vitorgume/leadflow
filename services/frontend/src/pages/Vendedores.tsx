@@ -1,5 +1,5 @@
 // src/pages/Vendedores.tsx
-import React, { useState, useEffect, useCallback, use } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
 import { Users, Plus, Search, Edit, Trash2 } from 'lucide-react';
 import type { Vendedor, VendedorCreateDTO, VendedorUpdateDTO } from '../types/vendedor';
@@ -37,9 +37,8 @@ export const Vendedores: React.FC = () => {
         const data = await getVendedores(user.id);
         setVendedores(data);
       }
-    } catch (err) {
-      setError('Falha ao carregar a lista de vendedores.');
-      console.error(err);
+    } catch (err: any) {
+      setError(err.message ||'Falha ao carregar a lista de vendedores.');
     } finally {
       setLoading(false);
     }
@@ -75,9 +74,8 @@ export const Vendedores: React.FC = () => {
       }
       setIsFormOpen(false);
       fetchVendedores();
-    } catch (err) {
-      setError('Falha ao salvar o vendedor.');
-      console.error(err);
+    } catch (err: any) {
+      setError(err.message || 'Falha ao salvar o vendedor.');
     } finally {
       setIsSaving(false);
     }
@@ -95,10 +93,9 @@ export const Vendedores: React.FC = () => {
       await deleteVendedor(vendedorToDelete);
       setVendedorToDelete(null);
       fetchVendedores();
-    } catch (err) {
-      setError('Falha ao deletar o vendedor.');
+    } catch (err: any) {
+      setError(err.message ||'Falha ao deletar o vendedor.');
       setVendedorToDelete(null);
-      console.error(err);
     } finally {
       setIsDeleting(false);
     }
@@ -112,7 +109,7 @@ export const Vendedores: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
           <div className="flex items-center gap-3 mb-8">
-            <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600">
+            <div className="bg-blue-100 p-2 rounded-xl text-blue-600">
               <Users size={24} />
             </div>
             <div>
@@ -127,7 +124,7 @@ export const Vendedores: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Buscar por nome ou telefone..."
-                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -135,7 +132,7 @@ export const Vendedores: React.FC = () => {
               </div>
               <button
                 onClick={handleAddVendedor}
-                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm w-full md:w-auto"
+                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm w-full md:w-auto"
               >
                 <Plus size={20} />
                 Adicionar Vendedor
@@ -170,12 +167,12 @@ export const Vendedores: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           {vendedor.padrao && (
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Sim</span>
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Sim</span>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{vendedor.id_vendedor_crm}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button onClick={() => handleEditVendedor(vendedor)} className="text-indigo-600 hover:text-indigo-900 mr-3 transition-colors" title="Editar">
+                          <button onClick={() => handleEditVendedor(vendedor)} className="text-blue-600 hover:text-blue-900 mr-3 transition-colors" title="Editar">
                             <Edit size={18} />
                           </button>
                           <button onClick={() => confirmDelete(vendedor.id)} className="text-rose-600 hover:text-rose-900 transition-colors" title="Deletar">

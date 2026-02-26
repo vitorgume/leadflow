@@ -158,6 +158,26 @@ class HandlerMiddlewareTest {
             throw new UsuarioNaoEncotradoException();
         }
 
+        @GetMapping("/baseConhecimentoNotFound")
+        public void baseConhecimentoNotFound() {
+            throw new BaseConhecimentoNaoEncontradoException();
+        }
+
+        @GetMapping("/limiteBaseConhecimento")
+        public void limiteBaseConhecimento() {
+            throw new LimiteDeUmBaseConhecimentoJaAtingidoException();
+        }
+
+        @GetMapping("/promptNotFound")
+        public void promptNotFound() {
+            throw new PromptNaoEncontradoException();
+        }
+
+        @GetMapping("/limitePrompt")
+        public void limitePrompt() {
+            throw new LimiteDeUmPromptJaAtingidoException();
+        }
+
         @GetMapping("/nullMessage")
         public void nullMessage() {
             throw new RuntimeException();
@@ -191,6 +211,10 @@ class HandlerMiddlewareTest {
             "outroContatoTipoGerencia,     400, Outro contato do tipo gerencia já cadastrado.",
             "usuarioExistente,             400, Usuário já cadastrado com esse mesmo telefone.",
             "usuarioNaoEncontrado,         404, Usuário não encontrado",
+            "baseConhecimentoNotFound,     404, Base de conhecimento não encontrada.",
+            "limiteBaseConhecimento,       400, Limite de uma base de conhecimento atingido.",
+            "promptNotFound,               404, Prompt não encontrado.",
+            "limitePrompt,                 400, Limite de apenas um prompt atingido.",
             "nullMessage,                  500, Erro interno inesperado."
     })
     void testHandlerMiddleware(

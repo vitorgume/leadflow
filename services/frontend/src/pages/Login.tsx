@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Mail, Lock, LogIn, Loader, AlertCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Importação do hook de navegação
+import { Mail, Lock, Loader, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type { LoginDTO } from '../types/auth';
 import { login } from '../services/authService';
-import { useAuth } from '../contexts/AuthContext'; // Importação do nosso contexto
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const [formData, setFormData] = useState<LoginDTO>({
@@ -14,7 +14,6 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Instanciando os hooks
   const { signIn } = useAuth();
   const navigate = useNavigate();
 
@@ -26,25 +25,21 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
+    setError(null); // Limpa erros antigos
 
     try {
-      // O response agora sabe que tem a propriedade .id
       const response = await login(formData);
-      
-      // Pegamos o ID diretamente da raiz da resposta do seu backend
       const userId = response.id || '';
       
-      // Salvamos na memória (Context API)
       signIn(response.token || '', { 
         id: userId, 
-        nome: 'Usuário', // Como o Login do backend não devolve o nome, deixamos um fallback
+        nome: 'Usuário',
         email: formData.email 
       });
       
-      // Redireciona para o dashboard
       navigate('/dashboard');
     } catch (err: any) {
+      // Graças ao Interceptor, se o Java devolver "Usuário não encontrado" ou "Senha incorreta", cai aqui!
       setError(err.message || 'Credenciais inválidas. Tente novamente.');
     } finally {
       setIsLoading(false);
@@ -55,20 +50,18 @@ export default function Login() {
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans text-slate-900">
       
       <div className="w-full max-w-md">
-        {/* Cabeçalho */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600 text-white shadow-md mb-4">
-            <LogIn size={32} />
+          <div className="inline-flex items-center justify-center mb-4">
+            <img src="/logo.svg" alt="Leadflow Logo" className="h-16 w-auto" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Bem-vindo de volta!</h1>
           <p className="text-slate-500 text-sm mt-2 font-medium">Faça login para acessar o Leadflow.</p>
         </div>
 
-        {/* Card do Formulário */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8">
           
           {error && (
-            <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-3 text-rose-700">
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-3 text-rose-700 animate-in fade-in slide-in-from-top-2 duration-300">
               <AlertCircle className="shrink-0 mt-0.5" size={20} />
               <p className="text-sm font-medium">{error}</p>
             </div>
@@ -88,7 +81,7 @@ export default function Login() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="joao@empresa.com"
-                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                 />
               </div>
             </div>
@@ -108,7 +101,7 @@ export default function Login() {
                   value={formData.senha}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                 />
               </div>
             </div>
@@ -116,7 +109,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading || !formData.email || !formData.senha}
-              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm disabled:opacity-70 mt-6"
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm disabled:opacity-70 mt-6"
             >
               {isLoading ? (
                 <Loader size={20} className="animate-spin" />
@@ -128,7 +121,7 @@ export default function Login() {
 
           <div className="mt-8 text-center text-sm text-slate-500">
             Ainda não tem uma conta?{' '}
-            <a href="/cadastro" className="font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+            <a href="/cadastro" className="font-medium text-blue-600 hover:text-blue-700 transition-colors">
               Cadastre-se aqui
             </a>
           </div>

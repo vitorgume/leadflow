@@ -15,7 +15,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipContentProps<number, s
     return (
       <div className="bg-white p-3 border border-slate-200 shadow-lg rounded-lg">
         <p className="text-xs font-bold text-slate-500 uppercase mb-1">{label}</p>
-        <p className="text-sm font-semibold text-indigo-600">
+        <p className="text-sm font-semibold text-blue-600">
           {payload[0].value} Contatos
         </p>
       </div>
