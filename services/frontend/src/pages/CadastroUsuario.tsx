@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { User, Phone, Mail, Lock, Smartphone, Loader, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Importando o hook de navegação
 import type { UsuarioCreateDTO } from '../types/usuario';
 import { cadastrarUsuario } from '../services/usuarioService';
 
 export default function CadastroUsuario() {
+  const navigate = useNavigate(); // Instanciando o hook
+
   const [formData, setFormData] = useState<UsuarioCreateDTO>({
     nome: '',
     email: '',
@@ -30,7 +33,8 @@ export default function CadastroUsuario() {
     try {
       await cadastrarUsuario(formData);
       setSuccess(true);
-      // Limpa o formulário após o sucesso
+      
+      // Limpa o formulário
       setFormData({
         nome: '',
         email: '',
@@ -38,6 +42,12 @@ export default function CadastroUsuario() {
         telefone: '',
         telefone_conectado: ''
       });
+
+      // Redireciona para a tela de login após 2 segundos
+      setTimeout(() => {
+        navigate('/'); // Assumindo que a raiz '/' é a sua tela de login
+      }, 2000);
+
     } catch (err: any) {
       setError(err.message || 'Ocorreu um erro ao cadastrar o usuário.');
     } finally {
@@ -71,7 +81,7 @@ export default function CadastroUsuario() {
           {success && (
             <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start gap-3 text-emerald-700">
               <CheckCircle2 className="shrink-0 mt-0.5" size={20} />
-              <p className="text-sm font-medium">Usuário cadastrado com sucesso! Agora você pode fazer o login.</p>
+              <p className="text-sm font-medium">Usuário cadastrado com sucesso! Redirecionando para o login...</p>
             </div>
           )}
 
@@ -168,7 +178,7 @@ export default function CadastroUsuario() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || success} // Desabilita também se já estiver redirecionando
               className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm disabled:opacity-70 mt-6"
             >
               {isLoading ? (

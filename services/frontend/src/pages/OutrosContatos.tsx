@@ -181,7 +181,13 @@ export const OutrosContatos: React.FC = () => {
       </main>
 
       {isFormOpen && (
-        <OutroContatoForm contato={editingContato} onSave={handleSaveContato} onClose={() => setIsFormOpen(false)} isSaving={isSaving} />
+        <OutroContatoForm
+          contato={editingContato}
+          onSave={handleSaveContato}
+          onClose={() => setIsFormOpen(false)}
+          isSaving={isSaving}
+          idUsuario={user == null ? '' : user.id}
+        />
       )}
 
       <DeleteConfirmationModal

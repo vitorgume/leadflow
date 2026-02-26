@@ -26,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
     { label: 'Outros Contatos', icon: Contact, path: '/outros-contatos' },
     { label: 'IA e Prompts', icon: Brain, path: '/configuracao-ia' }, // Placeholder path
     { label: 'Regras Distribuição', icon: GitBranch, path: '/regras-distribuicao' },
-    { label: 'Configurações', icon: Settings, path: '/configuracoes' }, // Placeholder path
+    { label: 'Configurações', icon: Settings, path: '/usuarios/configuracoes' }, // Placeholder path
   ];
 
   const toggleSidebar = () => setIsOpen(!isOpen);

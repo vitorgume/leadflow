@@ -17,6 +17,13 @@ const OPERADORES_LABELS: Record<string, string> = {
   [OperadorLogico.IS_LESS_THAN_OR_EQUAL_TO]: 'Menor ou igual (≤)',
 };
 
+// Tradutor Visual: Backend (snake_case) -> Frontend (Human Readable)
+const formatCampoToHuman = (campo: string) => {
+  if (!campo) return '';
+  const comEspaco = campo.replace(/_/g, ' ');
+  return comEspaco.charAt(0).toUpperCase() + comEspaco.slice(1);
+};
+
 export default function RegrasDistribuicao() {
   const { user } = useAuth();
   
@@ -52,7 +59,7 @@ export default function RegrasDistribuicao() {
       setConfiguracoes(configs || []);
       setVendedoresOptions(vends || []);
       
-      // Extrai as chaves do Map de atributos de qualificação do usuário
+      // Extrai as chaves do Map de atributos de qualificação do usuário (que vêm em snake_case do backend)
       if (usuarioDb?.atributos_qualificacao) {
         setCamposQualificacao(Object.keys(usuarioDb.atributos_qualificacao));
       }
@@ -270,7 +277,8 @@ export default function RegrasDistribuicao() {
                             >
                               <option value="">Selecione...</option>
                               {camposQualificacao.map(campo => (
-                                <option key={campo} value={campo}>{campo}</option>
+                                /* O 'value' continua sendo o snake_case pro backend, mas o usuário lê humano */
+                                <option key={campo} value={campo}>{formatCampoToHuman(campo)}</option>
                               ))}
                             </select>
                           </div>
@@ -380,7 +388,8 @@ export default function RegrasDistribuicao() {
                           {config.condicoes.map((cond, idx) => (
                             <React.Fragment key={cond.id || idx}>
                               <span className="px-2 py-1 bg-slate-100 rounded-md border border-slate-200">
-                                {cond.campo} <strong className="text-indigo-600 mx-1">{OPERADORES_LABELS[cond.operador_logico as string]}</strong> '{cond.valor}'
+                                {/* Aqui nós passamos o campo original pela função tradutora antes de mostrar */}
+                                {formatCampoToHuman(cond.campo)} <strong className="text-indigo-600 mx-1">{OPERADORES_LABELS[cond.operador_logico as string]}</strong> '{cond.valor}'
                               </span>
                               {cond.conector_logico && (
                                 <span className="text-xs font-bold text-slate-400 mx-1 uppercase">{cond.conector_logico}</span>

@@ -8,9 +8,10 @@ interface VendedorFormProps {
   onClose: () => void;
   availableUsers?: { id: string; nome: string }[];
   isSaving: boolean;
+  idUsuario: string
 }
 
-const VendedorForm: React.FC<VendedorFormProps> = ({ vendedor, onSave, onClose, isSaving }) => {
+const VendedorForm: React.FC<VendedorFormProps> = ({ vendedor, onSave, onClose, isSaving, idUsuario }) => {
   const [formData, setFormData] = useState<VendedorCreateDTO | VendedorUpdateDTO>(
     vendedor
       ? {
@@ -26,7 +27,7 @@ const VendedorForm: React.FC<VendedorFormProps> = ({ vendedor, onSave, onClose, 
           inativo: false,
           id_vendedor_crm: 0,
           padrao: false,
-          usuario: { id: 'e75fabfa-ece2-40c3-9a8e-f15e6109d867' },
+          usuario: { id: idUsuario },
         }
   );
 

@@ -10,7 +10,6 @@ public class UsuarioMapper {
                 .id(domain.getId())
                 .nome(domain.getNome())
                 .telefone(domain.getTelefone())
-                .senha(domain.getSenha())
                 .email(domain.getEmail())
                 .telefoneConectado(domain.getTelefoneConectado())
                 .atributosQualificacao(domain.getAtributosQualificacao() == null ? null : domain.getAtributosQualificacao())

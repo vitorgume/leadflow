@@ -1,5 +1,5 @@
 // src/pages/Vendedores.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, use } from 'react';
 import Sidebar from '../components/Sidebar';
 import { Users, Plus, Search, Edit, Trash2 } from 'lucide-react';
 import type { Vendedor, VendedorCreateDTO, VendedorUpdateDTO } from '../types/vendedor';
@@ -204,6 +204,7 @@ export const Vendedores: React.FC = () => {
           onSave={handleSaveVendedor}
           onClose={() => setIsFormOpen(false)}
           isSaving={isSaving}
+          idUsuario={user == null ? '' : user.id}
         />
       )}
 

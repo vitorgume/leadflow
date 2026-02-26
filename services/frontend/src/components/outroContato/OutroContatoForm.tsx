@@ -7,9 +7,10 @@ interface OutroContatoFormProps {
   onSave: (data: OutroContatoCreateDTO | OutroContatoUpdateDTO) => Promise<void>;
   onClose: () => void;
   isSaving: boolean;
+  idUsuario: string;
 }
 
-const OutroContatoForm: React.FC<OutroContatoFormProps> = ({ contato, onSave, onClose, isSaving }) => {
+const OutroContatoForm: React.FC<OutroContatoFormProps> = ({ contato, onSave, onClose, isSaving, idUsuario }) => {
   const [formData, setFormData] = useState<OutroContatoCreateDTO | OutroContatoUpdateDTO>(
     contato
       ? {
@@ -17,14 +18,14 @@ const OutroContatoForm: React.FC<OutroContatoFormProps> = ({ contato, onSave, on
           telefone: contato.telefone,
           descricao: contato.descricao,
           tipo_contato: contato.tipo_contato,
-          usuario: { id: 'e75fabfa-ece2-40c3-9a8e-f15e6109d867' }
+          usuario: { id: idUsuario }
         }
       : {
           nome: '',
           telefone: '',
           descricao: '',
           tipo_contato: 'PADRAO',
-          usuario: { id: 'e75fabfa-ece2-40c3-9a8e-f15e6109d867' }, // Mock do usuário
+          usuario: { id: idUsuario }, 
         }
   );
 

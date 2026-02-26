@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, type ReactNode } from 'react';
-import api from '../services/api';
 
 // Tipagem dos dados que queremos ter em todas as telas
 interface User {
@@ -10,7 +9,6 @@ interface User {
 
 interface AuthContextData {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
   signIn: (token: string, user: User) => void;
   signOut: () => void;
@@ -20,26 +18,35 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Estado GUARDADO EM MEMÓRIA (seguro contra XSS de leitura de disco)
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  
+  // LAZY INITIALIZATION: O React roda essa função antes de renderizar a tela pela primeira vez
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem('@Leadflow:user');
+    
+    if (storedUser) {
+      return JSON.parse(storedUser); // Transforma a string salva de volta em Objeto
+    }
+    
+    return null;
+  });
 
   const signIn = (newToken: string, loggedUser: User) => {
-    setToken(newToken);
     setUser(loggedUser);
     
-    // Injeta o token automaticamente no Axios para as próximas requisições!
-    api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+    // Salva APENAS os dados do usuário no LocalStorage (O token continua seguro no Cookie!)
+    localStorage.setItem('@Leadflow:user', JSON.stringify(loggedUser));
   };
 
   const signOut = () => {
-    setToken(null);
     setUser(null);
-    delete api.defaults.headers.common['Authorization'];
+    localStorage.removeItem('@Leadflow:user');
+    // Força o redirecionamento para a tela de login
+    window.location.href = '/'; 
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, signIn, signOut }}>
+    // Agora o isAuthenticated confia na existência do user, e não mais na variável token
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
