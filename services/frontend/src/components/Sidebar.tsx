@@ -9,7 +9,8 @@ import {
   Brain,
   LogOut,
   Menu,
-  X
+  X,
+  GitBranch
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -22,9 +23,9 @@ const Sidebar: React.FC<SidebarProps> = () => {
   const menuItems = [
     { label: 'Menu Principal', icon: LayoutDashboard, path: '/dashboard' },
     { label: 'Vendedores', icon: Users, path: '/vendedores' },
-    { label: 'Configuração Vendedor', icon: UserCog, path: '/configuracao-vendedor' }, // Placeholder path
     { label: 'Outros Contatos', icon: Contact, path: '/outros-contatos' },
     { label: 'IA e Prompts', icon: Brain, path: '/configuracao-ia' }, // Placeholder path
+    { label: 'Regras Distribuição', icon: GitBranch, path: '/regras-distribuicao' },
     { label: 'Configurações', icon: Settings, path: '/configuracoes' }, // Placeholder path
   ];
 

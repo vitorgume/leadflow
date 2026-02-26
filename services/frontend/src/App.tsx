@@ -6,6 +6,7 @@ import ConfiguracaoIA from './pages/ConfiguracaoIA';
 import CadastroUsuario from './pages/CadastroUsuario';
 import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
+import RegrasDistribuicao from './pages/RegrasDistribuicao';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/configuracao-ia" element={<ConfiguracaoIA />} />
           <Route path="/usuarios/cadastro" element={<CadastroUsuario />} />
           <Route path="/usuarios/login" element={<Login />} />
+          <Route path="/regras-distribuicao" element={<RegrasDistribuicao />} />
         </Routes>
       </AuthProvider>
     </div>
