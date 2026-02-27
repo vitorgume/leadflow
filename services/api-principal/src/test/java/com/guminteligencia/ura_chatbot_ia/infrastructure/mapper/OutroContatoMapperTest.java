@@ -3,7 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 import com.guminteligencia.ura_chatbot_ia.domain.ConfiguracaoCrm;
 import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
 import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntitySql;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.UsuarioEntity;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConfiguracaoCrmEntity;
 import com.guminteligencia.ura_chatbot_ia.domain.CrmType;
@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 
 class OutroContatoMapperTest {
 
-    private OutroContatoEntity outroContatoEntity;
+    private OutroContatoEntitySql outroContatoEntitySql;
     private OutroContato outroContatoDomain;
 
     @BeforeEach
     void setUp() {
-        outroContatoEntity = OutroContatoEntity.builder()
+        outroContatoEntitySql = OutroContatoEntitySql.builder()
                 .id(1L)
                 .nome("Nome outro contato")
                 .telefone("000000000000")
@@ -39,21 +39,21 @@ class OutroContatoMapperTest {
 
     @Test
     void deveTransformaraParaDomain() {
-        OutroContato outroContatoTeste = OutroContatoMapper.paraDomain(outroContatoEntity);
+        OutroContato outroContatoTeste = OutroContatoMapper.paraDomain(outroContatoEntitySql);
 
-        Assertions.assertEquals(outroContatoTeste.getId(), outroContatoEntity.getId());
-        Assertions.assertEquals(outroContatoTeste.getNome(), outroContatoEntity.getNome());
-        Assertions.assertEquals(outroContatoTeste.getTelefone(), outroContatoEntity.getTelefone());
-        Assertions.assertEquals(outroContatoTeste.getDescricao(), outroContatoEntity.getDescricao());
+        Assertions.assertEquals(outroContatoTeste.getId(), outroContatoEntitySql.getId());
+        Assertions.assertEquals(outroContatoTeste.getNome(), outroContatoEntitySql.getNome());
+        Assertions.assertEquals(outroContatoTeste.getTelefone(), outroContatoEntitySql.getTelefone());
+        Assertions.assertEquals(outroContatoTeste.getDescricao(), outroContatoEntitySql.getDescricao());
     }
 
     @Test
     void deveTransformarParaEntity() {
-        OutroContatoEntity outroContatoTeste = OutroContatoMapper.paraEntity(outroContatoDomain);
+        OutroContatoEntitySql outroContatoTeste = OutroContatoMapper.paraEntity(outroContatoDomain);
 
-        Assertions.assertEquals(outroContatoTeste.getId(), outroContatoEntity.getId());
-        Assertions.assertEquals(outroContatoTeste.getNome(), outroContatoEntity.getNome());
-        Assertions.assertEquals(outroContatoTeste.getTelefone(), outroContatoEntity.getTelefone());
-        Assertions.assertEquals(outroContatoTeste.getDescricao(), outroContatoEntity.getDescricao());
+        Assertions.assertEquals(outroContatoTeste.getId(), outroContatoEntitySql.getId());
+        Assertions.assertEquals(outroContatoTeste.getNome(), outroContatoEntitySql.getNome());
+        Assertions.assertEquals(outroContatoTeste.getTelefone(), outroContatoEntitySql.getTelefone());
+        Assertions.assertEquals(outroContatoTeste.getDescricao(), outroContatoEntitySql.getDescricao());
     }
 }

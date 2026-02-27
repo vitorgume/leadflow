@@ -5,11 +5,10 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum Setor {
-    FINANCEIRO(0, "Financeiro"),
-    LOGISTICA(1, "Logistica"),
+public enum TipoContato {
+    PADRAO(0, "Financeiro"),
     GERENTE(2, "Gerente"),
-    OUTRO(3, "Outro");
+    CONSULTOR(3, "Outro");
 
     private final int codigo;
     private final String descricao;

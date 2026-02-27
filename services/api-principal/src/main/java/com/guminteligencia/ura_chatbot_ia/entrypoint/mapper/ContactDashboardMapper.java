@@ -10,6 +10,7 @@ public class ContactDashboardMapper {
                 .nome(domain.getNome())
                 .telefone(domain.getTelefone())
                 .status(domain.getStatus())
+                .dataHorario(domain.getDataHorario())
                 .build();
     }
 }

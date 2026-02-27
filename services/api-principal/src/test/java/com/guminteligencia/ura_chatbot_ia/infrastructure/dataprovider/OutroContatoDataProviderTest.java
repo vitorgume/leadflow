@@ -5,8 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.TipoContato;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.OutroContatoMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.OutroContatoRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
-import org.junit.jupiter.api.BeforeEach;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntitySql;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,13 +53,13 @@ class OutroContatoDataProviderTest {
     @Test
     @DisplayName("ConsultarPorNome: Deve retornar contato mapeado")
     void deveConsultarPorNomeComSucesso() {
-        OutroContatoEntity entity = new OutroContatoEntity();
+        OutroContatoEntitySql entity = new OutroContatoEntitySql();
         OutroContato domain = new OutroContato();
 
         when(repository.findByNome(NOME)).thenReturn(Optional.of(entity));
 
         try (MockedStatic<OutroContatoMapper> ms = Mockito.mockStatic(OutroContatoMapper.class)) {
-            ms.when(() -> OutroContatoMapper.paraDomain(any(OutroContatoEntity.class)))
+            ms.when(() -> OutroContatoMapper.paraDomain(any(OutroContatoEntitySql.class)))
                     .thenReturn(domain);
 
             Optional<OutroContato> result = provider.consultarPorNome(NOME);
@@ -86,7 +85,7 @@ class OutroContatoDataProviderTest {
     @DisplayName("ConsultarPorTipo: Deve retornar contato mapeado")
     void deveConsultarPorTipoComSucesso() {
         TipoContato tipo = TipoContato.PADRAO; // Exemplo
-        OutroContatoEntity entity = new OutroContatoEntity();
+        OutroContatoEntitySql entity = new OutroContatoEntitySql();
         OutroContato domain = new OutroContato();
 
         when(repository.findByTipoContatoAndUsuario_Id(tipo, ID_USUARIO))
@@ -116,16 +115,16 @@ class OutroContatoDataProviderTest {
 
     @Test
     @DisplayName("ConsultarPorTelefone: Deve retornar contato mapeado")
-    void deveConsultarPorTelefoneComSucesso() {
-        OutroContatoEntity entity = new OutroContatoEntity();
+    void deveConsultarPorTelefoneEUsuarioComSucesso() {
+        OutroContatoEntitySql entity = new OutroContatoEntitySql();
         OutroContato domain = new OutroContato();
 
-        when(repository.findByTelefone(TELEFONE)).thenReturn(Optional.of(entity));
+        when(repository.findByTelefoneAndUsuario_Id(TELEFONE)).thenReturn(Optional.of(entity));
 
         try (MockedStatic<OutroContatoMapper> ms = Mockito.mockStatic(OutroContatoMapper.class)) {
             ms.when(() -> OutroContatoMapper.paraDomain(entity)).thenReturn(domain);
 
-            Optional<OutroContato> result = provider.consultarPorTelefone(TELEFONE);
+            Optional<OutroContato> result = provider.consultarPorTelefoneEUsuario(TELEFONE);
 
             assertTrue(result.isPresent());
             assertEquals(domain, result.get());
@@ -134,12 +133,12 @@ class OutroContatoDataProviderTest {
 
     @Test
     @DisplayName("ConsultarPorTelefone: Deve lançar exceção ao falhar")
-    void deveLancarExcecaoAoConsultarPorTelefone() {
+    void deveLancarExcecaoAoConsultarPorTelefoneEUsuario() {
         RuntimeException exBanco = new RuntimeException("Erro BD");
-        when(repository.findByTelefone(any())).thenThrow(exBanco);
+        when(repository.findByTelefoneAndUsuario_Id(any())).thenThrow(exBanco);
 
         DataProviderException ex = assertThrows(DataProviderException.class,
-                () -> provider.consultarPorTelefone(TELEFONE));
+                () -> provider.consultarPorTelefoneEUsuario(TELEFONE));
 
         assertEquals(MSG_ERRO_TELEFONE, ex.getMessage());
     }
@@ -148,11 +147,11 @@ class OutroContatoDataProviderTest {
     @DisplayName("Salvar: Deve converter, salvar e retornar domínio")
     void deveSalvarComSucesso() {
         OutroContato input = new OutroContato();
-        OutroContatoEntity entityInput = new OutroContatoEntity();
-        OutroContatoEntity entitySalva = new OutroContatoEntity();
+        OutroContatoEntitySql entityInput = new OutroContatoEntitySql();
+        OutroContatoEntitySql entitySalva = new OutroContatoEntitySql();
         OutroContato output = new OutroContato();
 
-        when(repository.save(any(OutroContatoEntity.class))).thenReturn(entitySalva);
+        when(repository.save(any(OutroContatoEntitySql.class))).thenReturn(entitySalva);
 
         try (MockedStatic<OutroContatoMapper> ms = Mockito.mockStatic(OutroContatoMapper.class)) {
             ms.when(() -> OutroContatoMapper.paraEntity(input)).thenReturn(entityInput);
@@ -173,7 +172,7 @@ class OutroContatoDataProviderTest {
         when(repository.save(any())).thenThrow(exBanco);
 
         try (MockedStatic<OutroContatoMapper> ms = Mockito.mockStatic(OutroContatoMapper.class)) {
-            ms.when(() -> OutroContatoMapper.paraEntity(any())).thenReturn(new OutroContatoEntity());
+            ms.when(() -> OutroContatoMapper.paraEntity(any())).thenReturn(new OutroContatoEntitySql());
 
             DataProviderException ex = assertThrows(DataProviderException.class,
                     () -> provider.salvar(new OutroContato()));
@@ -185,7 +184,7 @@ class OutroContatoDataProviderTest {
     @Test
     @DisplayName("ConsultarPorId: Deve retornar contato mapeado")
     void deveConsultarPorIdComSucesso() {
-        OutroContatoEntity entity = new OutroContatoEntity();
+        OutroContatoEntitySql entity = new OutroContatoEntitySql();
         OutroContato domain = new OutroContato();
 
         when(repository.findById(ID_CONTATO)).thenReturn(Optional.of(entity));
@@ -216,8 +215,8 @@ class OutroContatoDataProviderTest {
     @DisplayName("Listar: Deve retornar página mapeada")
     void deveListarComSucesso() {
         Pageable pageable = Pageable.unpaged();
-        OutroContatoEntity entity = new OutroContatoEntity();
-        Page<OutroContatoEntity> pageEntity = new PageImpl<>(List.of(entity));
+        OutroContatoEntitySql entity = new OutroContatoEntitySql();
+        Page<OutroContatoEntitySql> pageEntity = new PageImpl<>(List.of(entity));
         OutroContato domain = new OutroContato();
 
         when(repository.findByUsuario_Id(pageable, ID_USUARIO)).thenReturn(pageEntity);

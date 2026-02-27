@@ -134,8 +134,8 @@ const Dashboard: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <KPICard label="Total de Contatos" value={data.summary.totalContacts} icon={Users} />
                 <KPICard label="Contatos Hoje" value={data.summary.contactsToday} icon={Users} />
-                <KPICard label="Taxa de Resposta" value={`${data.summary.responseRate}%`} icon={Users} />
-                <KPICard label="Média por Vendedor" value={data.summary.avgPerVendor} icon={Users} />
+                <KPICard label="Taxa de Resposta" value={`${(Number(data.summary.responseRate) * 100).toFixed(1)}%`} icon={Users} />
+                <KPICard label="Média por Vendedor" value={Number(data.summary.avgPerVendor).toFixed(1)} icon={Users} />
               </div>
 
               <ChartsSection

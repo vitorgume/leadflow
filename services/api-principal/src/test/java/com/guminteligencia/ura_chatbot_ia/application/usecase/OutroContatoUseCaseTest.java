@@ -92,7 +92,7 @@ class OutroContatoUseCaseTest {
         outroContatoTeste.setUsuario(Usuario.builder().id(UUID.randomUUID()).build());
         outroContatoTeste.setTelefone("123456789");
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(Optional.empty());
-        Mockito.when(gateway.consultarPorTelefone(Mockito.anyString())).thenReturn(Optional.empty());
+        Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString())).thenReturn(Optional.empty());
         Mockito.when(usuarioUseCase.consultarPorId(Mockito.any(UUID.class))).thenReturn(new Usuario());
         Mockito.when(gateway.salvar(Mockito.any(OutroContato.class))).thenReturn(outroContatoTeste);
 
@@ -122,7 +122,7 @@ class OutroContatoUseCaseTest {
         outroContatoTeste.setUsuario(Usuario.builder().id(UUID.randomUUID()).build());
         outroContatoTeste.setTelefone("123456789");
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(Optional.empty());
-        Mockito.when(gateway.consultarPorTelefone(Mockito.anyString())).thenReturn(Optional.of(outroContatoTeste));
+        Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString())).thenReturn(Optional.of(outroContatoTeste));
 
         OutroContatoComMesmoTelefoneJaCadastradoExcetion exception = Assertions
                 .assertThrows(OutroContatoComMesmoTelefoneJaCadastradoExcetion.class,
@@ -148,7 +148,7 @@ class OutroContatoUseCaseTest {
         outroContatoTeste.setUsuario(Usuario.builder().id(UUID.randomUUID()).build());
         outroContatoTeste.setTelefone("123456789");
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(Optional.empty());
-        Mockito.when(gateway.consultarPorTelefone(Mockito.anyString())).thenReturn(Optional.empty());
+        Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString())).thenReturn(Optional.empty());
         Mockito.when(gateway.consultarPorId(Mockito.anyLong())).thenReturn(Optional.of(outroContatoTeste));
         Mockito.when(gateway.salvar(Mockito.any(OutroContato.class))).thenReturn(outroContatoTeste);
 
@@ -199,7 +199,7 @@ class OutroContatoUseCaseTest {
 
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class)))
                 .thenReturn(Optional.empty()); // Passa liso pela primeira validação de gerente
-        Mockito.when(gateway.consultarPorTelefone(Mockito.anyString()))
+        Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString()))
                 .thenReturn(Optional.of(contatoExistenteNoBanco));
 
         OutroContatoComMesmoTelefoneJaCadastradoExcetion exception = Assertions

@@ -48,7 +48,7 @@ public class RelatorioUseCase {
                 relatorio = clienteUseCase.getRelatorio(usuario.getId());
             }
 
-            OutroContato gerencia = null;
+            List<OutroContato> gerencia = new ArrayList<>();
 
             try {
                 gerencia = outroContatoUseCase.consultarPorTipo(TipoContato.GERENTE, usuario.getId());
@@ -56,10 +56,10 @@ public class RelatorioUseCase {
                 log.warn("Nenhum contato encontrado para usuario: {}", usuario);
             }
 
-            if(gerencia != null) {
+            if(!gerencia.isEmpty()) {
                 String arquivo = gerarArquivo(relatorio);
 
-                mensagemUseCase.enviarRelatorio(arquivo, "Relatorio.xlsx", gerencia.getTelefone(), usuario);
+                mensagemUseCase.enviarRelatorio(arquivo, "Relatorio.xlsx", gerencia.get(0).getTelefone(), usuario);
             }
         });
 

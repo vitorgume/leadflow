@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,39 +22,32 @@ public class OutroContatoUseCase {
 
     private final OutroContatoGateway gateway;
     private final UsuarioUseCase usuarioUseCase;
+    private final OutroContatoNoSqlUseCase outroContatoNoSqlUseCase;
 
     public OutroContato consultarPorNome(String nome) {
         Optional<OutroContato> outroContato = gateway.consultarPorNome(nome);
 
-        if(outroContato.isEmpty()) {
+        if (outroContato.isEmpty()) {
             throw new OutroContatoNaoEncontradoException();
         }
 
         return outroContato.get();
     }
 
-    public OutroContato consultarPorTipo(TipoContato tipo, UUID idUsuario) {
-        Optional<OutroContato> outroContato = gateway.consultarPorTipo(tipo, idUsuario);
-
-        if(outroContato.isEmpty()) {
-            throw new OutroContatoNaoEncontradoException();
-        }
-
-        return outroContato.get();
+    public List<OutroContato> consultarPorTipo(TipoContato tipo, UUID idUsuario) {
+        return gateway.consultarPorTipo(tipo, idUsuario);
     }
 
     public OutroContato cadastrar(OutroContato novoOutroContato) {
-        Optional<OutroContato> outroContato = gateway.consultarPorTipo(novoOutroContato.getTipoContato(), novoOutroContato.getUsuario().getId());
+        List<OutroContato> outroContatos = gateway.consultarPorTipo(novoOutroContato.getTipoContato(), novoOutroContato.getUsuario().getId());
 
-        if(outroContato.isPresent()) {
-            if(outroContato.get().getTipoContato().equals(TipoContato.GERENTE)) {
-                throw new OutroContatoTipoGerenciaJaCadastradoException();
-            }
+        if (outroContatos.size() > 1 && novoOutroContato.getTipoContato().equals(TipoContato.GERENTE)) {
+            throw new OutroContatoTipoGerenciaJaCadastradoException();
         }
 
-        outroContato = gateway.consultarPorTelefone(novoOutroContato.getTelefone());
+        Optional<OutroContato> outroContato = gateway.consultarPorTelefoneEUsuario(novoOutroContato.getTelefone(), novoOutroContato.getUsuario().getId());
 
-        if(outroContato.isPresent()) {
+        if (outroContato.isPresent()) {
             throw new OutroContatoComMesmoTelefoneJaCadastradoExcetion();
         }
 
@@ -61,7 +55,10 @@ public class OutroContatoUseCase {
 
         novoOutroContato.setUsuario(usuario);
 
-        return gateway.salvar(novoOutroContato);
+        OutroContato outroContatoSalvo = gateway.salvar(novoOutroContato);
+        outroContatoNoSqlUseCase.salvar(novoOutroContato);
+
+        return outroContatoSalvo;
     }
 
     public Page<OutroContato> listar(Pageable pageable, UUID idUsuario) {
@@ -69,32 +66,43 @@ public class OutroContatoUseCase {
     }
 
     public OutroContato alterar(Long idOutroContato, OutroContato novosDados) {
-        Optional<OutroContato> outroContato = gateway.consultarPorTipo(novosDados.getTipoContato(), novosDados.getUsuario().getId());
+        List<OutroContato> outroContatos = gateway.consultarPorTipo(novosDados.getTipoContato(), novosDados.getUsuario().getId());
 
-        if(outroContato.isPresent()) {
-            if(outroContato.get().getTipoContato().equals(TipoContato.GERENTE) && !outroContato.get().getId().equals(idOutroContato)) {
+        if (novosDados.getTipoContato().equals(TipoContato.GERENTE)) {
+            if (outroContatos.stream().anyMatch(
+                    outroContato -> outroContato.getTipoContato().equals(TipoContato.GERENTE)
+                            && !outroContato.getId().equals(idOutroContato)
+                    )
+            ) {
                 throw new OutroContatoTipoGerenciaJaCadastradoException();
             }
         }
 
-        outroContato = gateway.consultarPorTelefone(novosDados.getTelefone());
+        Optional<OutroContato> outroContato = gateway.consultarPorTelefoneEUsuario(novosDados.getTelefone(), novosDados.getUsuario().getId());
 
-        if(outroContato.isPresent()) {
-            if(!outroContato.get().getId().equals(idOutroContato))
+
+        if (outroContato.isPresent()) {
+            if (!outroContato.get().getId().equals(idOutroContato))
                 throw new OutroContatoComMesmoTelefoneJaCadastradoExcetion();
         }
 
         OutroContato outroContatoExistente = this.consultarPorId(idOutroContato);
+        OutroContato outroContatoNoSql = outroContatoNoSqlUseCase.consultarPorTelefoneEUsuario(
+                outroContatoExistente.getTelefone(), outroContatoExistente.getUsuario().getId());
 
         outroContatoExistente.setDados(novosDados);
+        outroContatoNoSql.setDados(novosDados);
 
-        return gateway.salvar(outroContatoExistente);
+        OutroContato novoDadosSalvos = gateway.salvar(outroContatoExistente);
+        outroContatoNoSqlUseCase.salvar(outroContatoNoSql);
+
+        return novoDadosSalvos;
     }
 
     private OutroContato consultarPorId(Long idOutroContato) {
         Optional<OutroContato> outroContato = gateway.consultarPorId(idOutroContato);
 
-        if(outroContato.isEmpty()) {
+        if (outroContato.isEmpty()) {
             throw new OutroContatoNaoEncontradoException();
         }
 

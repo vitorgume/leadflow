@@ -1,35 +1,56 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity;
 
 import com.guminteligencia.ura_chatbot_ia.domain.TipoContato;
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbConvertedBy;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
 
-@Entity(name = "OutroContato")
-@Table(name = "outros_contatos")
+import java.util.UUID;
+
+@DynamoDbBean
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
 @Builder
 public class OutroContatoEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_outro_contato")
-    private Long id;
+    private UUID id;
     private String nome;
     private String telefone;
     private String descricao;
-
-    @Column(name = "tipo_contato")
-    @Enumerated(EnumType.STRING)
     private TipoContato tipoContato;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "id_usuario",
-            referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "fk_outro_contato_usuario")
-    )
     private UsuarioEntity usuario;
+
+    @DynamoDbPartitionKey
+    public UUID getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    @DynamoDbSecondaryPartitionKey(indexNames = "TelefoneIndex")
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public TipoContato getTipoContato() {
+        return tipoContato;
+    }
+
+
+    public UsuarioEntity getUsuario() {
+        return usuario;
+    }
+
 }

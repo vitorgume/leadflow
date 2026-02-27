@@ -75,7 +75,8 @@ public class DashboardDataProvider implements DashboardDataGateway {
         return new ContactDashboard(
                 conversaAgente.getCliente().getNome(),
                 conversaAgente.getCliente().getTelefone(),
-                conversaAgente.getStatus()
+                conversaAgente.getStatus(),
+                conversaAgente.getDataCriacao()
         );
     }
 }

@@ -5,7 +5,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.TipoContato;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.OutroContatoRepository;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.UsuarioRepository;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConfiguracaoCrmEntity;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntitySql;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.UsuarioEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -97,10 +97,10 @@ class OutroContatoControllerTest {
         given(repository.findByTipoContatoAndUsuario_Id(eq(TipoContato.PADRAO), eq(ID_USUARIO)))
                 .willReturn(Optional.empty());
         // Validação por Telefone
-        given(repository.findByTelefone("11999999999")).willReturn(Optional.empty());
+        given(repository.findByTelefoneAndUsuario_Id("11999999999")).willReturn(Optional.empty());
 
         // 3. Mock do Save
-        OutroContatoEntity saved = OutroContatoEntity.builder()
+        OutroContatoEntitySql saved = OutroContatoEntitySql.builder()
                 .id(ID_CONTATO)
                 .nome("Novo Contato")
                 .telefone("11999999999")
@@ -108,7 +108,7 @@ class OutroContatoControllerTest {
                 .usuario(usuarioEntity)
                 .build();
 
-        given(repository.save(any(OutroContatoEntity.class))).willReturn(saved);
+        given(repository.save(any(OutroContatoEntitySql.class))).willReturn(saved);
 
         String json = """
             {
@@ -132,13 +132,13 @@ class OutroContatoControllerTest {
     @DisplayName("Listar: Quando sucesso retorna OK")
     void listarQuandoSucessoRetornaOk() throws Exception {
         // Arrange
-        OutroContatoEntity entity = OutroContatoEntity.builder()
+        OutroContatoEntitySql entity = OutroContatoEntitySql.builder()
                 .id(ID_CONTATO)
                 .nome("Contato Lista")
                 .usuario(usuarioEntity)
                 .build();
 
-        Page<OutroContatoEntity> page = new PageImpl<>(List.of(entity));
+        Page<OutroContatoEntitySql> page = new PageImpl<>(List.of(entity));
 
         given(repository.findByUsuario_Id(any(Pageable.class), eq(ID_USUARIO)))
                 .willReturn(page);
@@ -153,7 +153,7 @@ class OutroContatoControllerTest {
     @Test
     @DisplayName("Alterar: Quando sucesso retorna OK")
     void alterarQuandoSucessoRetornaOk() throws Exception {
-        OutroContatoEntity existing = OutroContatoEntity.builder()
+        OutroContatoEntitySql existing = OutroContatoEntitySql.builder()
                 .id(ID_CONTATO)
                 .nome("Antigo")
                 .usuario(usuarioEntity)
@@ -165,13 +165,13 @@ class OutroContatoControllerTest {
         // Mock das validações (caso o alterar também valide telefone/tipo)
         // Assumindo que o alterar não troca o tipo/telefone neste teste simples
 
-        OutroContatoEntity updated = OutroContatoEntity.builder()
+        OutroContatoEntitySql updated = OutroContatoEntitySql.builder()
                 .id(ID_CONTATO)
                 .nome("Novo Nome")
                 .usuario(usuarioEntity)
                 .build();
 
-        given(repository.save(any(OutroContatoEntity.class))).willReturn(updated);
+        given(repository.save(any(OutroContatoEntitySql.class))).willReturn(updated);
 
         String json = """
             {
@@ -193,7 +193,7 @@ class OutroContatoControllerTest {
     @DisplayName("Deletar: Quando sucesso retorna No Content")
     void deletarQuandoSucessoRetornaNoContent() throws Exception {
 
-        OutroContatoEntity existing = OutroContatoEntity.builder()
+        OutroContatoEntitySql existing = OutroContatoEntitySql.builder()
                 .id(ID_CONTATO)
                 .nome("Antigo")
                 .usuario(usuarioEntity)

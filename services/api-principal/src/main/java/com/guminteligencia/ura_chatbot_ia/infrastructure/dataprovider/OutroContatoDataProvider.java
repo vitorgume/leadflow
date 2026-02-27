@@ -6,13 +6,14 @@ import com.guminteligencia.ura_chatbot_ia.domain.TipoContato;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.exceptions.DataProviderException;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.OutroContatoMapper;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.OutroContatoRepository;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntitySql;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,7 +34,7 @@ public class OutroContatoDataProvider implements OutroContatoGateway {
 
     @Override
     public Optional<OutroContato> consultarPorNome(String nome) {
-        Optional<OutroContatoEntity> outroContatoEntity;
+        Optional<OutroContatoEntitySql> outroContatoEntity;
 
         try {
             outroContatoEntity = repository.findByNome(nome);
@@ -46,25 +47,25 @@ public class OutroContatoDataProvider implements OutroContatoGateway {
     }
 
     @Override
-    public Optional<OutroContato> consultarPorTipo(TipoContato tipo, UUID idUsuario) {
-        Optional<OutroContatoEntity> outroContatoEntity;
+    public List<OutroContato> consultarPorTipo(TipoContato tipo, UUID idUsuario) {
+        List<OutroContatoEntitySql> outroContatoEntities;
 
         try {
-            outroContatoEntity = repository.findByTipoContatoAndUsuario_Id(tipo, idUsuario);
+            outroContatoEntities = repository.findByTipoContatoAndUsuario_Id(tipo, idUsuario);
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_CONSULTAR_POR_TIPO, ex);
             throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_POR_TIPO, ex.getCause());
         }
 
-        return outroContatoEntity.map(OutroContatoMapper::paraDomain);
+        return outroContatoEntities.stream().map(OutroContatoMapper::paraDomain).toList();
     }
 
     @Override
-    public Optional<OutroContato> consultarPorTelefone(String telefone) {
-        Optional<OutroContatoEntity> outroContatoEntity;
+    public Optional<OutroContato> consultarPorTelefoneEUsuario(String telefone, UUID idUsuario) {
+        Optional<OutroContatoEntitySql> outroContatoEntity;
 
         try {
-            outroContatoEntity = repository.findByTelefone(telefone);
+            outroContatoEntity = repository.findByTelefoneAndUsuario_Id(telefone, idUsuario);
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE, ex);
             throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE, ex.getCause());
@@ -75,21 +76,21 @@ public class OutroContatoDataProvider implements OutroContatoGateway {
 
     @Override
     public OutroContato salvar(OutroContato novoOutroContato) {
-        OutroContatoEntity outroContatoEntity = OutroContatoMapper.paraEntity(novoOutroContato);
+        OutroContatoEntitySql outroContatoEntitySql = OutroContatoMapper.paraEntity(novoOutroContato);
 
         try {
-            outroContatoEntity = repository.save(outroContatoEntity);
+            outroContatoEntitySql = repository.save(outroContatoEntitySql);
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_SALVAR, ex);
             throw new DataProviderException(MENSAGEM_ERRO_SALVAR, ex.getCause());
         }
 
-        return OutroContatoMapper.paraDomain(outroContatoEntity);
+        return OutroContatoMapper.paraDomain(outroContatoEntitySql);
     }
 
     @Override
     public Optional<OutroContato> consultarPorId(Long idOutroContato) {
-        Optional<OutroContatoEntity> outroContatoEntity;
+        Optional<OutroContatoEntitySql> outroContatoEntity;
 
         try {
             outroContatoEntity = repository.findById(idOutroContato);
@@ -103,7 +104,7 @@ public class OutroContatoDataProvider implements OutroContatoGateway {
 
     @Override
     public Page<OutroContato> listar(Pageable pageable, UUID idUsuario) {
-        Page<OutroContatoEntity> outroContatoEntityPage;
+        Page<OutroContatoEntitySql> outroContatoEntityPage;
 
         try {
             outroContatoEntityPage = repository.findByUsuario_Id(pageable, idUsuario);

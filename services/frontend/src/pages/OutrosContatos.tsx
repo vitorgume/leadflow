@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Sidebar from '../components/Sidebar';
-import { Contact, Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Contact, Plus, Search, Edit, Trash2, Upload, Loader2 } from 'lucide-react';
 import type { OutroContato, OutroContatoCreateDTO, OutroContatoUpdateDTO } from '../types/outroContato';
 import { getOutrosContatos, createOutroContato, updateOutroContato, deleteOutroContato } from '../services/outroContatoService';
 
@@ -10,19 +10,26 @@ import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import OutroContatoForm from '../components/outroContato/OutroContatoForm';
 import { useAuth } from '../contexts/AuthContext';
 
+// Limite seguro de contatos para importação via Frontend (requisições sequenciais)
+const MAX_CSV_ROWS = 100;
+
 export const OutrosContatos: React.FC = () => {
   const [contatos, setContatos] = useState<OutroContato[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Modais
+  // Modais e Upload
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingContato, setEditingContato] = useState<OutroContato | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-
+  
   const [contatoToDelete, setContatoToDelete] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Estados e Referências para o CSV
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { user } = useAuth();
 
@@ -51,7 +58,7 @@ export const OutrosContatos: React.FC = () => {
 
   const handleSaveContato = async (data: OutroContatoCreateDTO | OutroContatoUpdateDTO) => {
     setIsSaving(true);
-    setError(null); // Limpa erros anteriores antes de tentar salvar
+    setError(null); 
     try {
       if (editingContato) {
         await updateOutroContato(editingContato.id, data as OutroContatoUpdateDTO);
@@ -61,7 +68,6 @@ export const OutrosContatos: React.FC = () => {
       setIsFormOpen(false);
       fetchContatos();
     } catch (err: any) {
-      // Captura a mensagem do backend interceptada pelo Axios
       setError(err.message || 'Falha ao salvar o contato.');
     } finally {
       setIsSaving(false);
@@ -78,13 +84,67 @@ export const OutrosContatos: React.FC = () => {
       fetchContatos();
     } catch (err: any) {
       setError(err.message || 'Falha ao deletar o contato.');
-      setContatoToDelete(null); // Fecha o modal para o usuário ver o erro na tela
+      setContatoToDelete(null);
     } finally {
       setIsDeleting(false);
     }
   };
 
-  // Cores dinâmicas para o Badge de Tipo de Contato
+  // --- LÓGICA DE IMPORTAÇÃO CSV COM TRAVA DE SEGURANÇA ---
+  const handleImportCSV = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    setIsImporting(true);
+    setError(null);
+
+    try {
+      const text = await file.text();
+      // Divide por quebras de linha e limpa linhas vazias
+      const rows = text.split('\n').filter(row => row.trim() !== '');
+      
+      if (rows.length <= 1) {
+        throw new Error("O arquivo CSV está vazio ou não possui dados válidos na segunda linha.");
+      }
+
+      // 🛑 TRAVA DE SEGURANÇA AQUI 🛑
+      // Subtraímos 1 para não contar o cabeçalho
+      const totalContatos = rows.length - 1;
+      if (totalContatos > MAX_CSV_ROWS) {
+        throw new Error(`O arquivo é muito grande (${totalContatos} contatos). O limite máximo é de ${MAX_CSV_ROWS} contatos por vez.`);
+      }
+
+      // Mapeia do CSV para a DTO (Ignorando a linha 0 que é o cabeçalho)
+      const contatosParaCriar: OutroContatoCreateDTO[] = rows.slice(1).map(row => {
+        // Assume o padrão: nome,telefone,descricao,tipo_contato
+        const [nome, telefone, descricao, tipo_contato] = row.split(',');
+        
+        return {
+          nome: nome?.trim() || '',
+          telefone: telefone?.trim() || '',
+          descricao: descricao?.trim() || '',
+          tipo_contato: (tipo_contato?.trim().toUpperCase() as 'PADRAO' | 'GERENTE' | 'CONSULTOR') || 'PADRAO',
+          usuario: { id: user.id }
+        };
+      }).filter(c => c.nome && c.telefone); // Garante que tem os dados obrigatórios
+
+      // Dispara a criação em sequência
+      for (const contato of contatosParaCriar) {
+        await createOutroContato(contato);
+      }
+
+      // Recarrega a tela com os dados novos
+      fetchContatos();
+    } catch (err: any) {
+      setError(err.message || 'Falha ao processar o arquivo CSV. Verifique a formatação.');
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''; // Reseta o input para permitir upload do mesmo arquivo novamente
+      }
+    }
+  };
+
   const getTipoBadge = (tipo: string) => {
     switch (tipo) {
       case 'GERENTE': return 'bg-blue-100 text-blue-800';
@@ -112,6 +172,7 @@ export const OutrosContatos: React.FC = () => {
 
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+              
               <div className="relative w-full md:w-1/2">
                 <input
                   type="text"
@@ -122,20 +183,43 @@ export const OutrosContatos: React.FC = () => {
                 />
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
-              <button
-                onClick={() => { setEditingContato(null); setIsFormOpen(true); setError(null); }}
-                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm w-full md:w-auto"
-              >
-                <Plus size={20} />
-                Adicionar Contato
-              </button>
+              
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 w-full justify-end">
+                  {/* Input escondido para capturar o arquivo */}
+                  <input 
+                    type="file" 
+                    accept=".csv" 
+                    ref={fileInputRef} 
+                    onChange={handleImportCSV} 
+                    className="hidden" 
+                  />
+                  
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isImporting}
+                    className="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors shadow-sm w-full sm:w-auto disabled:opacity-70"
+                  >
+                    {isImporting ? <Loader2 size={20} className="animate-spin" /> : <Upload size={20} />}
+                    Importar CSV
+                  </button>
+
+                  <button
+                    onClick={() => { setEditingContato(null); setIsFormOpen(true); setError(null); }}
+                    className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm w-full sm:w-auto"
+                  >
+                    <Plus size={20} />
+                    Adicionar Contato
+                  </button>
+                </div>
+              </div>
+
             </div>
 
             {loading ? (
               <LoadingSpinner />
             ) : (
               <>
-                {/* O erro agora aparece acima da tabela, sem esconder os dados! */}
                 {error && (
                   <div className="mb-6">
                     <ErrorMessage message={error} />

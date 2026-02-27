@@ -82,7 +82,7 @@ export const getDashboardData = async (filters: DashboardFilters, idUsuario: str
           id: item.id || `temp-id-${index}`,
           nome: item.nome || 'Não informado',
           telefone: item.telefone || 'Sem telefone',
-          horario: item.horario || '--:--',
+          dataHorario: item.dataHorario,
           status: item.status || 'ANDAMENTO'
         };
       });
