@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes;
 
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguraCrmUsuarioNaoConfiguradaException;
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguracaoCrmUsuarioNaoConfiguradaException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.crm.IntegracaoMoskitGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.CriptografiaJCAUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.moskit.ContatoMoskitDto;
@@ -44,7 +44,7 @@ public class IntegracaoMoskit implements CrmIntegracaoType {
             ConfiguracaoCrm configuracaoCrm = cliente.getUsuario().getConfiguracaoCrm();
 
             if (configuracaoCrm == null || configuracaoCrm.getMapeamentoCampos() == null) {
-                throw new ConfiguraCrmUsuarioNaoConfiguradaException();
+                throw new ConfiguracaoCrmUsuarioNaoConfiguradaException();
             }
 
             String acessToken = criptografiaJCAUseCase.descriptografar(configuracaoCrm.getAcessToken());

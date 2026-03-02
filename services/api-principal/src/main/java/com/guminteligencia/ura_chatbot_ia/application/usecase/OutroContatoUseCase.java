@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.OutroContatoComMesmoTelefoneJaCadastradoExcetion;
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.OutroContatoComMesmoTelefoneJaCadastradoException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.OutroContatoNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.OutroContatoTipoGerenciaJaCadastradoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.OutroContatoGateway;
@@ -48,7 +48,7 @@ public class OutroContatoUseCase {
         Optional<OutroContato> outroContato = gateway.consultarPorTelefoneEUsuario(novoOutroContato.getTelefone(), novoOutroContato.getUsuario().getId());
 
         if (outroContato.isPresent()) {
-            throw new OutroContatoComMesmoTelefoneJaCadastradoExcetion();
+            throw new OutroContatoComMesmoTelefoneJaCadastradoException();
         }
 
         Usuario usuario = usuarioUseCase.consultarPorId(novoOutroContato.getUsuario().getId());
@@ -65,7 +65,7 @@ public class OutroContatoUseCase {
         return gateway.listar(pageable, idUsuario);
     }
 
-    public OutroContato alterar(Long idOutroContato, OutroContato novosDados) {
+    public OutroContato alterar(UUID idOutroContato, OutroContato novosDados) {
         List<OutroContato> outroContatos = gateway.consultarPorTipo(novosDados.getTipoContato(), novosDados.getUsuario().getId());
 
         if (novosDados.getTipoContato().equals(TipoContato.GERENTE)) {
@@ -83,7 +83,7 @@ public class OutroContatoUseCase {
 
         if (outroContato.isPresent()) {
             if (!outroContato.get().getId().equals(idOutroContato))
-                throw new OutroContatoComMesmoTelefoneJaCadastradoExcetion();
+                throw new OutroContatoComMesmoTelefoneJaCadastradoException();
         }
 
         OutroContato outroContatoExistente = this.consultarPorId(idOutroContato);
@@ -99,7 +99,7 @@ public class OutroContatoUseCase {
         return novoDadosSalvos;
     }
 
-    private OutroContato consultarPorId(Long idOutroContato) {
+    private OutroContato consultarPorId(UUID idOutroContato) {
         Optional<OutroContato> outroContato = gateway.consultarPorId(idOutroContato);
 
         if (outroContato.isEmpty()) {
@@ -109,8 +109,9 @@ public class OutroContatoUseCase {
         return outroContato.get();
     }
 
-    public void deletar(Long id) {
-        this.consultarPorId(id);
+    public void deletar(UUID id) {
+        OutroContato outroContato = this.consultarPorId(id);
         gateway.deletar(id);
+        outroContatoNoSqlUseCase.deletar(outroContato.getTelefone(), outroContato.getUsuario().getId());
     }
 }

@@ -89,7 +89,7 @@ public class OutroContatoDataProvider implements OutroContatoGateway {
     }
 
     @Override
-    public Optional<OutroContato> consultarPorId(Long idOutroContato) {
+    public Optional<OutroContato> consultarPorId(UUID idOutroContato) {
         Optional<OutroContatoEntitySql> outroContatoEntity;
 
         try {
@@ -117,7 +117,7 @@ public class OutroContatoDataProvider implements OutroContatoGateway {
     }
 
     @Override
-    public void deletar(Long id) {
+    public void deletar(UUID id) {
         try {
             repository.deleteById(id);
         } catch (Exception ex) {

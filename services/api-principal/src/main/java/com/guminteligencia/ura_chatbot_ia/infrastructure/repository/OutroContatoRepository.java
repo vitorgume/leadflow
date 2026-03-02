@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface OutroContatoRepository extends JpaRepository<OutroContatoEntitySql, Long> {
+public interface OutroContatoRepository extends JpaRepository<OutroContatoEntitySql, UUID> {
     Optional<OutroContatoEntitySql> findByNome(String nome);
 
     List<OutroContatoEntitySql> findByTipoContatoAndUsuario_Id(TipoContato tipo, UUID id);

@@ -16,6 +16,7 @@ public class OutroContatoNoSqlUseCase {
     private final OutroContatoNoSqlGateway gateway;
 
     public OutroContato salvar(OutroContato novoOutroContato) {
+        novoOutroContato.setId(UUID.randomUUID());
         return gateway.salvar(novoOutroContato);
     }
 

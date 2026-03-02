@@ -9,7 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 export default function ConfiguracaoIA() {
 
     const { user } = useAuth();
-    
+
     // --- Estados Prompt ---
     const defaultPrompt: PromptDto = { usuario: { id: user == null ? "" : user.id }, titulo: '', prompt: '' };
     const [prompt, setPrompt] = useState<PromptDto>(defaultPrompt);
@@ -132,8 +132,8 @@ export default function ConfiguracaoIA() {
         <div className="flex h-screen bg-slate-50">
             <Sidebar activeItem="IA e Prompts" />
 
-            <main className="flex-1 overflow-auto p-4 lg:p-8">
-                <div className="max-w-5xl mx-auto">
+            <main className="flex-1 lg:ml-64 transition-all duration-300 p-4 lg:p-8">
+                <div className="w-full">
 
                     <div className="mb-8">
                         <div className="flex items-center gap-3 mb-2">

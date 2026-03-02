@@ -43,7 +43,7 @@ public class OutroContatoController {
 
     @PutMapping("/{idOutroContato}")
     public ResponseEntity<ResponseDto<OutroContatoDto>> alterar(
-            @PathVariable("idOutroContato") Long idOutroContato, @RequestBody OutroContatoDto novosDados
+            @PathVariable("idOutroContato") UUID idOutroContato, @RequestBody OutroContatoDto novosDados
     ) {
         OutroContatoDto resultado = OutroContatoMapper.paraDto(useCase.alterar(idOutroContato, OutroContatoMapper.paraDomain(novosDados)));
         ResponseDto<OutroContatoDto> response = new ResponseDto<>(resultado);
@@ -51,7 +51,7 @@ public class OutroContatoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deletar(@PathVariable("id") UUID id) {
         useCase.deletar(id);
         return ResponseEntity.noContent().build();
     }

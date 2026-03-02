@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase;
 
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.OutroContatoComMesmoTelefoneJaCadastradoExcetion;
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.OutroContatoComMesmoTelefoneJaCadastradoException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.OutroContatoNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.OutroContatoTipoGerenciaJaCadastradoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.OutroContatoGateway;
@@ -124,8 +124,8 @@ class OutroContatoUseCaseTest {
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(Optional.empty());
         Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString())).thenReturn(Optional.of(outroContatoTeste));
 
-        OutroContatoComMesmoTelefoneJaCadastradoExcetion exception = Assertions
-                .assertThrows(OutroContatoComMesmoTelefoneJaCadastradoExcetion.class,
+        OutroContatoComMesmoTelefoneJaCadastradoException exception = Assertions
+                .assertThrows(OutroContatoComMesmoTelefoneJaCadastradoException.class,
                         () -> outroContatoUseCase.cadastrar(outroContatoTeste)
                 );
 
@@ -202,8 +202,8 @@ class OutroContatoUseCaseTest {
         Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString()))
                 .thenReturn(Optional.of(contatoExistenteNoBanco));
 
-        OutroContatoComMesmoTelefoneJaCadastradoExcetion exception = Assertions
-                .assertThrows(OutroContatoComMesmoTelefoneJaCadastradoExcetion.class,
+        OutroContatoComMesmoTelefoneJaCadastradoException exception = Assertions
+                .assertThrows(OutroContatoComMesmoTelefoneJaCadastradoException.class,
                         () -> outroContatoUseCase.alterar(1L, novosDados)
                 );
 

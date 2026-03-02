@@ -18,9 +18,9 @@ public interface OutroContatoGateway {
 
     OutroContato salvar(OutroContato novoOutroContato);
 
-    Optional<OutroContato> consultarPorId(Long idOutroContato);
+    Optional<OutroContato> consultarPorId(UUID idOutroContato);
 
     Page<OutroContato> listar(Pageable pageable, UUID idUsuario);
 
-    void deletar(Long id);
+    void deletar(UUID id);
 }

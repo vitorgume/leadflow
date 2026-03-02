@@ -182,7 +182,7 @@ export default function RegrasDistribuicao() {
       <Sidebar activeItem="Regras de Distribuição" />
 
       <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8 transition-all duration-300">
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full">
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div className="flex items-center gap-3">

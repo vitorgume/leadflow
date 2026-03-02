@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes;
 
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.IntegracaoExistenteNaoIdentificada;
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.IntegracaoExistenteNaoIdentificadaException;
 import com.guminteligencia.ura_chatbot_ia.domain.CrmType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +48,7 @@ class CrmIntegracaoFactoryTest {
         factory = new CrmIntegracaoFactory(Collections.emptyList());
 
         // Act & Assert
-        assertThrows(IntegracaoExistenteNaoIdentificada.class,
+        assertThrows(IntegracaoExistenteNaoIdentificadaException.class,
                 () -> factory.create(CrmType.KOMMO));
     }
 
@@ -64,7 +63,7 @@ class CrmIntegracaoFactoryTest {
         // Act & Assert
         // ...se eu pedir null, o equals() vai dar false ou o filter não vai achar nada
         // e deve cair no orElseThrow
-        assertThrows(IntegracaoExistenteNaoIdentificada.class,
+        assertThrows(IntegracaoExistenteNaoIdentificadaException.class,
                 () -> factory.create(null));
     }
 }

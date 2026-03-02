@@ -110,17 +110,17 @@ class HandlerMiddlewareTest {
 
         @GetMapping("/configEscolhaVendedorNaoEncontrada")
         public void configEscolhaVendedorNaoEncontrada() {
-            throw new ConfiguracaoEscolhaVendedorNaoEncontrada();
+            throw new ConfiguracaoEscolhaVendedorNaoEncontradaException();
         }
 
         @GetMapping("/configCrmUsuarioNaoConfigurada")
         public void configCrmUsuarioNaoConfigurada() {
-            throw new ConfiguraCrmUsuarioNaoConfiguradaException();
+            throw new ConfiguracaoCrmUsuarioNaoConfiguradaException();
         }
 
         @GetMapping("/integracaoExistenteNaoIdentificada")
         public void integracaoExistenteNaoIdentificada() {
-            throw new IntegracaoExistenteNaoIdentificada();
+            throw new IntegracaoExistenteNaoIdentificadaException();
         }
 
         @GetMapping("/leadNaoEncontrado")
@@ -140,7 +140,7 @@ class HandlerMiddlewareTest {
 
         @GetMapping("/outroContatoMesmoTelefone")
         public void outroContatoMesmoTelefone() {
-            throw new OutroContatoComMesmoTelefoneJaCadastradoExcetion();
+            throw new OutroContatoComMesmoTelefoneJaCadastradoException();
         }
 
         @GetMapping("/outroContatoTipoGerencia")

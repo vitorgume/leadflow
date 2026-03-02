@@ -1,6 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 
 import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
 
 public class OutroContatoNoSqlMapper {
@@ -12,7 +13,7 @@ public class OutroContatoNoSqlMapper {
                 .tipoContato(entity.getTipoContato())
                 .descricao(entity.getDescricao())
                 .telefone(entity.getTelefone())
-                .usuario(UsuarioMapper.paraDomain(entity.getUsuario()))
+                .usuario(Usuario.builder().id(entity.getIdUsuario()).build())
                 .build();
     }
 
@@ -23,7 +24,7 @@ public class OutroContatoNoSqlMapper {
                 .tipoContato(domain.getTipoContato())
                 .descricao(domain.getDescricao())
                 .telefone(domain.getTelefone())
-                .usuario(UsuarioMapper.paraEntity(domain.getUsuario()))
+                .idUsuario(domain.getUsuario().getId())
                 .build();
     }
 }

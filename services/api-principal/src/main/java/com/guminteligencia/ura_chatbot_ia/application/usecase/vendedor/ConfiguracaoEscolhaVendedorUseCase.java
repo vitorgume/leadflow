@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.vendedor;
 
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguracaoEscolhaVendedorNaoEncontrada;
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguracaoEscolhaVendedorNaoEncontradaException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.ConfiguracaoEscolhaVendedorGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.UsuarioUseCase;
 import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
@@ -93,7 +93,7 @@ public class ConfiguracaoEscolhaVendedorUseCase {
         Optional<ConfiguracaoEscolhaVendedor> configuracaoEscolhaVendedor = gateway.consultarPorId(id);
 
         if(configuracaoEscolhaVendedor.isEmpty()) {
-            throw new ConfiguracaoEscolhaVendedorNaoEncontrada();
+            throw new ConfiguracaoEscolhaVendedorNaoEncontradaException();
         }
 
         return configuracaoEscolhaVendedor.get();

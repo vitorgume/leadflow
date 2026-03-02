@@ -6,9 +6,9 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbConvertedBy;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey;
 
 import java.util.UUID;
 
@@ -24,7 +24,7 @@ public class OutroContatoEntity {
     private String telefone;
     private String descricao;
     private TipoContato tipoContato;
-    private UsuarioEntity usuario;
+    private UUID idUsuario;
 
     @DynamoDbPartitionKey
     public UUID getId() {
@@ -36,6 +36,7 @@ public class OutroContatoEntity {
     }
 
     @DynamoDbSecondaryPartitionKey(indexNames = "TelefoneIndex")
+    @DynamoDbSecondarySortKey(indexNames = {"UsuarioTelefoneIndex"})
     public String getTelefone() {
         return telefone;
     }
@@ -48,9 +49,9 @@ public class OutroContatoEntity {
         return tipoContato;
     }
 
-
-    public UsuarioEntity getUsuario() {
-        return usuario;
+    @DynamoDbSecondaryPartitionKey(indexNames = {"UsuarioTelefoneIndex"})
+    public UUID getIdUsuario() {
+        return idUsuario;
     }
 
 }

@@ -16,7 +16,7 @@ import java.util.UUID;
 public class OutroContatoEntitySql {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_outro_contato")
     private UUID id;
     private String nome;
