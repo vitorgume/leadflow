@@ -47,7 +47,7 @@ public class OutroContatoControllerUnitTest {
     private MockMvc mockMvc;
     private final ObjectMapper om = new ObjectMapper();
     private final UUID ID_USUARIO = UUID.randomUUID();
-    private final Long ID_CONTATO = 1L;
+    private final UUID ID_CONTATO = UUID.randomUUID();
 
     private UsuarioDto usuarioDto;
     private Usuario usuarioDomain;

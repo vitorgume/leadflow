@@ -22,10 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -53,7 +50,7 @@ class OutroContatoControllerTest {
     private UsuarioRepository usuarioRepository;
 
     private final UUID ID_USUARIO = UUID.randomUUID();
-    private final Long ID_CONTATO = 1L;
+    private final UUID ID_CONTATO = UUID.randomUUID();
 
     private UsuarioEntity usuarioEntity;
 
@@ -95,9 +92,9 @@ class OutroContatoControllerTest {
         // 2. Mock das Validações de Duplicidade (Devem retornar vazio para permitir cadastro)
         // Validação por Tipo
         given(repository.findByTipoContatoAndUsuario_Id(eq(TipoContato.PADRAO), eq(ID_USUARIO)))
-                .willReturn(Optional.empty());
+                .willReturn(new ArrayList<>());
         // Validação por Telefone
-        given(repository.findByTelefoneAndUsuario_Id("11999999999")).willReturn(Optional.empty());
+        given(repository.findByTelefoneAndUsuario_Id("11999999999", ID_USUARIO)).willReturn(Optional.empty());
 
         // 3. Mock do Save
         OutroContatoEntitySql saved = OutroContatoEntitySql.builder()

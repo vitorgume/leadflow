@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -159,7 +160,7 @@ class DashboardControllerTest {
     @Test
     @DisplayName("IT - Deve retornar a lista paginada de contatos")
     void deveRetornarContatosPaginadoIntegrado() throws Exception {
-        ContactDashboard contact = new ContactDashboard("João Silva", "4499999999", StatusConversa.ATIVO);
+        ContactDashboard contact = new ContactDashboard("João Silva", "4499999999", StatusConversa.ATIVO, LocalDateTime.now());
         Page<ContactDashboard> page = new PageImpl<>(List.of(contact), PageRequest.of(0, 10), 1);
 
         given(dashboardUseCase.getPaginatedContacts(

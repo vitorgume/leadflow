@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -94,7 +95,7 @@ class DashboardControllerUnitTest {
     @Test
     @DisplayName("GetPaginatedContacts: Deve retornar 200 OK com a lista de contatos")
     void getPaginatedContactsDeveRetornarOk() throws Exception {
-        ContactDashboard contato = new ContactDashboard("João", "4499999999", StatusConversa.ATIVO);
+        ContactDashboard contato = new ContactDashboard("João", "4499999999", StatusConversa.ATIVO, LocalDateTime.now());
         Page<ContactDashboard> page = new PageImpl<>(List.of(contato), PageRequest.of(0, 10), 1);
 
         when(dashboardUseCase.getPaginatedContacts(any(), any(), any(), any(), any(), any(), eq(ID_USUARIO)))
