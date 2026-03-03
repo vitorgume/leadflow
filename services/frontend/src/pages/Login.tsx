@@ -119,7 +119,7 @@ export default function Login() {
 
           <div className="mt-8 text-center text-sm text-slate-500">
             Ainda não tem uma conta?{' '}
-            <a href="/cadastro" className="font-medium text-blue-600 hover:text-blue-700 transition-colors">
+            <a href="/usuarios/cadastro" className="font-medium text-blue-600 hover:text-blue-700 transition-colors">
               Cadastre-se aqui
             </a>
           </div>
