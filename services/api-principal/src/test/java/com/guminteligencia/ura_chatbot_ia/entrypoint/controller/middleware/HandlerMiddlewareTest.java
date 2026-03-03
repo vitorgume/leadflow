@@ -93,6 +93,11 @@ class HandlerMiddlewareTest {
             throw new OutroContatoNaoEncontradoException();
         }
 
+        @GetMapping("/outroContatoNoSqlNotFound")
+        public void outroContatoNoSqlNotFound() {
+            throw new OutroContatoNoSqlNaoEcontradoException();
+        }
+
         @GetMapping("/chatNotFound")
         public void chatNotFound() {
             throw new ChatNaoEncontradoException();
@@ -187,30 +192,31 @@ class HandlerMiddlewareTest {
     @ParameterizedTest(name = "{0} → {1} / “{2}”")
     @CsvSource({
             "generic,                      500, generic error",
-            "badCreds,                     401, Credências incorretas.",
+            "badCreds,                     401, Credenciais incorretas.",
             "clienteNotFound,              404, Cliente não encontrado.",
             "contextoNotFound,             404, Contexto não encontrado.",
-            "conversaAgenteNotFound,       404, Conversa não econtrada.",
-            "escolhaNaoIdentificado,       500, Escolha de vendedor não identificada",
+            "conversaAgenteNotFound,       404, Conversa não encontrada.",
+            "escolhaNaoIdentificado,       500, Escolha de vendedor não identificada.",
             "processoExistenteNaoIdentificado, 500, Processo de contexto existente não foi identificado.",
-            "vendedorSamePhone,            400, Vendedor com mesmo numero de telefone já cadastrado",
+            "vendedorSamePhone,            400, Vendedor com o mesmo número de telefone já cadastrado.",
             "vendedorNotFound,             404, Vendedor não encontrado.",
             "vendedorNotChosen,            500, Vendedor não escolhido de acordo com segmentação.",
             "dataProvider,                 500, DP error",
             "outroContatoNotFound,         404, Outro contato não encontrado.",
+            "outroContatoNoSqlNotFound,    404, Outro contato NoSQL não encontrado.",
             "chatNotFound,                 404, Chat não encontrado.",
             "condicaoLogicaNaoIdentificado,500, Condição lógica não identificada.",
-            "condicaoNaoEncontrada,        404, Condicação não encontrado.",
-            "configEscolhaVendedorNaoEncontrada, 404, Configuracão escolha vendedor não encontrada.",
-            "configCrmUsuarioNaoConfigurada, 400, Configuração de crm do usuário não configurado.",
+            "condicaoNaoEncontrada,        404, Condição não encontrada.",
+            "configEscolhaVendedorNaoEncontrada, 404, Configuração de escolha de vendedor não encontrada.",
+            "configCrmUsuarioNaoConfigurada, 400, Configuração de CRM do usuário não realizada.",
             "integracaoExistenteNaoIdentificada, 500, Integração existente não identificada.",
             "leadNaoEncontrado,            404, Lead não encontrado.",
-            "midiaClienteNaoEncontrada,    404, Midia do cliente não encontrada.",
-            "nenhumVendedorReferenciado,   400, Nenhum vendedor referênciado para a configuração de escolha dos vendedores.",
+            "midiaClienteNaoEncontrada,    404, Mídia do cliente não encontrada.",
+            "nenhumVendedorReferenciado,   400, Nenhum vendedor referenciado para a configuração de escolha dos vendedores.",
             "outroContatoMesmoTelefone,    400, Outro contato com o mesmo telefone já cadastrado.",
-            "outroContatoTipoGerencia,     400, Outro contato do tipo gerencia já cadastrado.",
+            "outroContatoTipoGerencia,     400, Outro contato do tipo gerência já cadastrado.",
             "usuarioExistente,             400, Usuário já cadastrado com esse mesmo telefone.",
-            "usuarioNaoEncontrado,         404, Usuário não encontrado",
+            "usuarioNaoEncontrado,         404, Usuário não encontrado.",
             "baseConhecimentoNotFound,     404, Base de conhecimento não encontrada.",
             "limiteBaseConhecimento,       400, Limite de uma base de conhecimento atingido.",
             "promptNotFound,               404, Prompt não encontrado.",

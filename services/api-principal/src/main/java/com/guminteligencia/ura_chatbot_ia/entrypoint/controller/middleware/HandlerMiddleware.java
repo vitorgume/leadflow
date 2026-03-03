@@ -120,6 +120,14 @@ public class HandlerMiddleware {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
     }
 
+    @ExceptionHandler(OutroContatoNoSqlNaoEcontradoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerOutroContatoNoSqlNaoEcontradoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
+    }
+
     @ExceptionHandler(ChatNaoEncontradoException.class)
     public ResponseEntity<ResponseDto> exceptionHandlerChatNaoEncontradoException(Exception exception) {
         ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()

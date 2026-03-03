@@ -49,7 +49,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "experimentos.chatbot.percentual=30",
         "aws.sqs.delay=0",
         "management.endpoints.web.exposure.include=health,info",
-        "management.endpoint.health.probes.enabled=true"
+        "management.endpoint.health.probes.enabled=true",
+        "app.dynamo.contexto-table=teste",
+        "app.dynamo.outro-contato-table=teste"
 })
 @AutoConfigureMockMvc
 @ActiveProfiles("test")

@@ -18,10 +18,12 @@ class OutroContatoMapperTest {
     private OutroContatoDto outroContatoDto;
     private OutroContato outroContatoDomain;
 
+    private final UUID ID_OUTRO_CONTATO = UUID.randomUUID();
+
     @BeforeEach
     void setUp() {
         outroContatoDto = OutroContatoDto.builder()
-                .id(UUID.randomUUID())
+                .id(ID_OUTRO_CONTATO)
                 .nome("Nome outro contato")
                 .telefone("000000000000")
                 .descricao("Descrição domain")
@@ -29,7 +31,7 @@ class OutroContatoMapperTest {
                 .build();
 
         outroContatoDomain = OutroContato.builder()
-                .id(UUID.randomUUID())
+                .id(ID_OUTRO_CONTATO)
                 .nome("Nome outro contato")
                 .telefone("000000000000")
                 .descricao("Descrição domain")

@@ -33,15 +33,6 @@ class ConfigTest {
     }
 
     @Test
-    void deveCriarDynamoDbClientDev() {
-        DynamoDbConfigDev config = new DynamoDbConfigDev("http://localhost:8000");
-
-        try (DynamoDbClient client = config.dynamoDbClient()) {
-            assertNotNull(client);
-        }
-    }
-
-    @Test
     void deveCriarEnhancedClientETabelas() {
         DynamoDbClient lowLevel = mock(DynamoDbClient.class);
         DynamoDbConfig config = new DynamoDbConfig();

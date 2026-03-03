@@ -17,11 +17,12 @@ class OutroContatoMapperTest {
 
     private OutroContatoEntitySql outroContatoEntitySql;
     private OutroContato outroContatoDomain;
+    private final UUID ID_OUTRO_CONTATO = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
         outroContatoEntitySql = OutroContatoEntitySql.builder()
-                .id(1L)
+                .id(ID_OUTRO_CONTATO)
                 .nome("Nome outro contato")
                 .telefone("000000000000")
                 .descricao("Descrição domain")
@@ -29,7 +30,7 @@ class OutroContatoMapperTest {
                 .build();
 
         outroContatoDomain = OutroContato.builder()
-                .id(1L)
+                .id(ID_OUTRO_CONTATO)
                 .nome("Nome outro contato")
                 .telefone("000000000000")
                 .descricao("Descrição domain")

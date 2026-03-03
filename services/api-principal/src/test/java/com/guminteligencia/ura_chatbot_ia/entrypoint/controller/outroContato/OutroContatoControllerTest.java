@@ -3,8 +3,10 @@ package com.guminteligencia.ura_chatbot_ia.entrypoint.controller.outroContato;
 import com.guminteligencia.ura_chatbot_ia.domain.CrmType;
 import com.guminteligencia.ura_chatbot_ia.domain.TipoContato;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.OutroContatoRepository;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.OutroContatoRepositoryNoSql;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.UsuarioRepository;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConfiguracaoCrmEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntitySql;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.UsuarioEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -49,8 +52,12 @@ class OutroContatoControllerTest {
     @MockitoBean
     private UsuarioRepository usuarioRepository;
 
+    @MockitoBean
+    private OutroContatoRepositoryNoSql outroContatoRepositoryNoSql;
+
     private final UUID ID_USUARIO = UUID.randomUUID();
     private final UUID ID_CONTATO = UUID.randomUUID();
+    private final String TELEFONE_OUTRO_CONTATO = "1145874523";
 
     private UsuarioEntity usuarioEntity;
 
@@ -107,14 +114,16 @@ class OutroContatoControllerTest {
 
         given(repository.save(any(OutroContatoEntitySql.class))).willReturn(saved);
 
+        willDoNothing().given(outroContatoRepositoryNoSql).salvar(any(OutroContatoEntity.class));
+
         String json = """
-            {
-              "nome": "Novo Contato",
-              "telefone": "11999999999",
-              "tipo_contato": "PADRAO",
-              "usuario": { "id": "%s" }
-            }
-        """.formatted(ID_USUARIO);
+                    {
+                      "nome": "Novo Contato",
+                      "telefone": "11999999999",
+                      "tipo_contato": "PADRAO",
+                      "usuario": { "id": "%s" }
+                    }
+                """.formatted(ID_USUARIO);
 
         // Act & Assert
         mockMvc.perform(post("/outros-contatos")
@@ -122,7 +131,7 @@ class OutroContatoControllerTest {
                         .content(json))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/outros-contatos/" + ID_CONTATO))
-                .andExpect(jsonPath("$.dado.id").value(ID_CONTATO));
+                .andExpect(jsonPath("$.dado.id").value(ID_CONTATO.toString()));
     }
 
     @Test
@@ -144,7 +153,7 @@ class OutroContatoControllerTest {
         mockMvc.perform(get("/outros-contatos/listar/" + ID_USUARIO)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dado.content[0].id").value(ID_CONTATO));
+                .andExpect(jsonPath("$.dado.content[0].id").value(ID_CONTATO.toString()));
     }
 
     @Test
@@ -153,11 +162,22 @@ class OutroContatoControllerTest {
         OutroContatoEntitySql existing = OutroContatoEntitySql.builder()
                 .id(ID_CONTATO)
                 .nome("Antigo")
+                .telefone(TELEFONE_OUTRO_CONTATO)
                 .usuario(usuarioEntity)
+                .build();
+
+        OutroContatoEntity outroContatoNoSqlExisting = OutroContatoEntity.builder()
+                .id(ID_CONTATO)
+                .nome("Antigo")
+                .telefone(TELEFONE_OUTRO_CONTATO)
+                .idUsuario(usuarioEntity.getId())
                 .build();
 
         // UseCase costuma buscar antes de alterar (verifique sua impl, assumindo que sim)
         given(repository.findById(ID_CONTATO)).willReturn(Optional.of(existing));
+
+        given(outroContatoRepositoryNoSql.consultarPorTelefoneEUsuario(TELEFONE_OUTRO_CONTATO, usuarioEntity.getId().toString()))
+                .willReturn(Optional.of(outroContatoNoSqlExisting));
 
         // Mock das validações (caso o alterar também valide telefone/tipo)
         // Assumindo que o alterar não troca o tipo/telefone neste teste simples
@@ -169,20 +189,22 @@ class OutroContatoControllerTest {
                 .build();
 
         given(repository.save(any(OutroContatoEntitySql.class))).willReturn(updated);
+        willDoNothing().given(outroContatoRepositoryNoSql).salvar(any(OutroContatoEntity.class));
 
         String json = """
-            {
-              "nome": "Novo Nome",
-              "usuario": { "id": "%s" }
-            }
-        """.formatted(ID_USUARIO);
+                    {
+                      "nome": "Novo Nome",
+                      "usuario": { "id": "%s" },
+                      "tipo_contato": "PADRAO"
+                    }
+                """.formatted(ID_USUARIO);
 
         // Act & Assert
         mockMvc.perform(put("/outros-contatos/" + ID_CONTATO)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dado.id").value(ID_CONTATO))
+                .andExpect(jsonPath("$.dado.id").value(ID_CONTATO.toString()))
                 .andExpect(jsonPath("$.dado.nome").value("Novo Nome"));
     }
 
@@ -192,12 +214,22 @@ class OutroContatoControllerTest {
 
         OutroContatoEntitySql existing = OutroContatoEntitySql.builder()
                 .id(ID_CONTATO)
+                .telefone(TELEFONE_OUTRO_CONTATO)
                 .nome("Antigo")
                 .usuario(usuarioEntity)
                 .build();
 
+        OutroContatoEntity outroContatoNoSqlExisting = OutroContatoEntity.builder()
+                .id(ID_CONTATO)
+                .nome("Antigo")
+                .telefone(TELEFONE_OUTRO_CONTATO)
+                .idUsuario(usuarioEntity.getId())
+                .build();
+
         // Arrange (Assume-se que o UseCase valida existência)
         given(repository.findById(ID_CONTATO)).willReturn(Optional.of(existing));
+        given(outroContatoRepositoryNoSql.consultarPorTelefoneEUsuario(TELEFONE_OUTRO_CONTATO, usuarioEntity.getId().toString()))
+                .willReturn(Optional.of(outroContatoNoSqlExisting));
 
         // Act
         mockMvc.perform(delete("/outros-contatos/" + ID_CONTATO))
@@ -205,6 +237,7 @@ class OutroContatoControllerTest {
 
         // Assert
         Mockito.verify(repository).deleteById(ID_CONTATO);
+        Mockito.verify(outroContatoRepositoryNoSql).deletar(ID_CONTATO);
     }
 
 }

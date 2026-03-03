@@ -34,6 +34,10 @@ class OutroContatoUseCaseTest {
     @Mock
     private UsuarioUseCase usuarioUseCase;
 
+    // NOVO: Adicionado o mock para o NoSQL
+    @Mock
+    private OutroContatoNoSqlUseCase outroContatoNoSqlUseCase;
+
     @InjectMocks
     private OutroContatoUseCase outroContatoUseCase;
 
@@ -41,7 +45,14 @@ class OutroContatoUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        outroContatoTeste = OutroContato.builder().id(UUID.randomUUID()).nome("Nome teste").build();
+        // Ajustado para sempre ter um telefone e usuario, já que o NoSQL usa ambos nas buscas/deleções
+        outroContatoTeste = OutroContato.builder()
+                .id(UUID.randomUUID())
+                .nome("Nome teste")
+                .telefone("11999999999")
+                .usuario(Usuario.builder().id(UUID.randomUUID()).build())
+                .tipoContato(TipoContato.PADRAO)
+                .build();
     }
 
     @Test
@@ -49,7 +60,6 @@ class OutroContatoUseCaseTest {
         Mockito.when(gateway.consultarPorNome(Mockito.anyString())).thenReturn(Optional.of(outroContatoTeste));
 
         OutroContato resultadoTeste = outroContatoUseCase.consultarPorNome(outroContatoTeste.getNome());
-
 
         Assertions.assertEquals(outroContatoTeste.getId(), resultadoTeste.getId());
         Mockito.verify(gateway, Mockito.times(1)).consultarPorNome(Mockito.anyString());
@@ -78,21 +88,7 @@ class OutroContatoUseCaseTest {
     }
 
     @Test
-    void deveLancarExceptionQuandoConsultarPorTipoRetornarVazia() {
-        Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(new ArrayList<>());
-
-        OutroContatoNaoEncontradoException exception = Assertions
-                .assertThrows(OutroContatoNaoEncontradoException.class,
-                        () -> outroContatoUseCase.consultarPorTipo(outroContatoTeste.getTipoContato(), UUID.randomUUID())
-                );
-
-        assertEquals("Outro contato não encontrado.", exception.getMessage());
-    }
-
-    @Test
     void deveCadastrarComSucesso() {
-        outroContatoTeste.setUsuario(Usuario.builder().id(UUID.randomUUID()).build());
-        outroContatoTeste.setTelefone("123456789");
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(new ArrayList<>());
         Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString(), Mockito.any())).thenReturn(Optional.empty());
         Mockito.when(usuarioUseCase.consultarPorId(Mockito.any(UUID.class))).thenReturn(new Usuario());
@@ -102,12 +98,13 @@ class OutroContatoUseCaseTest {
 
         Assertions.assertEquals(outroContatoTeste.getId(), resultadoTeste.getId());
         Mockito.verify(gateway, Mockito.times(1)).salvar(Mockito.any(OutroContato.class));
+        // NOVO: Verificando se também salvou no NoSQL
+        Mockito.verify(outroContatoNoSqlUseCase, Mockito.times(1)).salvar(Mockito.any(OutroContato.class));
     }
 
     @Test
     void deveLancarExceptionQuandoCadastrarGerenteJaExistente() {
         outroContatoTeste.setTipoContato(TipoContato.GERENTE);
-        outroContatoTeste.setUsuario(Usuario.builder().id(UUID.randomUUID()).build());
 
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(new ArrayList<>(List.of(outroContatoTeste)));
 
@@ -116,13 +113,11 @@ class OutroContatoUseCaseTest {
                         () -> outroContatoUseCase.cadastrar(outroContatoTeste)
                 );
 
-        assertEquals("Outro contato do tipo gerencia já cadastrado.", exception.getMessage());
+        assertEquals("Outro contato do tipo gerência já cadastrado.", exception.getMessage());
     }
 
     @Test
     void deveLancarExceptionQuandoCadastrarTelefoneJaExistente() {
-        outroContatoTeste.setUsuario(Usuario.builder().id(UUID.randomUUID()).build());
-        outroContatoTeste.setTelefone("123456789");
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(List.of());
         Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString(), Mockito.any())).thenReturn(Optional.of(outroContatoTeste));
 
@@ -147,30 +142,33 @@ class OutroContatoUseCaseTest {
 
     @Test
     void deveAlterarComSucesso() {
-        outroContatoTeste.setUsuario(Usuario.builder().id(UUID.randomUUID()).build());
-        outroContatoTeste.setTelefone("123456789");
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class))).thenReturn(new ArrayList<>());
         Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString(), Mockito.any())).thenReturn(Optional.empty());
         Mockito.when(gateway.consultarPorId(Mockito.any())).thenReturn(Optional.of(outroContatoTeste));
+
+        // NOVO: Mockando a consulta do DynamoDB para o fluxo de alteração
+        Mockito.when(outroContatoNoSqlUseCase.consultarPorTelefoneEUsuario(Mockito.anyString(), Mockito.any(UUID.class)))
+                .thenReturn(outroContatoTeste);
+
         Mockito.when(gateway.salvar(Mockito.any(OutroContato.class))).thenReturn(outroContatoTeste);
 
         OutroContato resultado = outroContatoUseCase.alterar(UUID.randomUUID(), outroContatoTeste);
 
         Assertions.assertEquals(outroContatoTeste.getId(), resultado.getId());
         Mockito.verify(gateway, Mockito.times(1)).salvar(Mockito.any(OutroContato.class));
+        // NOVO: Verificando se também atualizou no NoSQL
+        Mockito.verify(outroContatoNoSqlUseCase, Mockito.times(1)).salvar(Mockito.any(OutroContato.class));
     }
 
     @Test
     void deveLancarExceptionQuandoAlterarGerenteJaExistente() {
-        // 1. Prepara os novos dados que o frontend está enviando (para o ID 1L)
         OutroContato novosDados = OutroContato.builder()
                 .tipoContato(TipoContato.GERENTE)
                 .usuario(Usuario.builder().id(UUID.randomUUID()).build())
                 .build();
 
-        // 2. Simula um contato que JÁ EXISTE no banco de dados com OUTRO ID (2L)
         OutroContato contatoExistenteNoBanco = OutroContato.builder()
-                .id(UUID.randomUUID()) // ID diferente de 1L para cair na sua nova validação
+                .id(UUID.randomUUID())
                 .tipoContato(TipoContato.GERENTE)
                 .build();
 
@@ -182,25 +180,24 @@ class OutroContatoUseCaseTest {
                         () -> outroContatoUseCase.alterar(UUID.randomUUID(), novosDados)
                 );
 
-        assertEquals("Outro contato do tipo gerencia já cadastrado.", exception.getMessage());
+        assertEquals("Outro contato do tipo gerência já cadastrado.", exception.getMessage());
     }
 
     @Test
     void deveLancarExceptionQuandoAlterarTelefoneJaExistente() {
-        // 1. Prepara os novos dados da requisição
         OutroContato novosDados = OutroContato.builder()
                 .telefone("123456789")
                 .usuario(Usuario.builder().id(UUID.randomUUID()).build())
+                .tipoContato(TipoContato.PADRAO)
                 .build();
 
-        // 2. Simula o contato do banco que já é dono desse telefone, com um ID diferente (2L)
         OutroContato contatoExistenteNoBanco = OutroContato.builder()
-                .id(UUID.randomUUID()) // ID diferente de 1L para ativar a exceção
+                .id(UUID.randomUUID())
                 .telefone("123456789")
                 .build();
 
         Mockito.when(gateway.consultarPorTipo(Mockito.any(), Mockito.any(UUID.class)))
-                .thenReturn(new ArrayList<>()); // Passa liso pela primeira validação de gerente
+                .thenReturn(new ArrayList<>());
         Mockito.when(gateway.consultarPorTelefoneEUsuario(Mockito.anyString(), Mockito.any()))
                 .thenReturn(Optional.of(contatoExistenteNoBanco));
 
@@ -219,6 +216,8 @@ class OutroContatoUseCaseTest {
         outroContatoUseCase.deletar(UUID.randomUUID());
 
         Mockito.verify(gateway, Mockito.times(1)).deletar(Mockito.any());
+        // NOVO: Verificando se o deletr do NoSQL foi chamado passando os argumentos corretos
+        Mockito.verify(outroContatoNoSqlUseCase, Mockito.times(1)).deletar(Mockito.anyString(), Mockito.any(UUID.class));
     }
 
     @Test

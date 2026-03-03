@@ -1,6 +1,5 @@
 package com.gumeinteligencia.api_intermidiaria.application.usecase;
 
-import com.gumeinteligencia.api_intermidiaria.application.exceptions.ConversaAgenteNaoEncontradoException;
 import com.gumeinteligencia.api_intermidiaria.application.gateways.ConversaAgenteGateway;
 import com.gumeinteligencia.api_intermidiaria.domain.ConversaAgente;
 import lombok.RequiredArgsConstructor;

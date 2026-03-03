@@ -31,8 +31,8 @@ public class ContextoDataProvider implements ContextoGateway {
     private final String MENSAGEM_ERRO_CONSULTAR_CONTEXTO_PELO_TELEFONE_E_ATIVO = "Erro ao consultar contexto pelo seu telefone e ativo.";
     private final String MENSAGEM_ERRO_SALVAR_CONTEXTO = "Erro ao salvar contexto.";
 
-    @Value("app.dynamo.contexto-table")
-    private final String tableName;
+    @Value("${app.dynamo.contexto-table}")
+    private String tableName;
 
     @Override
     public Optional<Contexto> consultarPorTelefone(String telefone) {

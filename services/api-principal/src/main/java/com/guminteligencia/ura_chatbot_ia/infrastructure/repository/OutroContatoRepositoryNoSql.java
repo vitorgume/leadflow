@@ -25,9 +25,8 @@ public class OutroContatoRepositoryNoSql {
         this.outroContatoTable = dynamoDbEnhancedClient.table("outro_contato_entity", TableSchema.fromBean(OutroContatoEntity.class));
     }
 
-    public OutroContatoEntity salvar(OutroContatoEntity outroContato) {
+    public void salvar(OutroContatoEntity outroContato) {
         outroContatoTable.putItem(outroContato);
-        return outroContato;
     }
 
     public Optional<OutroContatoEntity> consultarPorTelefoneEUsuario(String telefone, String idUsuario) {

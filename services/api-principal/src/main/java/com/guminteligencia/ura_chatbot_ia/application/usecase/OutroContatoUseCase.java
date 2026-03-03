@@ -41,7 +41,7 @@ public class OutroContatoUseCase {
     public OutroContato cadastrar(OutroContato novoOutroContato) {
         List<OutroContato> outroContatos = gateway.consultarPorTipo(novoOutroContato.getTipoContato(), novoOutroContato.getUsuario().getId());
 
-        if (outroContatos.size() > 1 && novoOutroContato.getTipoContato().equals(TipoContato.GERENTE)) {
+        if (!outroContatos.isEmpty() && novoOutroContato.getTipoContato().equals(TipoContato.GERENTE)) {
             throw new OutroContatoTipoGerenciaJaCadastradoException();
         }
 

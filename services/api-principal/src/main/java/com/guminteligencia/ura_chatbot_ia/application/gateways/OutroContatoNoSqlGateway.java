@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface OutroContatoNoSqlGateway  {
 
-    OutroContato salvar(OutroContato novoContato);
+    void salvar(OutroContato novoContato);
     Optional<OutroContato> consultarPorTelefoneEUsuario(String telefone, UUID idUsuario);
 
     void deletar(UUID id);

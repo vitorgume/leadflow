@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,7 +38,7 @@ class OutroContatoDataProviderTest {
     private OutroContatoDataProvider provider;
 
     private final UUID ID_USUARIO = UUID.randomUUID();
-    private final Long ID_CONTATO = 1L;
+    private final UUID ID_CONTATO = UUID.randomUUID();
     private final String NOME = "Contato Teste";
     private final String TELEFONE = "5511999999999";
 
@@ -89,15 +90,15 @@ class OutroContatoDataProviderTest {
         OutroContato domain = new OutroContato();
 
         when(repository.findByTipoContatoAndUsuario_Id(tipo, ID_USUARIO))
-                .thenReturn(Optional.of(entity));
+                .thenReturn(new ArrayList<>(List.of(entity)));
 
         try (MockedStatic<OutroContatoMapper> ms = Mockito.mockStatic(OutroContatoMapper.class)) {
             ms.when(() -> OutroContatoMapper.paraDomain(entity)).thenReturn(domain);
 
-            Optional<OutroContato> result = provider.consultarPorTipo(tipo, ID_USUARIO);
+            List<OutroContato> result = provider.consultarPorTipo(tipo, ID_USUARIO);
 
-            assertTrue(result.isPresent());
-            assertEquals(domain, result.get());
+            assertFalse(result.isEmpty());
+            assertEquals(domain, result.get(0));
         }
     }
 
@@ -119,12 +120,12 @@ class OutroContatoDataProviderTest {
         OutroContatoEntitySql entity = new OutroContatoEntitySql();
         OutroContato domain = new OutroContato();
 
-        when(repository.findByTelefoneAndUsuario_Id(TELEFONE)).thenReturn(Optional.of(entity));
+        when(repository.findByTelefoneAndUsuario_Id(TELEFONE, ID_USUARIO)).thenReturn(Optional.of(entity));
 
         try (MockedStatic<OutroContatoMapper> ms = Mockito.mockStatic(OutroContatoMapper.class)) {
             ms.when(() -> OutroContatoMapper.paraDomain(entity)).thenReturn(domain);
 
-            Optional<OutroContato> result = provider.consultarPorTelefoneEUsuario(TELEFONE);
+            Optional<OutroContato> result = provider.consultarPorTelefoneEUsuario(TELEFONE, ID_USUARIO);
 
             assertTrue(result.isPresent());
             assertEquals(domain, result.get());
@@ -135,10 +136,10 @@ class OutroContatoDataProviderTest {
     @DisplayName("ConsultarPorTelefone: Deve lançar exceção ao falhar")
     void deveLancarExcecaoAoConsultarPorTelefoneEUsuario() {
         RuntimeException exBanco = new RuntimeException("Erro BD");
-        when(repository.findByTelefoneAndUsuario_Id(any())).thenThrow(exBanco);
+        when(repository.findByTelefoneAndUsuario_Id(any(), any())).thenThrow(exBanco);
 
         DataProviderException ex = assertThrows(DataProviderException.class,
-                () -> provider.consultarPorTelefoneEUsuario(TELEFONE));
+                () -> provider.consultarPorTelefoneEUsuario(TELEFONE, ID_USUARIO));
 
         assertEquals(MSG_ERRO_TELEFONE, ex.getMessage());
     }
@@ -203,7 +204,7 @@ class OutroContatoDataProviderTest {
     @DisplayName("ConsultarPorId: Deve lançar exceção ao falhar")
     void deveLancarExcecaoAoConsultarPorId() {
         RuntimeException exBanco = new RuntimeException("Erro ID");
-        when(repository.findById(anyLong())).thenThrow(exBanco);
+        when(repository.findById(any())).thenThrow(exBanco);
 
         DataProviderException ex = assertThrows(DataProviderException.class,
                 () -> provider.consultarPorId(ID_CONTATO));

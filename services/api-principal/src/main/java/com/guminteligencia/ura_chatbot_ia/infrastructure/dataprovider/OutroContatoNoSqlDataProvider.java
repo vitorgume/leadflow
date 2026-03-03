@@ -25,17 +25,15 @@ public class OutroContatoNoSqlDataProvider implements OutroContatoNoSqlGateway {
     private static final String MENSAGEM_ERRO_DELETAR = "Erro ao deletar outro contato NoSql.";
 
     @Override
-    public OutroContato salvar(OutroContato novoOutroContato) {
+    public void salvar(OutroContato novoOutroContato) {
         OutroContatoEntity outroContatoEntity = OutroContatoNoSqlMapper.paraEntity(novoOutroContato);
 
         try {
-            outroContatoEntity = repository.salvar(outroContatoEntity);
+            repository.salvar(outroContatoEntity);
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_SALVAR, ex);
             throw new DataProviderException(MENSAGEM_ERRO_SALVAR, ex.getCause());
         }
-
-        return OutroContatoNoSqlMapper.paraDomain(outroContatoEntity);
     }
 
     @Override
