@@ -10,7 +10,7 @@ interface User {
 interface AuthContextData {
   user: User | null;
   isAuthenticated: boolean;
-  signIn: (token: string, user: User) => void;
+  signIn: (_token: string, user: User) => void;
   signOut: () => void;
 }
 
@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return null;
   });
 
-  const signIn = (newToken: string, loggedUser: User) => {
+  const signIn = (_newToken: string, loggedUser: User) => {
     setUser(loggedUser);
     
     // Salva APENAS os dados do usuário no LocalStorage (O token continua seguro no Cookie!)
