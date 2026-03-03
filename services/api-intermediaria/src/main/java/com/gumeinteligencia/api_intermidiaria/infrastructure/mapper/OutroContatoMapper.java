@@ -11,7 +11,7 @@ public class OutroContatoMapper {
                 .nome(entity.getNome())
                 .descricao(entity.getDescricao())
                 .telefone(entity.getTelefone())
-                .setor(entity.getSetor())
+                .tipoContato(entity.getTipoContato())
                 .build();
     }
 
@@ -21,7 +21,7 @@ public class OutroContatoMapper {
                 .nome(domain.getNome())
                 .descricao(domain.getDescricao())
                 .telefone(domain.getTelefone())
-                .setor(domain.getSetor())
+                .tipoContato(domain.getTipoContato())
                 .build();
     }
 }

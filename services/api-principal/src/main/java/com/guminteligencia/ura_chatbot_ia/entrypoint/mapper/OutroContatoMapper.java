@@ -3,6 +3,7 @@ package com.guminteligencia.ura_chatbot_ia.entrypoint.mapper;
 import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
 import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.OutroContatoDto;
+import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.UsuarioDto;
 
 public class OutroContatoMapper {
 
@@ -24,7 +25,7 @@ public class OutroContatoMapper {
                 .telefone(domain.getTelefone())
                 .descricao(domain.getDescricao())
                 .tipoContato(domain.getTipoContato())
-                .usuario(UsuarioMapper.paraDto(domain.getUsuario()))
+                .usuario(UsuarioDto.builder().id(domain.getUsuario().getId()).build())
                 .build();
     }
 }

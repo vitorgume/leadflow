@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +32,8 @@ public class RelatorioUseCase {
     private final MensagemUseCase mensagemUseCase;
     private final UsuarioUseCase usuarioUseCase;
 
-    @Scheduled(cron = "0 35 17 * * MON-FRI")
+    @Scheduled(cron = "0 30 16 * * MON-FRI")
+    @Transactional
     public void enviarRelatorioDiarioVendedores() {
         log.info("Gerando relatório de contatos dos vendedores.");
         DayOfWeek dataHoje = LocalDate.now().getDayOfWeek();
@@ -48,7 +50,7 @@ public class RelatorioUseCase {
                 relatorio = clienteUseCase.getRelatorio(usuario.getId());
             }
 
-            OutroContato gerencia = null;
+            List<OutroContato> gerencia = new ArrayList<>();
 
             try {
                 gerencia = outroContatoUseCase.consultarPorTipo(TipoContato.GERENTE, usuario.getId());
@@ -56,10 +58,10 @@ public class RelatorioUseCase {
                 log.warn("Nenhum contato encontrado para usuario: {}", usuario);
             }
 
-            if(gerencia != null) {
+            if(!gerencia.isEmpty()) {
                 String arquivo = gerarArquivo(relatorio);
 
-                mensagemUseCase.enviarRelatorio(arquivo, "Relatorio.xlsx", gerencia.getTelefone(), usuario);
+                mensagemUseCase.enviarRelatorio(arquivo, "Relatorio.xlsx", gerencia.get(0).getTelefone(), usuario);
             }
         });
 

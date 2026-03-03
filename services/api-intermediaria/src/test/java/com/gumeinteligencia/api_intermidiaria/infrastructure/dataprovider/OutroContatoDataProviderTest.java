@@ -1,7 +1,7 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.dataprovider;
 
 import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.TipoContato;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
@@ -41,7 +41,7 @@ class OutroContatoDataProviderTest {
             outroContatos.add(OutroContatoEntity.builder()
                     .id(UUID.randomUUID())
                     .nome("Nome teste")
-                    .setor(Setor.LOGISTICA)
+                    .tipoContato(TipoContato.CONSULTOR)
                     .descricao("Descricao teste")
                     .telefone("000000000000")
                     .build()

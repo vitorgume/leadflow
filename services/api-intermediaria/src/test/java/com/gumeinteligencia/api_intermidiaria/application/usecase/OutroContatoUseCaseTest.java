@@ -2,7 +2,7 @@ package com.gumeinteligencia.api_intermidiaria.application.usecase;
 
 import com.gumeinteligencia.api_intermidiaria.application.gateways.OutroContatoGateway;
 import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.TipoContato;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ class OutroContatoUseCaseTest {
             outroContatoList.add(OutroContato.builder()
                     .id(UUID.randomUUID())
                     .nome("Nome teste")
-                    .setor(Setor.LOGISTICA)
+                    .tipoContato(TipoContato.CONSULTOR)
                     .descricao("Descricao teste")
                     .telefone("000000000000")
                     .build()

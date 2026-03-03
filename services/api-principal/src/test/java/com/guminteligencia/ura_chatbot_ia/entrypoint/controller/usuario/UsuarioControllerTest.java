@@ -170,4 +170,53 @@ class UsuarioControllerTest {
         Mockito.verify(repository).deleteById(ID_USUARIO);
     }
 
+    @Test
+    @DisplayName("Alterar: Quando sucesso retorna OK")
+    void alterarQuandoSucessoRetornaOk() throws Exception {
+        // Arrange
+        UsuarioEntity saved = UsuarioEntity.builder()
+                .id(ID_USUARIO)
+                .nome("Nome Alterado")
+                .telefone("5511999999999")
+                .senha("senhaForte123")
+                .email("teste@email.com")
+                .telefoneConectado("5511888888888")
+                .configuracaoCrm(ConfiguracaoCrmEntity.builder()
+                        .crmType(CrmType.KOMMO)
+                        .acessToken("token-crm-xyz")
+                        .build())
+                .build();
+
+        // 1. O UseCase vai primeiro procurar se o usuário existe para poder alterá-lo
+        given(repository.findById(ID_USUARIO)).willReturn(Optional.of(usuarioEntity));
+
+        // 2. O UseCase vai tentar salvar o usuário com as informações atualizadas e criptografadas
+        given(repository.save(any(UsuarioEntity.class))).willReturn(saved);
+
+        String json = """
+            {
+              "nome": "Nome Alterado",
+              "telefone": "5511999999999",
+              "senha": "senhaForte123",
+              "email": "teste@email.com",
+              "telefone_conectado": "5511888888888",
+              "configuracao_crm": {
+                "crm_type": "KOMMO",
+                "acess_token": "token-crm-xyz"
+              },
+              "whatsapp_token": "wpp-token-123",
+              "whatsapp_id_instance": "instance-01",
+              "agente_api_key": "ai-key-999"
+            }
+        """;
+
+        // Act & Assert
+        mockMvc.perform(put("/usuarios/" + ID_USUARIO)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dado.id").value(ID_USUARIO.toString()))
+                .andExpect(jsonPath("$.dado.nome").value("Nome Alterado"));
+    }
+
 }

@@ -1,6 +1,6 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.repository;
 
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.TipoContato;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class OutroContatoRepositoryTest {
                 .nome("Maria")
                 .telefone("47999999999")
                 .descricao("Contato para urgências")
-                .setor(Setor.FINANCEIRO)
+                .tipoContato(TipoContato.PADRAO)
                 .build();
     }
 

@@ -2,6 +2,8 @@ package com.guminteligencia.ura_chatbot_ia.domain;
 
 import lombok.*;
 
+import java.util.UUID;
+
 @AllArgsConstructor
 @Getter
 @Setter
@@ -9,7 +11,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 public class OutroContato {
-    private Long id;
+    private UUID id;
     private String nome;
     private String telefone;
     private String descricao;

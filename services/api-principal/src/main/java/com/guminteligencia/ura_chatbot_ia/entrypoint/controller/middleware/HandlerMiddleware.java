@@ -120,6 +120,14 @@ public class HandlerMiddleware {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
     }
 
+    @ExceptionHandler(OutroContatoNoSqlNaoEcontradoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerOutroContatoNoSqlNaoEcontradoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
+    }
+
     @ExceptionHandler(ChatNaoEncontradoException.class)
     public ResponseEntity<ResponseDto> exceptionHandlerChatNaoEncontradoException(Exception exception) {
         ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
@@ -144,7 +152,7 @@ public class HandlerMiddleware {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
     }
 
-    @ExceptionHandler(ConfiguracaoEscolhaVendedorNaoEncontrada.class)
+    @ExceptionHandler(ConfiguracaoEscolhaVendedorNaoEncontradaException.class)
     public ResponseEntity<ResponseDto> exceptionHandlerConfiguracaoEscolhaVendedorNaoEncontrada(Exception exception) {
         ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
                 .mensagens(mensagens(exception.getMessage()))
@@ -152,7 +160,7 @@ public class HandlerMiddleware {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
     }
 
-    @ExceptionHandler(ConfiguraCrmUsuarioNaoConfiguradaException.class)
+    @ExceptionHandler(ConfiguracaoCrmUsuarioNaoConfiguradaException.class)
     public ResponseEntity<ResponseDto> exceptionHandlerConfiguraCrmUsuarioNaoConfiguradaException(Exception exception) {
         ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
                 .mensagens(mensagens(exception.getMessage()))
@@ -192,7 +200,7 @@ public class HandlerMiddleware {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.comErro(erroDto));
     }
 
-    @ExceptionHandler(OutroContatoComMesmoTelefoneJaCadastradoExcetion.class)
+    @ExceptionHandler(OutroContatoComMesmoTelefoneJaCadastradoException.class)
     public ResponseEntity<ResponseDto> exceptionHandlerOutroContatoComMesmoTelefoneJaCadastradoExcetion(Exception exception) {
         ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
                 .mensagens(mensagens(exception.getMessage()))
@@ -222,6 +230,42 @@ public class HandlerMiddleware {
                 .mensagens(mensagens(exception.getMessage()))
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
+    }
+
+    // Base Conhecimento
+
+    @ExceptionHandler(BaseConhecimentoNaoEncontradoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerBaseConhecimentoNaoEncontradoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
+    }
+
+    @ExceptionHandler(LimiteDeUmBaseConhecimentoJaAtingidoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerLimiteDeUmBaseConhecimentoJaAtingidoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.comErro(erroDto));
+    }
+
+    // Prompt
+
+    @ExceptionHandler(PromptNaoEncontradoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerPromptNaoEncontradoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.comErro(erroDto));
+    }
+
+    @ExceptionHandler(LimiteDeUmPromptJaAtingidoException.class)
+    public ResponseEntity<ResponseDto> exceptionHandlerLimiteDeUmPromptJaAtingidoException(Exception exception) {
+        ResponseDto.ErroDto erroDto = ResponseDto.ErroDto.builder()
+                .mensagens(mensagens(exception.getMessage()))
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.comErro(erroDto));
     }
 
     private List<String> mensagens(String mensagem) {

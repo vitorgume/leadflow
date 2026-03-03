@@ -28,8 +28,7 @@ import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(
         properties = {
@@ -117,9 +116,11 @@ class LoginControllerTest {
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.dado.token").value("meu-token-abc"))
-                .andExpect(jsonPath("$.dado.id").value(ID_USUARIO.toString()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dado.token").doesNotExist())
+                .andExpect(jsonPath("$.dado.id").value(ID_USUARIO.toString()))
+                .andExpect(cookie().exists("jwt_token"))
+                .andExpect(cookie().httpOnly("jwt_token", true));
     }
 
 

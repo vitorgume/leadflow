@@ -1,7 +1,7 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguraCrmUsuarioNaoConfiguradaException;
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguracaoCrmUsuarioNaoConfiguradaException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.LeadNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.crm.IntegracaoKommoGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.CriptografiaJCAUseCase;
@@ -40,7 +40,7 @@ public class IntegracaoKommo implements CrmIntegracaoType {
             ConfiguracaoCrm configuracaoCrm = cliente.getUsuario().getConfiguracaoCrm();
 
             if(configuracaoCrm == null || configuracaoCrm.getMapeamentoCampos() == null) {
-                throw new ConfiguraCrmUsuarioNaoConfiguradaException();
+                throw new ConfiguracaoCrmUsuarioNaoConfiguradaException();
             }
             
             String acessToken = criptografiaJCAUseCase.descriptografar(configuracaoCrm.getAcessToken());

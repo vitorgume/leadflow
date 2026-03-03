@@ -8,6 +8,9 @@ import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.ConversaAgen
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConversaAgenteEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -79,5 +82,20 @@ public class ConversaAgenteDataProvider implements ConversaAgenteGateway {
         }
 
         return conversasEntity.stream().map(ConversaAgenteMapper::paraDomain).toList();
+    }
+
+    @Override
+    public Long count(Specification<ConversaAgenteEntity> spec) {
+        return repository.count(spec);
+    }
+
+    @Override
+    public Page<ConversaAgenteEntity> findAllPage(Specification<ConversaAgenteEntity> baseSpec, Pageable pageable) {
+        return repository.findAll(baseSpec, pageable);
+    }
+
+    @Override
+    public List<ConversaAgenteEntity> findAllList(Specification<ConversaAgenteEntity> spec) {
+        return repository.findAll(spec);
     }
 }

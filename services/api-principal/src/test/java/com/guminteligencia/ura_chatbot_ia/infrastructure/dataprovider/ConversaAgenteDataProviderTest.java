@@ -6,12 +6,18 @@ import com.guminteligencia.ura_chatbot_ia.infrastructure.mapper.ConversaAgenteMa
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.ConversaAgenteRepository;
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConversaAgenteEntity;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
@@ -192,6 +198,59 @@ class ConversaAgenteDataProviderTest {
                 () -> provider.listarNaoFinalizados()
         );
         assertEquals(ERR_LIST, ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve retornar a contagem de conversas usando Specification")
+    void deveRetornarCountComSpecification() {
+        // Arrange
+        Specification<ConversaAgenteEntity> spec = mock(Specification.class);
+        Long expectedCount = 42L;
+        when(repository.count(spec)).thenReturn(expectedCount);
+
+        // Act
+        Long result = provider.count(spec);
+
+        // Assert
+        assertEquals(expectedCount, result);
+        verify(repository).count(spec);
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista paginada de conversas usando Specification e Pageable")
+    void deveRetornarFindAllPage() {
+        // Arrange
+        Specification<ConversaAgenteEntity> spec = mock(Specification.class);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ConversaAgenteEntity> expectedPage = new PageImpl<>(List.of(entityIn));
+
+        when(repository.findAll(spec, pageable)).thenReturn(expectedPage);
+
+        // Act
+        Page<ConversaAgenteEntity> result = provider.findAllPage(spec, pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedPage, result);
+        verify(repository).findAll(spec, pageable);
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista de conversas usando Specification")
+    void deveRetornarFindAllList() {
+        // Arrange
+        Specification<ConversaAgenteEntity> spec = mock(Specification.class);
+        List<ConversaAgenteEntity> expectedList = List.of(entityIn);
+
+        when(repository.findAll(spec)).thenReturn(expectedList);
+
+        // Act
+        List<ConversaAgenteEntity> result = provider.findAllList(spec);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedList, result);
+        verify(repository).findAll(spec);
     }
 
 }

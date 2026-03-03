@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes;
 
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguraCrmUsuarioNaoConfiguradaException;
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguracaoCrmUsuarioNaoConfiguradaException;
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.LeadNaoEncontradoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.crm.IntegracaoKommoGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.CriptografiaJCAUseCase;
@@ -260,7 +260,7 @@ class IntegracaoKommoTest {
         cliente.getUsuario().setConfiguracaoCrm(null);
 
         // Act & Assert
-        assertThrows(ConfiguraCrmUsuarioNaoConfiguradaException.class,
+        assertThrows(ConfiguracaoCrmUsuarioNaoConfiguradaException.class,
                 () -> integracaoKommo.implementacao(vendedor, cliente, conversaAgente));
     }
 
@@ -271,7 +271,7 @@ class IntegracaoKommoTest {
         configCrm.setMapeamentoCampos(null);
 
         // Act & Assert
-        assertThrows(ConfiguraCrmUsuarioNaoConfiguradaException.class,
+        assertThrows(ConfiguracaoCrmUsuarioNaoConfiguradaException.class,
                 () -> integracaoKommo.implementacao(vendedor, cliente, conversaAgente));
     }
 

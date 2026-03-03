@@ -17,6 +17,6 @@ public class ConfiguracaoEscolhaVendedorDto {
     private UUID id;
     private UsuarioDto usuario;
     private List<VendedorDto> vendedores;
-    List<CondicaoDto> condicoes;
+    private List<CondicaoDto> condicoes;
     private Integer prioridade;
 }

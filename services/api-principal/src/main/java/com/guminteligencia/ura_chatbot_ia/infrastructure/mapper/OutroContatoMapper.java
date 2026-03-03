@@ -1,10 +1,10 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.mapper;
 
 import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
-import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntity;
+import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.OutroContatoEntitySql;
 
 public class OutroContatoMapper {
-    public static OutroContato paraDomain(OutroContatoEntity entity) {
+    public static OutroContato paraDomain(OutroContatoEntitySql entity) {
         return OutroContato.builder()
                 .id(entity.getId())
                 .nome(entity.getNome())
@@ -15,8 +15,8 @@ public class OutroContatoMapper {
                 .build();
     }
 
-    public static OutroContatoEntity paraEntity(OutroContato domain) {
-        return OutroContatoEntity.builder()
+    public static OutroContatoEntitySql paraEntity(OutroContato domain) {
+        return OutroContatoEntitySql.builder()
                 .id(domain.getId())
                 .nome(domain.getNome())
                 .telefone(domain.getTelefone())

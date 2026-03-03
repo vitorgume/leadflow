@@ -1,7 +1,7 @@
 package com.gumeinteligencia.api_intermidiaria.infrastructure.mapper;
 
 import com.gumeinteligencia.api_intermidiaria.domain.outroContato.OutroContato;
-import com.gumeinteligencia.api_intermidiaria.domain.outroContato.Setor;
+import com.gumeinteligencia.api_intermidiaria.domain.outroContato.TipoContato;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.OutroContatoEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +19,7 @@ class OutroContatoMapperTest {
         outroContatoDomain = OutroContato.builder()
                 .id(UUID.randomUUID())
                 .nome("Nome teste")
-                .setor(Setor.LOGISTICA)
+                .tipoContato(TipoContato.CONSULTOR)
                 .descricao("Descricao teste")
                 .telefone("000000000000")
                 .build();
@@ -27,7 +27,7 @@ class OutroContatoMapperTest {
         outroContatoEntity = OutroContatoEntity.builder()
                 .id(UUID.randomUUID())
                 .nome("Nome teste")
-                .setor(Setor.LOGISTICA)
+                .tipoContato(TipoContato.CONSULTOR)
                 .descricao("Descricao teste")
                 .telefone("000000000000")
                 .build();
@@ -41,7 +41,7 @@ class OutroContatoMapperTest {
         Assertions.assertEquals(outroContatoEntity.getNome(), resultado.getNome());
         Assertions.assertEquals(outroContatoEntity.getTelefone(), resultado.getTelefone());
         Assertions.assertEquals(outroContatoEntity.getDescricao(), resultado.getDescricao());
-        Assertions.assertEquals(outroContatoEntity.getSetor(), resultado.getSetor());
+        Assertions.assertEquals(outroContatoEntity.getTipoContato(), resultado.getTipoContato());
     }
 
     @Test
@@ -52,6 +52,6 @@ class OutroContatoMapperTest {
         Assertions.assertEquals(outroContatoDomain.getNome(), resultado.getNome());
         Assertions.assertEquals(outroContatoDomain.getTelefone(), resultado.getTelefone());
         Assertions.assertEquals(outroContatoDomain.getDescricao(), resultado.getDescricao());
-        Assertions.assertEquals(outroContatoDomain.getSetor(), resultado.getSetor());
+        Assertions.assertEquals(outroContatoDomain.getTipoContato(), resultado.getTipoContato());
     }
 }

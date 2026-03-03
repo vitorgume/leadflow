@@ -14,5 +14,5 @@ public class OutroContato {
     private String nome;
     private String telefone;
     private String descricao;
-    private Setor setor;
+    private TipoContato tipoContato;
 }

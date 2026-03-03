@@ -38,13 +38,32 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String jwt = null;
+
+        // 1. Tenta buscar o token dentro dos Cookies (Fluxo Principal do React)
+        if (request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("jwt_token".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // 2. Fallback: Se não achou no Cookie, tenta no Header (Útil para Postman/Swagger)
+        if (jwt == null) {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwt = authHeader.substring(7);
+            }
+        }
+
+        // Se realmente não tem token em lugar nenhum, barra a requisição
+        if (jwt == null) {
             chain.doFilter(request, response);
             return;
         }
 
-        final String jwt = authHeader.substring(7);
         try {
             if (jwtUtil.isTokenValid(jwt)) {
                 String username = jwtUtil.extractUsername(jwt);

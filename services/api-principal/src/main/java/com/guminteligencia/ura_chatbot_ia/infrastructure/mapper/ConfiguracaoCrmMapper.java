@@ -6,6 +6,11 @@ import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.Confi
 public class ConfiguracaoCrmMapper {
 
     public static ConfiguracaoCrm paraDomain(ConfiguracaoCrmEntity entity) {
+
+        if(entity == null) {
+            return null;
+        }
+
         return ConfiguracaoCrm.builder()
                 .crmType(entity.getCrmType())
                 .mapeamentoCampos(entity.getMapeamentoCampos())
@@ -19,6 +24,11 @@ public class ConfiguracaoCrmMapper {
     }
 
     public static ConfiguracaoCrmEntity paraEntity(ConfiguracaoCrm domain) {
+
+        if(domain == null) {
+            return null;
+        }
+
         return ConfiguracaoCrmEntity.builder()
                 .crmType(domain.getCrmType())
                 .mapeamentoCampos(domain.getMapeamentoCampos())

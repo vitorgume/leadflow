@@ -5,8 +5,9 @@ import com.guminteligencia.ura_chatbot_ia.infrastructure.dataprovider.dto.Objeto
 import com.guminteligencia.ura_chatbot_ia.domain.OutroContato;
 import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
 import com.guminteligencia.ura_chatbot_ia.domain.TipoContato;
-import java.util.LinkedHashMap;
-import java.util.Map;
+
+import java.util.*;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -24,9 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -85,7 +83,8 @@ class RelatorioUseCaseTest {
             when(clienteUseCase.getRelatorioSegundaFeira(any(UUID.class))).thenReturn(List.of(dto)); // Updated to any(UUID.class)
 
             OutroContato gerente = mock(OutroContato.class);
-            when(outroContatoUseCase.consultarPorTipo(any(TipoContato.class), eq(userId))).thenReturn(gerente); // Updated
+            List<OutroContato> outroContatoList = new ArrayList<>(List.of(gerente));
+            when(outroContatoUseCase.consultarPorTipo(any(TipoContato.class), eq(userId))).thenReturn(outroContatoList); // Updated
             when(gerente.getTelefone()).thenReturn("+55000000001");
 
             useCase.enviarRelatorioDiarioVendedores();

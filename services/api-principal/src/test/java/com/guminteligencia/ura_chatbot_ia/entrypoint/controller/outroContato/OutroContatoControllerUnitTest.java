@@ -47,7 +47,7 @@ public class OutroContatoControllerUnitTest {
     private MockMvc mockMvc;
     private final ObjectMapper om = new ObjectMapper();
     private final UUID ID_USUARIO = UUID.randomUUID();
-    private final Long ID_CONTATO = 1L;
+    private final UUID ID_CONTATO = UUID.randomUUID();
 
     private UsuarioDto usuarioDto;
     private Usuario usuarioDomain;
@@ -139,7 +139,7 @@ public class OutroContatoControllerUnitTest {
                         .content(om.writeValueAsString(dtoInput)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/outros-contatos/" + ID_CONTATO))
-                .andExpect(jsonPath("$.dado.id").value(ID_CONTATO))
+                .andExpect(jsonPath("$.dado.id").value(ID_CONTATO.toString()))
                 .andExpect(jsonPath("$.dado.nome").value("Contato Teste"));
     }
 
@@ -162,7 +162,7 @@ public class OutroContatoControllerUnitTest {
         mockMvc.perform(get("/outros-contatos/listar/{idUsuario}", ID_USUARIO)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dado.content[0].id").value(ID_CONTATO))
+                .andExpect(jsonPath("$.dado.content[0].id").value(ID_CONTATO.toString()))
                 .andExpect(jsonPath("$.dado.content[0].nome").value("Contato Lista"));
     }
 
@@ -188,7 +188,7 @@ public class OutroContatoControllerUnitTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(dtoInput)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dado.id").value(ID_CONTATO))
+                .andExpect(jsonPath("$.dado.id").value(ID_CONTATO.toString()))
                 .andExpect(jsonPath("$.dado.nome").value("Nome Alterado"));
     }
 

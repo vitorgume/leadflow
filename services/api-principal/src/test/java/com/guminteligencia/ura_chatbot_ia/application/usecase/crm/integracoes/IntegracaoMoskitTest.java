@@ -1,6 +1,6 @@
 package com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes;
 
-import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguraCrmUsuarioNaoConfiguradaException;
+import com.guminteligencia.ura_chatbot_ia.application.exceptions.ConfiguracaoCrmUsuarioNaoConfiguradaException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.crm.IntegracaoMoskitGateway;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.CriptografiaJCAUseCase;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.crm.integracoes.payloads.moskit.ContatoMoskitDto;
@@ -161,7 +161,7 @@ class IntegracaoMoskitTest {
         cliente.getUsuario().setConfiguracaoCrm(null);
 
         // Act & Assert
-        assertThrows(ConfiguraCrmUsuarioNaoConfiguradaException.class,
+        assertThrows(ConfiguracaoCrmUsuarioNaoConfiguradaException.class,
                 () -> integracaoMoskit.implementacao(vendedor, cliente, conversaAgente));
 
         verifyNoInteractions(gateway);
@@ -175,7 +175,7 @@ class IntegracaoMoskitTest {
         cliente.getUsuario().getConfiguracaoCrm().setMapeamentoCampos(null);
 
         // Act & Assert
-        assertThrows(ConfiguraCrmUsuarioNaoConfiguradaException.class,
+        assertThrows(ConfiguracaoCrmUsuarioNaoConfiguradaException.class,
                 () -> integracaoMoskit.implementacao(vendedor, cliente, conversaAgente));
 
         verifyNoInteractions(gateway);

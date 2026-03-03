@@ -5,12 +5,14 @@ import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.ContatoRequest
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.DocumentoRequestDto;
 import com.guminteligencia.ura_chatbot_ia.application.usecase.dto.MensagemRequestWhatsAppDto;
 import com.guminteligencia.ura_chatbot_ia.domain.Cliente;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
+@Slf4j
 public class MensagemDataProvider implements MensagemGateway {
 
     private final WebClientExecutor executor;
@@ -33,6 +35,7 @@ public class MensagemDataProvider implements MensagemGateway {
 
     @Override
     public void enviar(String resposta, String telefone, String idInstance, String token) {
+        log.info("Enviando mensagem. Resposta: {}, Telefone: {}, Id instance: {}, Token: {}", resposta, telefone, idInstance, token);
         MensagemRequestWhatsAppDto body = MensagemRequestWhatsAppDto.builder()
                 .phone(telefone)
                 .message(resposta)
@@ -44,6 +47,8 @@ public class MensagemDataProvider implements MensagemGateway {
             String uri = String.format("https://api.z-api.io/instances/%s/token/%s/send-text", idInstance, token);
 
             executor.post(uri, body, headers, "Erro ao enviar mensagem.");
+
+            log.info("Mensagem enviada com sucesso.");
         } else {
             System.out.println("Mensagem enviada: " + body);
         }

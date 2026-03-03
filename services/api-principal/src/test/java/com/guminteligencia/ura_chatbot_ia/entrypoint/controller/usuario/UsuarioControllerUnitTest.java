@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -163,5 +164,31 @@ public class UsuarioControllerUnitTest {
                 .andExpect(status().isNoContent());
 
         verify(usuarioUseCase).deletar(ID_USUARIO);
+    }
+
+    @Test
+    @DisplayName("Alterar: Deve retornar 200 OK")
+    void alterarDeveRetornarOk() throws Exception {
+        // Arrange
+        UsuarioDto dtoInput = UsuarioDto.builder()
+                .nome("Nome Alterado")
+                .telefone("11999999999")
+                .build();
+
+        Usuario domainRetorno = Usuario.builder()
+                .id(ID_USUARIO)
+                .nome("Nome Alterado")
+                .telefone("11999999999")
+                .build();
+
+        when(usuarioUseCase.alterar(eq(ID_USUARIO), any(Usuario.class))).thenReturn(domainRetorno);
+
+        // Act & Assert
+        mockMvc.perform(put("/usuarios/{id}", ID_USUARIO)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(dtoInput)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dado.id").value(ID_USUARIO.toString()))
+                .andExpect(jsonPath("$.dado.nome").value("Nome Alterado"));
     }
 }
