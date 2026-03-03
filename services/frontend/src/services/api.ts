@@ -5,7 +5,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true // Mantém o envio do nosso cookie seguro
+  withCredentials: true 
 });
 
 // --- INTERCEPTOR DE RESPOSTAS ---
