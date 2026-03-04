@@ -79,7 +79,7 @@ public class ConversaAgenteDataProvider implements ConversaAgenteGateway {
         List<ConversaAgenteEntity> conversasEntity;
 
         try {
-            conversasEntity = repository.listarNaoFinalizadas(idUsuarioTeste);
+            conversasEntity = repository.listarNaoFinalizadas(UUID.fromString(idUsuarioTeste));
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_LISTAR_CONVERSAS_NAO_FINALIZADAS, ex);
             throw new DataProviderException(MENSAGEM_ERRO_LISTAR_CONVERSAS_NAO_FINALIZADAS, ex.getCause());

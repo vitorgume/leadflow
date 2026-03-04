@@ -181,21 +181,21 @@ class ConversaAgenteDataProviderTest {
         List<ConversaAgenteEntity> raw = List.of(entityIn);
         List<ConversaAgente> expected = List.of(domainOut);
 
-        when(repository.listarNaoFinalizadas(idUsuarioTeste.toString())).thenReturn(raw);
+        when(repository.listarNaoFinalizadas(idUsuarioTeste)).thenReturn(raw);
         try (MockedStatic<ConversaAgenteMapper> ms = mockStatic(ConversaAgenteMapper.class)) {
             ms.when(() -> ConversaAgenteMapper.paraDomain(entityIn))
                     .thenReturn(domainOut);
 
             List<ConversaAgente> result = provider.listarNaoFinalizados();
             assertEquals(expected, result);
-            verify(repository).listarNaoFinalizadas(idUsuarioTeste.toString());
+            verify(repository).listarNaoFinalizadas(idUsuarioTeste);
             ms.verify(() -> ConversaAgenteMapper.paraDomain(entityIn));
         }
     }
 
     @Test
     void deveLancarExceptionAoListarConversasNaoFinalizadas() {
-        when(repository.listarNaoFinalizadas(idUsuarioTeste.toString()))
+        when(repository.listarNaoFinalizadas(idUsuarioTeste))
                 .thenThrow(new RuntimeException("fail-list"));
 
         DataProviderException ex = assertThrows(

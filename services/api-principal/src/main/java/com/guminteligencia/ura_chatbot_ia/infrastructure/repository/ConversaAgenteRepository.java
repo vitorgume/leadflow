@@ -15,5 +15,5 @@ public interface ConversaAgenteRepository extends JpaRepository<ConversaAgenteEn
     Optional<ConversaAgenteEntity> findByCliente_Id(UUID id);
 
     @Query("SELECT c FROM ConversaAgente c WHERE c.finalizada = false AND c.cliente.usuario.id != :idUsuarioTeste")
-    List<ConversaAgenteEntity> listarNaoFinalizadas(String idUsuarioTeste);
+    List<ConversaAgenteEntity> listarNaoFinalizadas(UUID idUsuarioTeste);
 }
