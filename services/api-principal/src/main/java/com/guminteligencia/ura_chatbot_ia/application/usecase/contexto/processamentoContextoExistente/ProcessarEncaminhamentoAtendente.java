@@ -28,7 +28,7 @@ public class ProcessarEncaminhamentoAtendente implements ProcessamentoContextoEx
         mensagemUseCase.enviarContato(vendedor, cliente);
 
         mensagemUseCase.enviarMensagem(
-                mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, null, null),
+                mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, vendedor.getNome(), cliente),
                 cliente.getTelefone(),
                 false,
                 cliente.getUsuario()

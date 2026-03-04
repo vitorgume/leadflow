@@ -36,7 +36,7 @@ class ProcessarEncaminhamentoAtendenteTest {
 
     @Test
     void deveEncaminharParaAtendenteEAjustarConversa() {
-        Vendedor vendedor = Vendedor.builder().id(10L).telefone("+5500").build();
+        Vendedor vendedor = Vendedor.builder().id(10L).nome("Vendedor teste").telefone("+5500").build();
         Usuario usuario = Usuario.builder().id(UUID.randomUUID()).build();
         Cliente cliente = Cliente.builder().id(UUID.randomUUID()).telefone("+5511").usuario(usuario).build();
         ConversaAgente conversa = ConversaAgente.builder()
@@ -46,7 +46,7 @@ class ProcessarEncaminhamentoAtendenteTest {
                 .build();
 
         when(escolhaVendedorUseCase.escolherVendedor(cliente)).thenReturn(vendedor);
-        when(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, null, null))
+        when(mensagemBuilder.getMensagem(TipoMensagem.REDIRECIONAMENTO_RECONTATO, vendedor.getNome(), cliente))
                 .thenReturn("msg");
 
         processador.processar("encaminhar:true", conversa, cliente);

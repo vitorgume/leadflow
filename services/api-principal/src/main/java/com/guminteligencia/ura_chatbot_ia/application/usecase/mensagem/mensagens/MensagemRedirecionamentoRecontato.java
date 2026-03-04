@@ -13,11 +13,15 @@ public class MensagemRedirecionamentoRecontato implements MensagemType {
     public String getMensagem(String nomeVendedor, Cliente cliente) {
         String mensagem = cliente.getUsuario().getMensagemEncaminhamento();
 
-        mensagem = mensagem.replaceAll("\\{nome_cliente\\}", cliente.getNome());
-        mensagem = mensagem.replaceAll("\\{nome_vendedor\\}", nomeVendedor);
+        if(cliente.getNome() != null)
+            mensagem = mensagem.replaceAll("\\{nome_cliente\\}", cliente.getNome());
+
+        if(nomeVendedor != null)
+            mensagem = mensagem.replaceAll("\\{nome_vendedor\\}", nomeVendedor);
 
         for (Map.Entry<String, Object> dado : cliente.getAtributosQualificacao().entrySet()) {
-            mensagem = mensagem.replaceAll("\\{" + dado.getKey() + "\\}", dado.getValue().toString());
+            if(dado.getValue().toString() != null)
+                mensagem = mensagem.replaceAll("\\{" + dado.getKey() + "\\}", dado.getValue().toString());
         }
 
         return mensagem;
