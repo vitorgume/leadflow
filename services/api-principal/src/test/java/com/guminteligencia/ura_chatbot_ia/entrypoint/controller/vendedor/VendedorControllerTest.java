@@ -32,7 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(
         properties = {
                 "spring.task.scheduling.enabled=false",
-                "spring.jpa.hibernate.ddl-auto=validate"
+                "spring.jpa.hibernate.ddl-auto=validate",
+                "app.id.usuario.teste=teste"
         }
 )
 @AutoConfigureMockMvc(addFilters = false)

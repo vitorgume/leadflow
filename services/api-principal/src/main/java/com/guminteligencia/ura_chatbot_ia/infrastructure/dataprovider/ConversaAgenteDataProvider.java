@@ -8,6 +8,7 @@ import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.ConversaAgen
 import com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity.ConversaAgenteEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,6 +28,9 @@ public class ConversaAgenteDataProvider implements ConversaAgenteGateway {
     private final String MENSAGEM_ERRO_CONSULTAR_ID_CLIENTE = "Erro ao consultar conversa pelo id do cliente.";
     private final String MENSAGEM_ERRO_SALVAR_CONVERSA_AGENTE = "Erro ao salvar conversa do agente.";
     private final ConversaAgenteRepository repository;
+
+    @Value("${app.id.usuario.teste}")
+    private String idUsuarioTeste;
 
     @Override
     public ConversaAgente salvar(ConversaAgente conversaAgente) {
@@ -75,7 +79,7 @@ public class ConversaAgenteDataProvider implements ConversaAgenteGateway {
         List<ConversaAgenteEntity> conversasEntity;
 
         try {
-            conversasEntity = repository.listarNaoFinalizadas();
+            conversasEntity = repository.listarNaoFinalizadas(idUsuarioTeste);
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_LISTAR_CONVERSAS_NAO_FINALIZADAS, ex);
             throw new DataProviderException(MENSAGEM_ERRO_LISTAR_CONVERSAS_NAO_FINALIZADAS, ex.getCause());

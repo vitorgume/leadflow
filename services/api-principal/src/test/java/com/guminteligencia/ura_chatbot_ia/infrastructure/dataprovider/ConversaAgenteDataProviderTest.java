@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,7 @@ class ConversaAgenteDataProviderTest {
     private ConversaAgenteEntity entityIn;
     private ConversaAgenteEntity entityOut;
     private UUID id;
+    private UUID idUsuarioTeste;
 
     @BeforeEach
     void setup() {
@@ -55,6 +57,9 @@ class ConversaAgenteDataProviderTest {
         entityIn = mock(ConversaAgenteEntity.class);
         entityOut = mock(ConversaAgenteEntity.class);
         id = UUID.randomUUID();
+        idUsuarioTeste = UUID.randomUUID();
+
+        ReflectionTestUtils.setField(provider, "idUsuarioTeste", idUsuarioTeste.toString());
     }
 
     @Test
@@ -176,21 +181,21 @@ class ConversaAgenteDataProviderTest {
         List<ConversaAgenteEntity> raw = List.of(entityIn);
         List<ConversaAgente> expected = List.of(domainOut);
 
-        when(repository.listarNaoFinalizadas()).thenReturn(raw);
+        when(repository.listarNaoFinalizadas(idUsuarioTeste.toString())).thenReturn(raw);
         try (MockedStatic<ConversaAgenteMapper> ms = mockStatic(ConversaAgenteMapper.class)) {
             ms.when(() -> ConversaAgenteMapper.paraDomain(entityIn))
                     .thenReturn(domainOut);
 
             List<ConversaAgente> result = provider.listarNaoFinalizados();
             assertEquals(expected, result);
-            verify(repository).listarNaoFinalizadas();
+            verify(repository).listarNaoFinalizadas(idUsuarioTeste.toString());
             ms.verify(() -> ConversaAgenteMapper.paraDomain(entityIn));
         }
     }
 
     @Test
     void deveLancarExceptionAoListarConversasNaoFinalizadas() {
-        when(repository.listarNaoFinalizadas())
+        when(repository.listarNaoFinalizadas(idUsuarioTeste.toString()))
                 .thenThrow(new RuntimeException("fail-list"));
 
         DataProviderException ex = assertThrows(

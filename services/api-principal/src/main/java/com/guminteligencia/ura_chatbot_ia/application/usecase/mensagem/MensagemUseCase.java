@@ -65,7 +65,7 @@ public class MensagemUseCase {
     }
 
     public void enviarRelatorio(String arquivo, String fileName, String telefone, Usuario usuario) {
-        log.info("Enviando relatorio de vendedores.");
+        log.info("Enviando relatorio de vendedores. Arquivo: {}, File name: {}, Telefone: {}, Usuario: {}", arquivo, fileName, telefone, usuario);
         gateway.enviarRelatorio(arquivo, fileName, telefone, criptografiaJCAUseCase.descriptografar(usuario.getWhatsappIdInstance()), criptografiaJCAUseCase.descriptografar(usuario.getWhatsappToken()));
         log.info("Relatorio enviado com sucesso.");
     }

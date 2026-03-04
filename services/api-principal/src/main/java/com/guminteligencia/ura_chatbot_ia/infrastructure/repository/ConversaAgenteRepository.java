@@ -14,6 +14,6 @@ import java.util.UUID;
 public interface ConversaAgenteRepository extends JpaRepository<ConversaAgenteEntity, UUID>, JpaSpecificationExecutor<ConversaAgenteEntity> {
     Optional<ConversaAgenteEntity> findByCliente_Id(UUID id);
 
-    @Query("SELECT c FROM ConversaAgente c WHERE c.finalizada = false")
-    List<ConversaAgenteEntity> listarNaoFinalizadas();
+    @Query("SELECT c FROM ConversaAgente c WHERE c.finalizada = false AND c.cliente.usuario.id != :idUsuarioTeste")
+    List<ConversaAgenteEntity> listarNaoFinalizadas(String idUsuarioTeste);
 }
