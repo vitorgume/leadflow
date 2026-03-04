@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
-import { Settings, MessageSquare, Database, Link as LinkIcon, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle, Smartphone } from 'lucide-react';
+// Adicionamos o ícone Power aqui nos imports
+import { Settings, MessageSquare, Database, Link as LinkIcon, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle, Smartphone, Power } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usuarioConfigService } from '../services/usuarioConfigService';
 import { type UsuarioCompletoDTO, CrmType } from '../types/usuarioConfig';
@@ -32,9 +33,12 @@ export default function ConfiguracaoUsuario() {
         dadosDb.configuracao_crm.acess_token = '******************';
       }
       
-      // Garante que o boolean venha preenchido, assumindo true como padrão de segurança se não existir
+      // Garante defaults para os booleanos caso venham nulos do banco antigo
       if (dadosDb.enviar_contato === undefined) {
           dadosDb.enviar_contato = true;
+      }
+      if (dadosDb.software_ligado === undefined) {
+          dadosDb.software_ligado = true;
       }
       
       setFormData(dadosDb);
@@ -67,7 +71,6 @@ export default function ConfiguracaoUsuario() {
     setFormData(prev => prev ? { ...prev, [field]: value } : null);
   };
 
-  // Handler específico para o Toggle (Booleano)
   const handleToggleChange = (field: keyof UsuarioCompletoDTO, value: boolean) => {
     setFormData(prev => prev ? { ...prev, [field]: value } : null);
   };
@@ -198,7 +201,43 @@ export default function ConfiguracaoUsuario() {
           {formData && (
             <form onSubmit={handleSubmit} className="space-y-8 flex flex-col">
               
-              {/* NOVA SESSÃO: PREFERÊNCIAS DE NOTIFICAÇÃO (WhatsApp) */}
+              {/* NOVA SESSÃO: STATUS DO SISTEMA (ON/OFF) */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
+                  <Power size={20} className="text-blue-600" />
+                  <h2 className="text-lg font-bold text-slate-900">Status do Sistema</h2>
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-900">Software Ativo</span>
+                      <span className="text-xs text-slate-500 mt-1 max-w-[80%]">
+                        Liga ou desliga completamente o processamento da IA e o envio de mensagens. Se desligado, o robô irá pausar o atendimento.
+                      </span>
+                    </div>
+                    
+                    {/* Toggle Switch UI */}
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={formData.software_ligado}
+                      onClick={() => handleToggleChange('software_ligado', !formData.software_ligado)}
+                      className={`${
+                        formData.software_ligado ? 'bg-blue-600' : 'bg-slate-300'
+                      } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2`}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`${
+                          formData.software_ligado ? 'translate-x-5' : 'translate-x-0'
+                        } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* SESSÃO DE PREFERÊNCIAS DE NOTIFICAÇÃO (WhatsApp) */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
                   <Smartphone size={20} className="text-blue-600" />

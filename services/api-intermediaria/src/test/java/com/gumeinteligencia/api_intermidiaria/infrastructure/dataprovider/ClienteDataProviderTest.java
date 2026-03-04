@@ -2,7 +2,7 @@ package com.gumeinteligencia.api_intermidiaria.infrastructure.dataprovider;
 
 import com.gumeinteligencia.api_intermidiaria.domain.Cliente;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.CLienteRepository;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ClienteRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ClienteEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 class ClienteDataProviderTest {
 
     @Mock
-    private CLienteRepository repository;
+    private ClienteRepository repository;
 
     @InjectMocks
     private ClienteDataProvider dataProvider;

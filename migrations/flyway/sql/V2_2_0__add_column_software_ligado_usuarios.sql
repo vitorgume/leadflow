@@ -1,0 +1,1 @@
+ALTER TABLE usuarios ADD COLUMN software_ligado BIT(1) DEFAULT b'1';

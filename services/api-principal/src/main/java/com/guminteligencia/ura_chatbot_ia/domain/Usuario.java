@@ -26,6 +26,7 @@ public class Usuario {
     private String whatsappIdInstance;
     private String agenteApiKey;
     private Boolean enviarContato;
+    private Boolean softwareLigado;
 
 
     @Override
@@ -69,9 +70,11 @@ public class Usuario {
         this.configuracaoCrm = novosDados.getConfiguracaoCrm();
         this.mensagemDirecionamentoVendedor = novosDados.getMensagemDirecionamentoVendedor();
         this.mensagemRecontatoG1 = novosDados.getMensagemRecontatoG1();
-        this.whatsappToken = novosDados.getWhatsappToken();
-        this.whatsappIdInstance = novosDados.getWhatsappIdInstance();
-        this.agenteApiKey = novosDados.getAgenteApiKey();
+        this.mensagemEncaminhamento = novosDados.getMensagemEncaminhamento();
+        this.setWhatsappToken(novosDados.getWhatsappToken());
+        this.setWhatsappIdInstance(novosDados.getWhatsappIdInstance());
+        this.setAgenteApiKey(novosDados.getAgenteApiKey());
         this.enviarContato = novosDados.getEnviarContato();
+        this.softwareLigado = novosDados.getSoftwareLigado();
     }
 }

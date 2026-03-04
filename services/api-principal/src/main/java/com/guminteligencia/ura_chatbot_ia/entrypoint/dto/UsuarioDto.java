@@ -49,4 +49,7 @@ public class UsuarioDto {
 
     @JsonProperty("enviar_contato")
     private Boolean enviarContato;
+
+    @JsonProperty("software_ligado")
+    private Boolean softwareLigado;
 }
