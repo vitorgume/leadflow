@@ -21,6 +21,7 @@ public class UsuarioMapper {
                 .whatsappToken(entity.getWhatsappToken() == null ? null : entity.getWhatsappToken())
                 .whatsappIdInstance(entity.getWhatsappIdInstance() == null ? null : entity.getWhatsappIdInstance())
                 .agenteApiKey(entity.getAgenteApiKey() == null ? null : entity.getAgenteApiKey())
+                .enviarContato(entity.getEnviarContato())
                 .build();
     }
 
@@ -40,6 +41,7 @@ public class UsuarioMapper {
                 .whatsappToken(domain.getWhatsappToken() == null ? null : domain.getWhatsappToken())
                 .whatsappIdInstance(domain.getWhatsappIdInstance() == null ? null : domain.getWhatsappIdInstance())
                 .agenteApiKey(domain.getAgenteApiKey() == null ? null : domain.getAgenteApiKey())
+                .enviarContato(domain.getEnviarContato())
                 .build();
     }
 }

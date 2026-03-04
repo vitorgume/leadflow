@@ -43,7 +43,7 @@ export default function CadastroUsuario() {
       });
 
       setTimeout(() => {
-        navigate('/');
+        navigate('/usuarios/login');
       }, 2000);
 
     } catch (err: any) {

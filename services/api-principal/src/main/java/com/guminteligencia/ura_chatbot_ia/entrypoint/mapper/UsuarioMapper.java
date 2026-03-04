@@ -17,6 +17,7 @@ public class UsuarioMapper {
                 .mensagemDirecionamentoVendedor(domain.getMensagemDirecionamentoVendedor() == null ? null : domain.getMensagemDirecionamentoVendedor())
                 .mensagemRecontatoG1(domain.getMensagemRecontatoG1() == null ? null : domain.getMensagemRecontatoG1())
                 .mensagemEncaminhamento(domain.getMensagemEncaminhamento() == null ? null : domain.getMensagemEncaminhamento())
+                .enviarContato(domain.getEnviarContato())
                 .build();
     }
 
@@ -36,6 +37,7 @@ public class UsuarioMapper {
                 .whatsappToken(dto.getWhatsappToken() == null ? null : dto.getWhatsappToken())
                 .whatsappIdInstance(dto.getWhatsappIdInstance() == null ? null : dto.getWhatsappIdInstance())
                 .agenteApiKey(dto.getAgenteApiKey() == null ? null : dto.getAgenteApiKey())
+                .enviarContato(dto.getEnviarContato())
                 .build();
     }
 }

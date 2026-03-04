@@ -31,4 +31,5 @@ export interface UsuarioCompletoDTO {
   whatsapp_token?: string;
   whatsapp_id_instance?: string;
   agente_api_key?: string;
+  enviar_contato?: boolean
 }

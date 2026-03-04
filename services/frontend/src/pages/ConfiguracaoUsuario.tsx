@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
-import { Settings, MessageSquare, Database, Link as LinkIcon, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Settings, MessageSquare, Database, Link as LinkIcon, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle, Smartphone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usuarioConfigService } from '../services/usuarioConfigService';
 import { type UsuarioCompletoDTO, CrmType } from '../types/usuarioConfig';
@@ -19,23 +19,26 @@ export default function ConfiguracaoUsuario() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null); // Novo estado de erro
+  const [error, setError] = useState<string | null>(null);
 
   const carregarDados = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    setError(null); // Limpa o erro ao buscar
+    setError(null);
     try {
       const dadosDb = await usuarioConfigService.buscar(user.id);
       
-      // Proteção UX: Esconde o token real com asteriscos
       if (dadosDb.configuracao_crm?.acess_token) {
         dadosDb.configuracao_crm.acess_token = '******************';
       }
       
+      // Garante que o boolean venha preenchido, assumindo true como padrão de segurança se não existir
+      if (dadosDb.enviar_contato === undefined) {
+          dadosDb.enviar_contato = true;
+      }
+      
       setFormData(dadosDb);
 
-      // Conversão do Backend (snake_case) para a Tela (Human Readable)
       if (dadosDb.atributos_qualificacao) {
         const arr = Object.entries(dadosDb.atributos_qualificacao).map(([chave, valor]) => {
           const chaveComEspaco = chave.replace(/_/g, ' ');
@@ -49,7 +52,6 @@ export default function ConfiguracaoUsuario() {
         setAtributosList(arr);
       }
     } catch (err: any) {
-      // Captura o erro do interceptor e tira do console!
       setError(err.message || "Erro ao carregar as configurações do usuário.");
     } finally {
       setLoading(false);
@@ -62,6 +64,11 @@ export default function ConfiguracaoUsuario() {
 
   // --- HANDLERS DO FORMULÁRIO ---
   const handleTextChange = (field: keyof UsuarioCompletoDTO, value: string) => {
+    setFormData(prev => prev ? { ...prev, [field]: value } : null);
+  };
+
+  // Handler específico para o Toggle (Booleano)
+  const handleToggleChange = (field: keyof UsuarioCompletoDTO, value: boolean) => {
     setFormData(prev => prev ? { ...prev, [field]: value } : null);
   };
 
@@ -118,10 +125,9 @@ export default function ConfiguracaoUsuario() {
 
     setSaving(true);
     setSuccess(false);
-    setError(null); // Limpa erros antigos ao tentar salvar
+    setError(null);
 
     try {
-      // Conversão da Tela (Humana) para o Backend (snake_case)
       const novoMapaAtributos: Record<string, string> = {};
       atributosList.forEach(attr => {
         if (attr.chave.trim()) {
@@ -135,7 +141,6 @@ export default function ConfiguracaoUsuario() {
         atributos_qualificacao: novoMapaAtributos
       };
 
-      // Limpa os asteriscos se o usuário não alterou o token
       if (payloadFinal.configuracao_crm?.acess_token === '******************') {
         payloadFinal.configuracao_crm.acess_token = '';
       }
@@ -144,14 +149,12 @@ export default function ConfiguracaoUsuario() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
-      // Retira o console.error e mostra na tela!
       setError(err.message || "Falha ao salvar as configurações.");
     } finally {
       setSaving(false);
     }
   };
 
-  // Proteção: Mostra o loading apenas enquanto a API está buscando
   if (loading) {
     return (
       <div className="flex h-screen bg-slate-50 items-center justify-center">
@@ -185,7 +188,6 @@ export default function ConfiguracaoUsuario() {
             )}
           </div>
 
-          {/* CARD DE ERRO - Exibe os erros de leitura ou salvamento */}
           {error && (
             <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-3 text-rose-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
               <AlertCircle className="shrink-0 mt-0.5" size={20} />
@@ -193,10 +195,45 @@ export default function ConfiguracaoUsuario() {
             </div>
           )}
 
-          {/* Só renderiza o formulário se tiver os dados base carregados */}
           {formData && (
             <form onSubmit={handleSubmit} className="space-y-8 flex flex-col">
               
+              {/* NOVA SESSÃO: PREFERÊNCIAS DE NOTIFICAÇÃO (WhatsApp) */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
+                  <Smartphone size={20} className="text-blue-600" />
+                  <h2 className="text-lg font-bold text-slate-900">Preferências de Notificação</h2>
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-900">Enviar Contato via WhatsApp</span>
+                      <span className="text-xs text-slate-500 mt-1 max-w-[80%]">
+                        Habilite para que a IA envie o VCard (cartão de contato clicável) do Lead diretamente para o WhatsApp do vendedor responsável.
+                      </span>
+                    </div>
+                    
+                    {/* Toggle Switch UI */}
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={formData.enviar_contato}
+                      onClick={() => handleToggleChange('enviar_contato', !formData.enviar_contato)}
+                      className={`${
+                        formData.enviar_contato ? 'bg-blue-600' : 'bg-slate-300'
+                      } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2`}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`${
+                          formData.enviar_contato ? 'translate-x-5' : 'translate-x-0'
+                        } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* SESSÃO 1: MENSAGENS E AUTOMAÇÃO */}
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
@@ -376,7 +413,6 @@ export default function ConfiguracaoUsuario() {
                         </div>
                       </div>
 
-                      {/* MAPEAMENTO DE CAMPOS DINÂMICO */}
                       {atributosList.length > 0 && (
                         <div className="mt-6 pt-6 border-t border-slate-200">
                           <h3 className="text-sm font-bold text-slate-900 mb-3">Mapeamento de Campos (ID no CRM)</h3>
@@ -385,7 +421,6 @@ export default function ConfiguracaoUsuario() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {atributosList.map((attr, index) => {
                               if (!attr.chave.trim()) return null;
-                              // Calcula a chave formatada para mostrar pro usuário e buscar o valor correto
                               const chaveFormatada = attr.chave.trim().replace(/\s+/g, '_').toLowerCase();
                               const valorAtual = formData.configuracao_crm?.mapeamento_campos?.[chaveFormatada] || '';
                               

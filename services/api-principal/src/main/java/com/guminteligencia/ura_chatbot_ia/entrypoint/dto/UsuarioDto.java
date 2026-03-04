@@ -47,6 +47,6 @@ public class UsuarioDto {
     @JsonProperty("agente_api_key")
     private String agenteApiKey;
 
-    @JsonProperty("enviar_whatsapp")
-    private Boolean enviarWhatsapp;
+    @JsonProperty("enviar_contato")
+    private Boolean enviarContato;
 }

@@ -25,6 +25,7 @@ public class Usuario {
     private String whatsappToken;
     private String whatsappIdInstance;
     private String agenteApiKey;
+    private Boolean enviarContato;
 
 
     @Override
@@ -71,5 +72,6 @@ public class Usuario {
         this.whatsappToken = novosDados.getWhatsappToken();
         this.whatsappIdInstance = novosDados.getWhatsappIdInstance();
         this.agenteApiKey = novosDados.getAgenteApiKey();
+        this.enviarContato = novosDados.getEnviarContato();
     }
 }
