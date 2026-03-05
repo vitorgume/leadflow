@@ -1,9 +1,7 @@
-package com.guminteligencia.ura_chatbot_ia.domain;
+package com.guminteligencia.ura_chatbot_ia.domain.outrosSetores;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@ToString
 public class Setor {
     private UUID id;
     private String nome;

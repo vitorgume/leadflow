@@ -14,7 +14,7 @@ CREATE TABLE usuarios (
     mensagem_recontato_g1 VARCHAR(255),
     whatsapp_token TEXT,
     whatsapp_id_instance TEXT,
-    agente_api_key TEXT,
+    agente_api_key TEXT,    
     -- Campos da entidade embutida ConfiguracaoCrmEntity
     crm_type VARCHAR(255),
     mapeamento_campos JSON,

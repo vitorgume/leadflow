@@ -1,4 +1,4 @@
-package com.guminteligencia.ura_chatbot_ia.domain;
+package com.guminteligencia.ura_chatbot_ia.entrypoint.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class Membro {
-
+public class MembroDto {
     private UUID id;
     private String nome;
     private String telefone;
-    private Usuario usuario;
-
+    private UsuarioDto usuario;
 }

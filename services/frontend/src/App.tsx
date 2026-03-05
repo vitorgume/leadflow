@@ -8,6 +8,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
 import RegrasDistribuicao from './pages/RegrasDistribuicao';
 import ConfiguracaoUsuario from './pages/ConfiguracaoUsuario';
+import OutrosSetores from './pages/OutrosSetores';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/usuarios/login" element={<Login />} />
           <Route path="/regras-distribuicao" element={<RegrasDistribuicao />} />
           <Route path="/usuarios/configuracoes" element={<ConfiguracaoUsuario />} />
+          <Route path="/outros-setores" element={<OutrosSetores />} />
         </Routes>
       </AuthProvider>
     </div>
