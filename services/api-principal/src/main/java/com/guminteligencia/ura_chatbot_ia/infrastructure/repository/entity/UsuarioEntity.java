@@ -53,4 +53,10 @@ public class UsuarioEntity {
 
     @Column(name = "agente_api_key", columnDefinition = "TEXT")
     private String agenteApiKey;
+
+    @Column(name = "enviar_contato")
+    private Boolean enviarContato;
+
+    @Column(name = "software_ligado")
+    private Boolean softwareLigado;
 }

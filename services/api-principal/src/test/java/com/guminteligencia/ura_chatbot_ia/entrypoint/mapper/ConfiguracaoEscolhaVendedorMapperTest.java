@@ -189,7 +189,7 @@ class ConfiguracaoEscolhaVendedorMapperTest {
         Assertions.assertNotNull(resultado.getUsuario());
         Assertions.assertEquals(domain.getUsuario().getId(), resultado.getUsuario().getId());
         Assertions.assertEquals(domain.getUsuario().getTelefone(), resultado.getUsuario().getTelefone());
-        Assertions.assertNull(resultado.getUsuario().getWhatsappToken());
+        Assertions.assertEquals(domain.getUsuario().getWhatsappToken(), resultado.getUsuario().getWhatsappToken());
 
         // Assert - Vendedores
         Assertions.assertNotNull(resultado.getVendedores());

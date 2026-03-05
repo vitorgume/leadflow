@@ -47,6 +47,11 @@ public class MensagemUseCase {
     }
 
     public void enviarContato(Vendedor vendedor, Cliente cliente) {
+
+        if(!cliente.getUsuario().getEnviarContato()) {
+            return;
+        }
+
         log.info("Enviando contato para vendedor. Vendedor: {}, Cliente: {}", vendedor, cliente);
 
         String textoMensagem = mensagemBuilder.getMensagem(TipoMensagem.DADOS_CONTATO_VENDEDOR, null, cliente);

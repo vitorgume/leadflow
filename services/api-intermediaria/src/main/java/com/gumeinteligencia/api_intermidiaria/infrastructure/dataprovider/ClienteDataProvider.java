@@ -4,7 +4,7 @@ import com.gumeinteligencia.api_intermidiaria.application.gateways.ClienteGatewa
 import com.gumeinteligencia.api_intermidiaria.domain.Cliente;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.exceptions.DataProviderException;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.ClienteMapper;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.CLienteRepository;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ClienteRepository;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ClienteEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.util.Optional;
 @Slf4j
 public class ClienteDataProvider implements ClienteGateway {
 
-    private final CLienteRepository cLienteRepository;
+    private final ClienteRepository cLienteRepository;
     private final String MENSAGEM_ERRO_CONSULTAR_POR_TELEFONE = "Erro ao consultar cliente pelo telefone.";
 
     @Override

@@ -37,6 +37,7 @@ class MensagemUseCaseExtendedTest {
         usuario = Usuario.builder()
                 .whatsappIdInstance("instance")
                 .whatsappToken("token")
+                .enviarContato(true)
                 .build();
         when(criptografiaJCAUseCase.descriptografar(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
     }

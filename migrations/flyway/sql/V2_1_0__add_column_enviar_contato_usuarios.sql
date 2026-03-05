@@ -1,0 +1,1 @@
+ALTER TABLE usuarios ADD COLUMN enviar_contato BIT(1) DEFAULT b'0';

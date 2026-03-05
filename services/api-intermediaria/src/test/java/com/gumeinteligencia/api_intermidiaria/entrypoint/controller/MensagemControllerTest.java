@@ -3,6 +3,7 @@ package com.gumeinteligencia.api_intermidiaria.entrypoint.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gumeinteligencia.api_intermidiaria.application.gateways.MensageriaGateway;
 import com.gumeinteligencia.api_intermidiaria.application.usecase.ContextoUseCase;
+import com.gumeinteligencia.api_intermidiaria.application.usecase.UsuarioUseCase;
 import com.gumeinteligencia.api_intermidiaria.application.usecase.validadorMensagens.ValidadorMensagemUseCase;
 import com.gumeinteligencia.api_intermidiaria.domain.Contexto;
 import com.gumeinteligencia.api_intermidiaria.domain.Mensagem;
@@ -11,11 +12,9 @@ import com.gumeinteligencia.api_intermidiaria.domain.StatusContexto;
 import com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.MensagemDto;
 import com.gumeinteligencia.api_intermidiaria.entrypoint.controller.dto.TextoDto;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.mapper.ContextoMapper;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.CLienteRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ContextoRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.ConversaAgenteRepository;
-import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.OutroContatoRepository;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.*;
 import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.ContextoEntity;
+import com.gumeinteligencia.api_intermidiaria.infrastructure.repository.entity.UsuarioEntity;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,11 +72,16 @@ class MensagemControllerTest {
     private ConversaAgenteRepository conversaAgenteRepository;
 
     @MockitoBean
-    private CLienteRepository cLienteRepository;
+    private ClienteRepository cLienteRepository;
+
+    @MockitoBean
+    private UsuarioRepository usuarioRepository;
 
     private MensagemDto mensagemDto;
 
     private ContextoEntity contextoEntity;
+
+    private UsuarioEntity usuarioEntity;
 
     @BeforeEach
     void setUp() {
@@ -92,6 +96,15 @@ class MensagemControllerTest {
                 .status(StatusContexto.ATIVO)
                 .mensagens(List.of(MensagemContexto.builder().mensagem("Ola").build()))
                 .build();
+
+        usuarioEntity = UsuarioEntity.builder()
+                .id(UUID.randomUUID())
+                .nome("User teste")
+                .telefone("554469857453")
+                .email("useremail@gmail.com")
+                .telefoneConectado("554469857445")
+                .softwareLigado(true)
+                .build();
     }
 
     @Test
@@ -100,6 +113,7 @@ class MensagemControllerTest {
         when(contextoRepository.buscarPorTelefone(any())).thenReturn(Optional.empty());
         when(contextoRepository.salvar(any())).thenReturn(contextoEntity);
         when(mensageriaGateway.enviarParaFila(any())).thenReturn(null);
+        when(usuarioRepository.findByTelefoneConectado(anyString())).thenReturn(Optional.of(usuarioEntity));
 
         String mensagemJson = objectMapper.writeValueAsString(mensagemDto);
 
@@ -117,6 +131,7 @@ class MensagemControllerTest {
         when(contextoUseCase.consultarPorTelefone(any())).thenReturn(Optional.of(ContextoMapper.paraDomain(contextoEntity)));
         when(contextoRepository.salvar(any())).thenReturn(contextoEntity);
         when(mensageriaGateway.enviarParaFila(any())).thenReturn(null);
+        when(usuarioRepository.findByTelefoneConectado(anyString())).thenReturn(Optional.of(usuarioEntity));
 
         String mensagemJson = objectMapper.writeValueAsString(mensagemDto);
 

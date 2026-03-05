@@ -35,7 +35,7 @@ public class LoginController {
                 .secure(!profile.equals("dev"))
                 .path("/")
                 .maxAge(4 * 60 * 60)
-                .sameSite("None")
+                .sameSite(profile.equals("dev") ? "Strict" : "None")
                 .build();
 
         LoginResponseDto resultado = LoginMapper.paraDto(loginResponse);

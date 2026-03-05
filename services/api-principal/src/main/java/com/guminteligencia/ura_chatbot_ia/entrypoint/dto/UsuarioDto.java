@@ -46,4 +46,10 @@ public class UsuarioDto {
 
     @JsonProperty("agente_api_key")
     private String agenteApiKey;
+
+    @JsonProperty("enviar_contato")
+    private Boolean enviarContato;
+
+    @JsonProperty("software_ligado")
+    private Boolean softwareLigado;
 }
