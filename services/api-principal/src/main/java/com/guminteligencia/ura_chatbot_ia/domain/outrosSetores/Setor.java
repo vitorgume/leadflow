@@ -19,4 +19,10 @@ public class Setor {
     private List<Membro> membros;
     private LocalDateTime dataCriacao;
     private Usuario usuario;
+
+    public void setDados(Setor novosDados) {
+        this.nome = novosDados.getNome();
+        this.descricao = novosDados.getDescricao();
+        this.membros = novosDados.getMembros();
+    }
 }

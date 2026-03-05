@@ -16,6 +16,7 @@ public class MembroEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id_membro")
     private UUID id;
     private String nome;
     private String telefone;

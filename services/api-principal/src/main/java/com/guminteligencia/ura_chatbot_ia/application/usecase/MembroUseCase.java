@@ -51,7 +51,7 @@ public class MembroUseCase {
         return gateway.salvar(membroExistente);
     }
 
-    private Membro consultarPorId(UUID idMembro) {
+    public Membro consultarPorId(UUID idMembro) {
         Optional<Membro> membro = gateway.consultarPorId(idMembro);
 
         if(membro.isEmpty()) {
