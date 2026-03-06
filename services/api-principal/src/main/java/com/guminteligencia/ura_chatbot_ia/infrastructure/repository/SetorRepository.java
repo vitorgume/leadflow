@@ -13,6 +13,4 @@ public interface SetorRepository extends JpaRepository<SetorEntity, UUID> {
     Optional<SetorEntity> findByNome(String nome);
 
     List<SetorEntity> findByUsuario_Id(UUID idUsuario);
-
-    void deletarById(UUID id);
 }

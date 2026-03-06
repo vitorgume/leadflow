@@ -6,3 +6,13 @@ export interface MembroDTO {
     id: string;
   };
 }
+
+export interface SetorDTO {
+  id?: string;
+  nome: string;
+  descricao?: string;
+  membros?: MembroDTO[]; 
+  usuario?: {
+    id: string;
+  };
+}

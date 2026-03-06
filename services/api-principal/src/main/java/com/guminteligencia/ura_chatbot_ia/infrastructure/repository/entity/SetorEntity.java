@@ -26,7 +26,7 @@ public class SetorEntity {
     private String descricao;
 
     @OneToMany
-    @JoinColumn(name = "id_membro")
+    @JoinColumn(name = "setor_id")
     private List<MembroEntity> membros;
 
     @Column(name = "data_criacao")

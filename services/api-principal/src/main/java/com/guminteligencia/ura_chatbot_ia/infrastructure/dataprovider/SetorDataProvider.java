@@ -85,7 +85,7 @@ public class SetorDataProvider implements SetorGateway {
     @Override
     public void deletar(UUID id) {
         try {
-            repository.deletarById(id);
+            repository.deleteById(id);
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_DELETAR, ex);
             throw new DataProviderException(MENSAGEM_ERRO_DELETAR, ex.getCause());

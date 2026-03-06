@@ -9,6 +9,7 @@ import com.guminteligencia.ura_chatbot_ia.domain.outrosSetores.Setor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +29,7 @@ public class SetorUseCase {
             throw new SetorComMesmoNomeJaExistenteException();
         }
 
-        Usuario usuario = usuarioUseCase.consultarPorId(novoSetor.getId());
+        Usuario usuario = usuarioUseCase.consultarPorId(novoSetor.getUsuario().getId());
 
         novoSetor.setUsuario(usuario);
 
@@ -37,6 +38,7 @@ public class SetorUseCase {
                 .toList();
 
         novoSetor.setMembros(membros);
+        novoSetor.setDataCriacao(LocalDateTime.now());
 
         return gateway.salvar(novoSetor);
     }
