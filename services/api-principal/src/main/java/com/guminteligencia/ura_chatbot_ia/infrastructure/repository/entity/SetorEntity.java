@@ -1,7 +1,5 @@
 package com.guminteligencia.ura_chatbot_ia.infrastructure.repository.entity;
 
-import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
-import com.guminteligencia.ura_chatbot_ia.domain.outrosSetores.Membro;
 import jakarta.persistence.*;
 import lombok.*;
 
