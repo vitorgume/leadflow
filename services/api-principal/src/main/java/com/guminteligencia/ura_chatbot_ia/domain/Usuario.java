@@ -63,7 +63,6 @@ public class Usuario {
     public void setDados(Usuario novosDados) {
         this.nome = novosDados.getNome();
         this.telefone = novosDados.getTelefone();
-        this.senha = novosDados.getSenha();
         this.email = novosDados.getEmail();
         this.telefoneConectado = novosDados.getTelefoneConectado();
         this.atributosQualificacao = novosDados.getAtributosQualificacao();

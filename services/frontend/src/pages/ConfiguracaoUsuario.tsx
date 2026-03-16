@@ -29,9 +29,9 @@ export default function ConfiguracaoUsuario() {
     try {
       const dadosDb = await usuarioConfigService.buscar(user.id);
       
-      if (dadosDb.configuracao_crm?.acess_token) {
-        dadosDb.configuracao_crm.acess_token = '******************';
-      }
+      // if (dadosDb.configuracao_crm?.acess_token) {
+      //   dadosDb.configuracao_crm.acess_token = '******************';
+      // }
       
       // Garante defaults para os booleanos caso venham nulos do banco antigo
       if (dadosDb.enviar_contato === undefined) {

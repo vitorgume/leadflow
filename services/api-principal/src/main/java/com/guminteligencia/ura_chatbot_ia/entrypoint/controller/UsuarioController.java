@@ -6,6 +6,7 @@ import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.ResponseDto;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.UsuarioDto;
 import com.guminteligencia.ura_chatbot_ia.entrypoint.mapper.UsuarioMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -49,5 +50,12 @@ public class UsuarioController {
     public ResponseEntity<Void> deletar(@PathVariable("id") UUID id) {
         usuarioUseCase.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/alterar/senha/{id}")
+    public ResponseEntity<ResponseDto<UsuarioDto>> alterarSenha(@RequestBody UsuarioDto novaSenha, @PathVariable("id") UUID idUsuario) {
+        UsuarioDto resultado = UsuarioMapper.paraDto(usuarioUseCase.alterarSenha(novaSenha, idUsuario));
+        ResponseDto<UsuarioDto> response = new ResponseDto<>(resultado);
+        return ResponseEntity.ok(response);
     }
 }

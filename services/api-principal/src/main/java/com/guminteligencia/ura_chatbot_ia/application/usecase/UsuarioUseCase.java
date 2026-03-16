@@ -4,6 +4,7 @@ import com.guminteligencia.ura_chatbot_ia.application.exceptions.UsuarioExistent
 import com.guminteligencia.ura_chatbot_ia.application.exceptions.UsuarioNaoEncotradoException;
 import com.guminteligencia.ura_chatbot_ia.application.gateways.UsuarioGateway;
 import com.guminteligencia.ura_chatbot_ia.domain.Usuario;
+import com.guminteligencia.ura_chatbot_ia.entrypoint.dto.UsuarioDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -100,6 +101,14 @@ public class UsuarioUseCase {
         novosDados.setAgenteApiKey(criptografiaJCAUseCase.criptografar(novosDados.getAgenteApiKey()));
 
         usuarioExistente.setDados(novosDados);
+
+        return gateway.salvar(usuarioExistente);
+    }
+
+    public Usuario alterarSenha(UsuarioDto novaSenha, UUID idUsuario) {
+        Usuario usuarioExistente = this.consultarPorId(idUsuario);
+
+        usuarioExistente.setSenha(criptografiaUseCase.criptografar(novaSenha.getSenha()));
 
         return gateway.salvar(usuarioExistente);
     }
