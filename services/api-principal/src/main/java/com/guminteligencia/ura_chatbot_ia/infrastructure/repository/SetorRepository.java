@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface SetorRepository extends JpaRepository<SetorEntity, UUID> {
-    Optional<SetorEntity> findByNome(String nome);
+    Optional<SetorEntity> findByNomeAndUsuario_Id(String nome, UUID idUsuario);
 
     List<SetorEntity> findByUsuario_Id(UUID idUsuario);
 }

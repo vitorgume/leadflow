@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+
+from src.entrypoint.controller.dto.mensagem_outro_setor_dto import MensagemOutroSetorDto
 from src.entrypoint.controller.dto.mensagem_dto import MensagemDto
 from src.entrypoint.controller.dto.mensagem_json_dto import MensagemJsonDto
 from src.entrypoint.mapper.mensagem_json_mapper import MensagemJsonMapper
@@ -84,3 +86,9 @@ def estrutura_json_usuario(
 ):
     dom = mensagem_json_mapper.para_domain(msg)
     return use_case.transformar(dom)
+
+@router.post("/chat/outro-setor")
+def escolher_outro_setor(
+        msg: MensagemOutroSetorDto,
+        use_case:
+)

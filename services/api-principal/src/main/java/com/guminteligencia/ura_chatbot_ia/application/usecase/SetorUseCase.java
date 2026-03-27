@@ -23,7 +23,7 @@ public class SetorUseCase {
     private final MembroUseCase membroUseCase;
 
     public Setor cadastrar(Setor novoSetor) {
-        Optional<Setor> setorExistente = gateway.consultarPorNome(novoSetor.getNome());
+        Optional<Setor> setorExistente = gateway.consultarPorNome(novoSetor.getNome(), novoSetor.getUsuario().getId());
 
         if(setorExistente.isPresent()) {
             throw new SetorComMesmoNomeJaExistenteException();
@@ -79,6 +79,16 @@ public class SetorUseCase {
 
     private Setor consultarPorId(UUID id) {
         Optional<Setor> setor = gateway.consultarPorId(id);
+
+        if(setor.isEmpty()) {
+            throw new SetorNaoEncontradoException();
+        }
+
+        return setor.get();
+    }
+
+    public Setor consultarPorNome(String nomeSetor, UUID idUsuario) {
+        Optional<Setor> setor = gateway.consultarPorNome(nomeSetor, idUsuario);
 
         if(setor.isEmpty()) {
             throw new SetorNaoEncontradoException();

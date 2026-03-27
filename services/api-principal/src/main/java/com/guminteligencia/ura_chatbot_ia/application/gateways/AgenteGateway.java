@@ -9,4 +9,6 @@ public interface AgenteGateway {
     String enviarMensagem(MensagemAgenteDto mensagem);
 
     String enviarJsonTrasformacao(String texto, UUID idUsuario);
+
+    String enviarOutroSetorTransformacao(String texto, UUID id);
 }

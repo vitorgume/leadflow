@@ -41,7 +41,7 @@ public class ProcessarConversaInativa implements ProcessamentoContextoExistenteT
 
         try {
             log.info("Tentando enviar contato do vendedor...");
-            mensagemUseCase.enviarContato(vendedor, cliente);
+            mensagemUseCase.enviarContato(vendedor.getTelefone(), cliente);
             log.info("Contato enviado com sucesso");
         } catch (Exception e) {
             log.error("Erro ao enviar contato do vendedor, continuando processamento", e);

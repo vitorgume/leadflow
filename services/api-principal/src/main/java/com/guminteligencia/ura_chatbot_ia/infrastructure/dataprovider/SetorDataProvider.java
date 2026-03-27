@@ -27,11 +27,11 @@ public class SetorDataProvider implements SetorGateway {
     private final String MENSAGEM_ERRO_DELETAR = "Erro ao deletar setor.";
 
     @Override
-    public Optional<Setor> consultarPorNome(String nome) {
+    public Optional<Setor> consultarPorNome(String nome, UUID idUsaurio) {
         Optional<SetorEntity> setorEntity;
 
         try {
-            setorEntity = repository.findByNome(nome);
+            setorEntity = repository.findByNomeAndUsuario_Id(nome, idUsaurio);
         } catch (Exception ex) {
             log.error(MENSAGEM_ERRO_CONSULTAR_POR_NOME, ex);
             throw new DataProviderException(MENSAGEM_ERRO_CONSULTAR_POR_NOME, ex.getCause());

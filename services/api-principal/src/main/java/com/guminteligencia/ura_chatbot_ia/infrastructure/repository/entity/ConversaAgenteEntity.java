@@ -40,4 +40,7 @@ public class ConversaAgenteEntity {
 
     @Enumerated(EnumType.ORDINAL)
     private StatusConversa status;
+
+    @ManyToOne
+    private MembroEntity membro;
 }

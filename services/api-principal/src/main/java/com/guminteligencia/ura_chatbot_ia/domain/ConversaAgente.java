@@ -1,8 +1,10 @@
 package com.guminteligencia.ura_chatbot_ia.domain;
 
+import com.guminteligencia.ura_chatbot_ia.domain.outrosSetores.Membro;
 import com.guminteligencia.ura_chatbot_ia.domain.vendedor.Vendedor;
 import lombok.*;
 
+import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -21,4 +23,5 @@ public class ConversaAgente {
         private LocalDateTime dataUltimaMensagem;
         private Boolean recontato;
         private StatusConversa status;
+        private Membro membro;
 }

@@ -60,6 +60,24 @@ class AgenteDataProvider:
             logger.exception("Erro ao enviar mensagem a IA: %s", e)
             raise DataProviderException(self.mensagem_erro_enviar_mensagem_ia)
 
+    def enviar_mensagem_escolha_setor(self, historico, api_key: str):
+
+        try:
+            client = OpenAI(api_key=api_key)
+            response = client.chat.completions.create(
+                model=self.modelo_json,
+                messages=historico,
+                temperature=0
+            )
+
+            content = response.choices[0].message.content
+
+            return content
+
+        except Exception as e:
+            logger.exception("Erro ao enviar mensagem a IA: %s", e)
+            raise DataProviderException(self.mensagem_erro_enviar_mensagem_ia)
+
     def transcrever_audio(self, audio_url: str, api_key: str) -> str:
         caminho_tmp = None
         try:

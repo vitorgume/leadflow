@@ -102,4 +102,12 @@ public class AgenteUseCase {
 
         return textoLimpo.trim();
     }
+
+    public String enviarOutroContatoTransformacao(String texto, UUID id) {
+        log.info("Enviando texto para direcionamento de outro setor");
+        String response = gateway.enviarOutroSetorTransformacao(texto, id);
+        log.info("Outro setor escolhido. Setor: {}", response);
+
+        return response;
+    }
 }

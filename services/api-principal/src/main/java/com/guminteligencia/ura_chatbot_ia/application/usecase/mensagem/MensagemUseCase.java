@@ -46,25 +46,25 @@ public class MensagemUseCase {
         log.info("Mensagem para o usuario enviada com sucesso.");
     }
 
-    public void enviarContato(Vendedor vendedor, Cliente cliente) {
+    public void enviarContato(String contato, Cliente cliente) {
 
         if(!cliente.getUsuario().getEnviarContato()) {
             return;
         }
 
-        log.info("Enviando contato para vendedor. Vendedor: {}, Cliente: {}", vendedor, cliente);
+        log.info("Enviando contato para um contato. Contato: {}, Cliente: {}", contato, cliente);
 
         String textoMensagem = mensagemBuilder.getMensagem(TipoMensagem.DADOS_CONTATO_VENDEDOR, null, cliente);
         String textoSeparacao = mensagemBuilder.getMensagem(TipoMensagem.MENSAGEM_SEPARACAO, null, null);
 
         try {
-            gateway.enviarContato(vendedor.getTelefone(), cliente, criptografiaJCAUseCase.descriptografar(cliente.getUsuario().getWhatsappIdInstance()), criptografiaJCAUseCase.descriptografar(cliente.getUsuario().getWhatsappToken()));
+            gateway.enviarContato(contato, cliente, criptografiaJCAUseCase.descriptografar(cliente.getUsuario().getWhatsappIdInstance()), criptografiaJCAUseCase.descriptografar(cliente.getUsuario().getWhatsappToken()));
         } catch (Exception e) {
             log.error("Erro ao enviar contato para vendedor", e);
         }
 
-        this.enviarMensagem(textoMensagem, vendedor.getTelefone(), false, cliente.getUsuario());
-        this.enviarMensagem(textoSeparacao, vendedor.getTelefone(), false, cliente.getUsuario());
+        this.enviarMensagem(textoMensagem, contato, false, cliente.getUsuario());
+        this.enviarMensagem(textoSeparacao, contato, false, cliente.getUsuario());
 
         log.info("Contato enviado com sucesso para vendedor.");
     }

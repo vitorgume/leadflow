@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface SetorGateway {
-    Optional<Setor> consultarPorNome(String nome);
+    Optional<Setor> consultarPorNome(String nome, UUID idUsuario);
 
     Setor salvar(Setor novoSetor);
 

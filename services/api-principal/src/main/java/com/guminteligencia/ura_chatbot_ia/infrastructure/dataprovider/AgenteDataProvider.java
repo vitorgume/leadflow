@@ -27,6 +27,7 @@ public class AgenteDataProvider implements AgenteGateway {
 
     private final String MENSAGEM_ERRO_ENVIAR_MENSAGEM_AGENTE = "Erro ao enviar mensagem para o agente.";
     private final String MENSAGEM_ERRO_ENVIAR_MENSAGEM_TRANSFORMAR_JSON = "Erro ao enviar mensagem para transformação em JSON.";
+    private final String MENSAGEM_eRRO_ENVIAR_MENSAGEM_ESCOLHA_OUTRO_SETOR = "Erro ao enviar mensagem para escolha de setor.";
 
     public AgenteDataProvider(
             WebClient.Builder builder,// 2. Injeção da dependência global
@@ -80,6 +81,26 @@ public class AgenteDataProvider implements AgenteGateway {
                 .bodyToMono(String.class)
                 .retryWhen(retrySpec)
                 .doOnError(e -> log.error("{} | Erro: {}", MENSAGEM_ERRO_ENVIAR_MENSAGEM_TRANSFORMAR_JSON, e.getMessage()))
+                .block();
+    }
+
+    @Override
+    public String enviarOutroSetorTransformacao(String texto, UUID id) {
+        Map<String, String> body = Map.of(
+                "mensagem", texto,
+                "id_usuario", id.toString()
+        );
+
+        String uri = agenteUriApi + "/chat/outro-setor";
+
+        return webClient.post()
+                .uri(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(String.class)
+                .retryWhen(retrySpec)
+                .doOnError(e -> log.error("{} | Erro: {}", MENSAGEM_eRRO_ENVIAR_MENSAGEM_ESCOLHA_OUTRO_SETOR, e.getMessage()))
                 .block();
     }
 }

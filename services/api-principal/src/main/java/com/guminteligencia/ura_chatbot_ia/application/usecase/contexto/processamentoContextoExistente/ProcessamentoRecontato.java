@@ -34,7 +34,7 @@ public class ProcessamentoRecontato implements ProcessamentoContextoExistenteTyp
                     false,
                     cliente.getUsuario()
             );
-            mensagemUseCase.enviarContato(vendedor, cliente);
+            mensagemUseCase.enviarContato(vendedor.getTelefone(), cliente);
 
             conversaAgente.setRecontato(true);
             conversaAgenteUseCase.salvar(conversaAgente);
